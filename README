@@ -1,0 +1,17 @@
+Wrapper script to download and play videos with youtube-dl.
+
+Goals:
+ Retry failed downloads
+ Prevent duplicate downloads
+ Prevent overlapping download processes (two processes downloading the same file)
+ Handle all URLs that youtube-dl naively handles (including the generic last resort extractor)
+
+Dependencies:
+ youtube-dl	https://github.com/rg3/youtube-dl.git
+ xclip
+ lsof
+ python3
+
+
+I cleaned this up a bit to post, no doubt it has bugs. Patches welcome.
+

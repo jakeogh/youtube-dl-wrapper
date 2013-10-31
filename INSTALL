@@ -1,0 +1,7 @@
+In general, you should make a key binding to execute:
+
+xterm -e youtube-dl-wrapper
+
+To use, highlight 1 (or more) URLs (highlighting the text around the URLs is fine), and then launch youtube-dl-wrapper.
+
+
