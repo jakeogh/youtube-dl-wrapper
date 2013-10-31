@@ -86,27 +86,21 @@ def play(video_list):
 
 def output_buffer_stdout(input):
 	stdout = open("/dev/stdout", "wb")
-
 	buffer_stdout.append(input)
-
 	try:
 		stdout.write(input)
 	except:
 		stdout.write(bytes(input, 'UTF-8'))
-
 	stdout.close()
 
 
 def output_buffer_stderr(input):
 	stderr = open("/dev/stderr", "wb")
-
 	buffer_stderr.append(input)
-
 	try:
 		stderr.write(input)
 	except:
 		stderr.write(bytes(input, 'UTF-8'))
-
 	stderr.close()
 
 
@@ -122,17 +116,13 @@ def extract_urls_from_text(intext):
 	clean_text = filter(None, text)
 	extracted_url_list = []
 	for line in clean_text:
-		print("line:", line)
 		for word in line.split(' '):
-			print("word:", word)
 			urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', word)
 
 			for url in urls:
-				print("url:", url)
 				extracted_url_list.append(url)
 
 	url_set = set(extracted_url_list)
-	print("url_set:", url_set)
 	return list(url_set)
 
 
@@ -189,7 +179,7 @@ def find_cached_file_by_id(item):
 def get_template_filename(url):
 	cmd = sh.Command("/usr/bin/youtube-dl")
 	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
-	print("\nDownloading video ID's for:", url)
+	print("\nDownloading video IDs for:", url)
 	for line in cmd("--simulate", "--get-filename", "--output", output_file_template, url, _piped=True):
 		filename = line.strip()
 	return filename
@@ -309,7 +299,7 @@ def process_url_list(url_list):
 			downloaded_video_list.add(destination)
 
 		except:
-			print("Problem full filename template for: ", item, "Either the extractor does not support one of the template fields (like --get-id) for this video provider, or the video 404... attempting to download without --get-id")
+			print("Problem getting template defined filename for: ", item, "Either the extractor does not support one of the template fields (like --get-id) for this video provider, or the video 404... attempting to download without --get-id")
 
 			filename = get_default_filename(item)
 			destination = "/home/user/_youtube/" + filename
