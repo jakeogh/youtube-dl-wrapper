@@ -285,7 +285,7 @@ def process_url_list(url_list):
 				if tries == max_tries:
 					print("---------LAST TRY---------")
 				try:
-					if download_with_full_template(url, destination):
+					if download_with_full_template(item, destination):
 						continue
 				except sh.ErrorReturnCode_1:
 					tries += 1
