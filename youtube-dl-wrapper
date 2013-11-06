@@ -202,13 +202,17 @@ def download_default(url, destination):
 		return True
 
 	cmd = sh.Command("/usr/bin/youtube-dl")
-	downloader = cmd("--verbose", "--continue", "--write-description", "--write-info-json", url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
-	downloader.wait()
-	exit_code = downloader.exit_code
-	print("exit_code:", exit_code)
-	if exit_code == 0:
-		return True
-	return False
+
+	try:
+		downloader = cmd("--verbose", "--continue", "--write-description", "--write-info-json", url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
+		downloader.wait()
+		exit_code = downloader.exit_code
+		print("exit_code:", exit_code)
+		if exit_code == 0:
+			return True
+		return False
+	except:
+		return False
 
 
 def download_with_full_template(url, destination):
@@ -221,13 +225,17 @@ def download_with_full_template(url, destination):
 
 	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
 	cmd = sh.Command("/usr/bin/youtube-dl")
-	downloader = cmd("--verbose", "--continue", "--write-description", "--write-info-json", "--output", output_file_template, url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
-	downloader.wait()
-	exit_code = downloader.exit_code
-	print("exit_code:", exit_code)
-	if exit_code == 0:
-		return True
-	return False
+
+	try:
+		downloader = cmd("--verbose", "--continue", "--write-description", "--write-info-json", "--output", output_file_template, url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
+		downloader.wait()
+		exit_code = downloader.exit_code
+		print("exit_code:", exit_code)
+		if exit_code == 0:
+			return True
+		return False
+	except:
+		return False
 
 
 def check_if_file_exists(destination):
@@ -277,7 +285,10 @@ def process_url_list(url_list):
 			continue
 
 		try:
-			filename = get_template_filename(item)
+			try:
+				filename = get_template_filename(item)
+			except:
+				continue
 			destination = "/home/user/_youtube/" + filename
 
 			while not os.path.isfile(destination) and tries <= max_tries:
@@ -301,7 +312,11 @@ def process_url_list(url_list):
 		except:
 			print("Problem getting template defined filename for: ", item, "Either the extractor does not support one of the template fields (like --get-id) for this video provider, or the video 404... attempting to download without --get-id")
 
-			filename = get_default_filename(item)
+			try:
+				filename = get_default_filename(item)
+			except:
+				continue
+
 			destination = "/home/user/_youtube/" + filename
 
 			while not os.path.isfile(destination) and tries <= max_tries:
