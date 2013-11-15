@@ -179,10 +179,13 @@ def find_cached_file_by_id(item):
 def get_template_filename(url):
 	cmd = sh.Command("/usr/bin/youtube-dl")
 	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
-	print("\nDownloading video IDs for:", url)
-	for line in cmd("--simulate", "--get-filename", "--output", output_file_template, url, _piped=True):
-		filename = line.strip()
-	return filename
+	print("\n(template) Downloading video IDs for:", url)
+	output = cmd("--simulate", "--get-filename", "--output", output_file_template, url, _piped=True)
+	if len(output) > 0:
+		filename = output.strip()
+		return filename
+	else:
+		raise Exception("Cant get template filename")
 
 
 def get_default_filename(url):
@@ -288,7 +291,8 @@ def process_url_list(url_list):
 			try:
 				filename = get_template_filename(item)
 			except:
-				continue
+				raise Exception("get_template_filename encountered an exception")
+
 			destination = "/home/user/_youtube/" + filename
 
 			while not os.path.isfile(destination) and tries <= max_tries:
