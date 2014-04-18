@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.3
 
-def pause(message="Press any key to continue"):
-	print(message)
-	input()
+#Public Domain
+
 
 import os
 import re
@@ -11,14 +10,37 @@ import subprocess
 import sh
 import urllib.parse
 import glob
+from functools import wraps
+from functools import partial
+
+
+def pause(message="Press any key to continue"):
+	print(message)
+	input()
+
+
+def log_prefix(func=None, *, prefix=''):
+	if func is None:
+		return partial(log_prefix, prefix=prefix)
+	msg = prefix + ": " + func.__qualname__
+	@wraps(func)
+	def wrapper(*args, **kwargs):
+		print(msg, *args, **kwargs)
+		return func(*args, **kwargs)
+	return wrapper
+
 
 
 try:
 	os.chdir("/home/user/_youtube")
 except:
-	print("Unable to os.chdir() to /home/user/_youtube, exiting.")
+	print("Unable to os.chdir() to /home/user/_youtube. Press enter to retry.")
 	pause()
-	os._exit(1)
+	try:
+		os.chdir("/home/user/_youtube")
+	except:
+		print("Unable to os.chdir() to /home/user/_youtube. Exiting.")
+		os._exit(1)
 
 
 global downloaded_video_list
@@ -35,6 +57,7 @@ noplay = False
 
 
 #from https://github.com/rg3/youtube-dl/
+@log_prefix
 def extract_youtube_id(url):
 
 	_VALID_URL = r"""^
@@ -66,12 +89,13 @@ def extract_youtube_id(url):
 	print(id)
 	return id
 
-
+@log_prefix
 def mplayer(file):
 	cmd = sh.Command("mplayer")
 	cmd(file)
 
 
+@log_prefix
 def play(video_list):
 	if noplay == True:
 		return
@@ -104,6 +128,7 @@ def output_buffer_stderr(input):
 	stderr.close()
 
 
+@log_prefix
 def get_clipboard():
 	clipboard_text = subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
 	clipboard_text_utf8 = clipboard_text.decode("utf-8")
@@ -126,12 +151,105 @@ def extract_urls_from_text(intext):
 	return list(url_set)
 
 
+@log_prefix
 def get_clipboard_urls():
 	clipboard_text = get_clipboard()
 	urls = extract_urls_from_text(clipboard_text)
 	return urls
 
 
+
+
+@log_prefix
+def get_template_filename(url):
+	if not extract_youtube_id(url):
+		raise Exception("Cant get template filename")
+	cmd = sh.Command("/usr/bin/youtube-dl")
+	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
+	print("\n(template) Downloading video IDs for:", url)
+	output = cmd("--simulate", "--get-filename", "--output", output_file_template, url, _piped=True)
+	if len(output) > 0:
+		filename = output.strip()
+		return filename
+	else:
+		raise Exception("Cant get template filename")
+
+
+@log_prefix
+def get_default_filename(url):
+	if not extract_youtube_id(url):
+		raise Exception("Cant get default filename")
+	
+	cmd = sh.Command("/usr/bin/youtube-dl")
+	for line in cmd("--simulate", "--get-filename", url, _piped=True):
+		filename = line.strip()
+	print("get_default_filename():", filename)
+	return filename
+
+
+@log_prefix
+def download_default(url, destination):
+	if check_lsof_for_duplicate_process(destination):
+		print("Download in progress by another process, skipping.")
+		return False
+
+	if check_if_file_exists(destination):
+		return True
+
+	cmd = sh.Command("/usr/bin/youtube-dl")
+
+	try:
+		downloader = cmd("--verbose", "--ignore-errors", "--continue", "--write-description", "--write-info-json", url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
+		downloader.wait()
+		exit_code = downloader.exit_code
+		print("exit_code:", exit_code)
+		if exit_code == 0:
+			return True
+		return False
+	except:
+		return False
+
+
+@log_prefix
+def download_with_full_template(url, destination=''):
+	if destination != '':
+		if check_lsof_for_duplicate_process(destination):
+			print("Download in progress by another process, skipping.")
+			return False
+
+		if check_if_file_exists(destination):
+			return True
+
+	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
+	cmd = sh.Command("/usr/bin/youtube-dl")
+
+	try:
+		downloader = cmd("--verbose", "--ignore-errors", "--continue", "--write-description", "--write-info-json", "--output", output_file_template, url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
+		downloader.wait()
+		exit_code = downloader.exit_code
+		print("exit_code:", exit_code)
+		if exit_code == 0:
+			return True
+		return False
+	except:
+		return False
+
+
+
+@log_prefix
+def check_if_video_exists_by_video_id(item):
+	try:
+		id = extract_youtube_id(item)
+	except:
+		return False
+
+	matches = glob.glob("/home/user/_youtube/*"+id+"*")
+	print("matches:", matches)
+	return matches
+
+
+
+@log_prefix
 def find_cached_file_by_id(item):
 	print("trying to find", item)
 
@@ -175,72 +293,10 @@ def find_cached_file_by_id(item):
 
 	return matches[index_to_play]
 
-
-def get_template_filename(url):
-	cmd = sh.Command("/usr/bin/youtube-dl")
-	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
-	print("\n(template) Downloading video IDs for:", url)
-	output = cmd("--simulate", "--get-filename", "--output", output_file_template, url, _piped=True)
-	if len(output) > 0:
-		filename = output.strip()
-		return filename
-	else:
-		raise Exception("Cant get template filename")
+		
 
 
-def get_default_filename(url):
-	cmd = sh.Command("/usr/bin/youtube-dl")
-	for line in cmd("--simulate", "--get-filename", url, _piped=True):
-		filename = line.strip()
-	print("get_default_filename():", filename)
-	return filename
-
-
-def download_default(url, destination):
-	if check_lsof_for_duplicate_process(destination):
-		print("Download in progress by another process, skipping.")
-		return False
-
-	if check_if_file_exists(destination):
-		return True
-
-	cmd = sh.Command("/usr/bin/youtube-dl")
-
-	try:
-		downloader = cmd("--verbose", "--continue", "--write-description", "--write-info-json", url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
-		downloader.wait()
-		exit_code = downloader.exit_code
-		print("exit_code:", exit_code)
-		if exit_code == 0:
-			return True
-		return False
-	except:
-		return False
-
-
-def download_with_full_template(url, destination):
-	if check_lsof_for_duplicate_process(destination):
-		print("Download in progress by another process, skipping.")
-		return False
-
-	if check_if_file_exists(destination):
-		return True
-
-	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
-	cmd = sh.Command("/usr/bin/youtube-dl")
-
-	try:
-		downloader = cmd("--verbose", "--continue", "--write-description", "--write-info-json", "--output", output_file_template, url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
-		downloader.wait()
-		exit_code = downloader.exit_code
-		print("exit_code:", exit_code)
-		if exit_code == 0:
-			return True
-		return False
-	except:
-		return False
-
-
+@log_prefix
 def check_if_file_exists(destination):
 	if os.path.isfile(destination):
 		print("file:", destination, "exists. Skipping")
@@ -250,6 +306,7 @@ def check_if_file_exists(destination):
 	return False
 
 
+@log_prefix
 def check_lsof_for_duplicate_process(string):
 	lsof_check = ""
 	try:
@@ -271,7 +328,7 @@ def process_url_list(url_list):
 	max_tries = 10
 	tries = 0
 
-	print("url_list:", url_list)
+#	print("url_list:", url_list)
 
 	for item in url_list:
 
@@ -282,17 +339,17 @@ def process_url_list(url_list):
 
 		#check for a video that has a ID in the url, and then play it, without hitting the network
 		match = find_cached_file_by_id(item)
-
 		if match:
 			downloaded_video_list.add(match)
 			continue
+
 
 		try:
 			try:
 				filename = get_template_filename(item)
 			except:
 				raise Exception("get_template_filename encountered an exception")
-
+	
 			destination = "/home/user/_youtube/" + filename
 
 			while not os.path.isfile(destination) and tries <= max_tries:
@@ -319,6 +376,7 @@ def process_url_list(url_list):
 			try:
 				filename = get_default_filename(item)
 			except:
+				download_with_full_template(item)				
 				continue
 
 			destination = "/home/user/_youtube/" + filename
