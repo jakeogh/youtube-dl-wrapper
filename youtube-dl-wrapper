@@ -167,7 +167,10 @@ def get_template_filename(url):
 	cmd = sh.Command("/usr/bin/youtube-dl")
 	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
 	print("\n(template) Downloading video IDs for:", url)
-	output = cmd("--simulate", "--get-filename", "--output", output_file_template, url, _piped=True)
+	output = cmd("--no-playlist", "--simulate", "--get-filename", "--output", output_file_template, url, _piped=True)
+	print(dir(output))
+	print(output.cmd)
+#	os._exit(1)
 	if len(output) > 0:
 		filename = output.strip()
 		return filename
@@ -181,7 +184,7 @@ def get_default_filename(url):
 		raise Exception("Cant get default filename")
 	
 	cmd = sh.Command("/usr/bin/youtube-dl")
-	for line in cmd("--simulate", "--get-filename", url, _piped=True):
+	for line in cmd("--no-playlist", "--simulate", "--get-filename", url, _piped=True):
 		filename = line.strip()
 	print("get_default_filename():", filename)
 	return filename
@@ -199,7 +202,7 @@ def download_default(url, destination):
 	cmd = sh.Command("/usr/bin/youtube-dl")
 
 	try:
-		downloader = cmd("--verbose", "--ignore-errors", "--continue", "--write-description", "--write-info-json", "--all-subs", "--no-playlist", url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
+		downloader = cmd("--all-subs", "--no-playlist", "--verbose", "--ignore-errors", "--continue", "--write-description", "--write-info-json", url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
 		downloader.wait()
 		exit_code = downloader.exit_code
 		print("exit_code:", exit_code)
@@ -224,7 +227,7 @@ def download_with_full_template(url, destination=''):
 	cmd = sh.Command("/usr/bin/youtube-dl")
 
 	try:
-		downloader = cmd("--verbose", "--ignore-errors", "--continue", "--write-description", "--write-info-json", "--output", "--all-subs", "--no-playlist", output_file_template, url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
+		downloader = cmd("--all-subs", "--no-playlist", "--verbose", "--ignore-errors", "--continue", "--write-description", "--write-info-json", "--output", output_file_template, url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
 		downloader.wait()
 		exit_code = downloader.exit_code
 		print("exit_code:", exit_code)
