@@ -1,432 +1,222 @@
-#!/usr/bin/env python3.3
+#!/usr/bin/env python
 
-#Public Domain
-
-
+import sys
+import sh
 import os
 import re
-import sys
-import subprocess
-import sh
-import urllib.parse
 import glob
-from functools import wraps
-from functools import partial
+import subprocess
+import youtube_dl
 
+from youtube_dl.compat import compat_expanduser
 
-def pause(message="Press any key to continue"):
-	print(message)
-	input()
+from youtube_dl.extractor import gen_extractors
+extractors = gen_extractors()
 
-
-def log_prefix(func=None, *, prefix=''):
-	if func is None:
-		return partial(log_prefix, prefix=prefix)
-	msg = prefix + ": " + func.__qualname__
-	@wraps(func)
-	def wrapper(*args, **kwargs):
-		print(msg, *args, **kwargs)
-		return func(*args, **kwargs)
-	return wrapper
-
-
-
-try:
-	os.chdir("/home/user/_youtube")
-except:
-	print("Unable to os.chdir() to /home/user/_youtube. Press enter to retry.")
-	pause()
-	try:
-		os.chdir("/home/user/_youtube")
-	except:
-		print("Unable to os.chdir() to /home/user/_youtube. Exiting.")
-		os._exit(1)
-
-
-global downloaded_video_list
-downloaded_video_list = set({})
-
-global buffer_stdout
-buffer_stdout = []
-
-global buffer_stderr
-buffer_stderr = []
-
-global noplay
+cache_folder = compat_expanduser('~/_youtube')
+video_command = [compat_expanduser('~/cfg/appwrappers/mplayer')]
+downloaded_video_list = []
 noplay = False
 
 
-#from https://github.com/rg3/youtube-dl/
-@log_prefix
-def extract_youtube_id(url):
-
-	_VALID_URL = r"""^
-                     (
-                         (?:https?://)?                                       # http(s):// (optional)
-                         (?:(?:(?:(?:\w+\.)?youtube(?:-nocookie)?\.com/|
-                            tube\.majestyc\.net/|
-                            youtube\.googleapis\.com/)                        # the various hostnames, with wildcard subdomains
-                         (?:.*?\#/)?                                          # handle anchor (#/) redirect urls
-                         (?:                                                  # the various things that can precede the ID:
-                             (?:(?:v|embed|e)/)                               # v/ or embed/ or e/
-                             |(?:                                             # or the v= param in all its forms
-                                 (?:(?:watch|movie)(?:_popup)?(?:\.php)?)?    # preceding watch(_popup|.php) or nothing (like /?v=xxxx)
-                                 (?:\?|\#!?)                                  # the params delimiter ? or # or #!
-                                 (?:.*?&)?                                    # any other preceding param (like /?s=tuff&v=xxxx)
-                                 v=
-                             )
-                         ))
-                         |youtu\.be/                                          # just youtu.be/xxxx
-                         )
-                     )?                                                       # all until now is optional -> you can pass the naked ID
-                     ([0-9A-Za-z_-]{11})                                      # here is it! the YouTube video ID
-                     (?(1).+)?                                                # if we found the ID, everything can follow
-                     $"""
-
-	_NEXT_URL_RE = r'[\?&]next_url=([^&]+)'
-
-	id = re.match(_VALID_URL, url, re.VERBOSE).groups()[-1]
-	print(id)
-	return id
-
-@log_prefix
-def mplayer(file):
-	cmd = sh.Command("mplayer")
-	cmd(file)
+def is_non_zero_file(fpath):
+    if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
+        return True
+    return False
 
 
-@log_prefix
-def play(video_list):
-	if noplay == True:
-		return
-	for file in video_list:
-		pause("\nPress any key to play: " + str(file))
-		play = "y"
-		while play.lower() == "y":
-			mplayer(file)
-			print("Done playing.")
-			play = input("\nEnter y to replay: ")
+def extract_id_from_url(url):
+    for e in extractors:
+        try:
+            regex = e._VALID_URL
+            id = re.match(regex, url, re.VERBOSE).groups()[-1]
+            return id
+        except re.error:
+            pass
+        except AttributeError:
+            pass
+        except IndexError:
+            pass
+    return False
 
 
-def output_buffer_stdout(input):
-	stdout = open("/dev/stdout", "wb")
-	buffer_stdout.append(input)
-	try:
-		stdout.write(input)
-	except:
-		stdout.write(bytes(input, 'UTF-8'))
-	stdout.close()
+def download_id_for_url(url):
+    ydl_opts = {
+        'simulate': True,
+        'skip_download': True
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False, process=False)
+        if info['id']:
+            return info['id']
+        return False
 
 
-def output_buffer_stderr(input):
-	stderr = open("/dev/stderr", "wb")
-	buffer_stderr.append(input)
-	try:
-		stderr.write(input)
-	except:
-		stderr.write(bytes(input, 'UTF-8'))
-	stderr.close()
+class MyLogger(object):
+    def debug(self, msg):
+        print(msg)
+
+    def warning(self, msg):
+        print(msg)
+
+    def error(self, msg):
+        print(msg)
 
 
-@log_prefix
 def get_clipboard():
-	clipboard_text = subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
-	clipboard_text_utf8 = clipboard_text.decode("utf-8")
-	print("clipboard_text_utf8:", clipboard_text_utf8)
-	return clipboard_text_utf8
+    clipboard_text = subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
+    clipboard_text_utf8 = clipboard_text.decode("utf-8")
+    print("clipboard_text_utf8:", clipboard_text_utf8)
+    return clipboard_text_utf8
+
+
+def get_clipboard_urls():
+    clipboard_text = get_clipboard()
+    urls = extract_urls_from_text(clipboard_text)
+    return urls
 
 
 def extract_urls_from_text(intext):
-	text = intext.split("\n")
-	clean_text = filter(None, text)
-	extracted_url_list = []
-	for line in clean_text:
-		for word in line.split(' '):
-			urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', word)
+    text = intext.split("\n")
+    clean_text = filter(None, text)
+    extracted_url_list = []
+    for line in clean_text:
+        for word in line.split(' '):
+            urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', word)
+            for url in urls:
+                extracted_url_list.append(url)
 
-			for url in urls:
-				extracted_url_list.append(url)
-
-	url_set = set(extracted_url_list)
-	return list(url_set)
-
-
-@log_prefix
-def get_clipboard_urls():
-	clipboard_text = get_clipboard()
-	urls = extract_urls_from_text(clipboard_text)
-	return urls
+    url_set = set(extracted_url_list)
+    return list(url_set)
 
 
+def check_lsof_for_duplicate_process(video_id):
+    lsof_check = ""
+    try:
+        lsof_check = sh.grep(sh.lsof(), video_id)
+    except:
+        pass
+
+    if len(lsof_check) > 0:
+        print("lsof_check:", lsof_check)
+        print("Found", video_id, "in lsof output, skipping.")
+        return True
+    return False
 
 
-@log_prefix
-def get_template_filename(url):
-	if not extract_youtube_id(url):
-		raise Exception("Cant get template filename")
-	cmd = sh.Command("/usr/bin/youtube-dl")
-	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
-	print("\n(template) Downloading video IDs for:", url)
-	output = cmd("--socket-timeout", 30, "--no-playlist", "--simulate", "--get-filename", "--output", output_file_template, url, _piped=True)
-	print(dir(output))
-	print(output.cmd)
-#	os._exit(1)
-	if len(output) > 0:
-		filename = output.strip()
-		return filename
-	else:
-		raise Exception("Cant get template filename")
-
-
-@log_prefix
-def get_default_filename(url):
-	if not extract_youtube_id(url):
-		raise Exception("Cant get default filename")
-	
-	cmd = sh.Command("/usr/bin/youtube-dl")
-	for line in cmd("--socket-timeout", 30, "--no-playlist", "--simulate", "--get-filename", url, _piped=True):
-		filename = line.strip()
-	print("get_default_filename():", filename)
-	return filename
-
-
-@log_prefix
-def download_default(url, destination):
-	if check_lsof_for_duplicate_process(destination):
-		print("Download in progress by another process, skipping.")
-		return False
-
-	if check_if_file_exists(destination):
-		return True
-
-	cmd = sh.Command("/usr/bin/youtube-dl")
-
-	try:
-		downloader = cmd("--socket-timeout", 30, "--all-subs", "--no-playlist", "--verbose", "--ignore-errors", "--continue", "--write-description", "--write-info-json", url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
-		downloader.wait()
-		exit_code = downloader.exit_code
-		print("exit_code:", exit_code)
-		if exit_code == 0:
-			return True
-		return False
-	except:
-		return False
-
-
-@log_prefix
-def download_with_full_template(url, destination=''):
-	if destination != '':
-		if check_lsof_for_duplicate_process(destination):
-			print("Download in progress by another process, skipping.")
-			return False
-
-		if check_if_file_exists(destination):
-			return True
-
-	output_file_template = "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s"
-	cmd = sh.Command("/usr/bin/youtube-dl")
-
-	try:
-		downloader = cmd("--socket-timeout", 30, "--all-subs", "--no-playlist", "--verbose", "--ignore-errors", "--continue", "--write-description", "--write-info-json", "--output", output_file_template, url, _out=output_buffer_stdout, _err=output_buffer_stderr, _out_bufsize=0)
-		downloader.wait()
-		exit_code = downloader.exit_code
-		print("exit_code:", exit_code)
-		if exit_code == 0:
-			return True
-		return False
-	except:
-		return False
-
-
-
-@log_prefix
-def check_if_video_exists_by_video_id(item):
-	try:
-		id = extract_youtube_id(item)
-	except:
-		return False
-
-	matches = glob.glob("/home/user/_youtube/*"+id+"*")
-	print("matches:", matches)
-	return matches
-
-
-
-@log_prefix
-def find_cached_file_by_id(item):
-	print("trying to find", item)
-
-	try:
-		print("calling extract_youtube_id()")
-		id = extract_youtube_id(item)
-		print("id:", id)
-	except:
-		print("could not get video id, skipping.")
-		return False
-
-	try:
-		matches = []
-		pre_matches = glob.glob("*" + id + "*")
-		for match in pre_matches:
-			if match.endswith('.description'):
-				continue
-			if match.endswith('.json'):
-				continue
-			if match.endswith('.part'):
-				continue
-			matches.append(match)
-
-		print("matches:", matches)
-		if len(matches) == 0:
-			print("No matches found. Skipping.")
-			return False
-
-	except:
-		print("No matches found. Skipping.")
-		return False
-
-	print(matches)
-	max = 0
-	index_to_play = 0
-	for index, match in enumerate(matches):
-		size = os.stat(match).st_size
-		if size > max:
-			max = size
-			index_to_play = index
-
-	return matches[index_to_play]
-
-		
-
-
-@log_prefix
-def check_if_file_exists(destination):
-	if os.path.isfile(destination):
-		print("file:", destination, "exists. Skipping")
-		downloaded_video_list.add(destination)
-		return True
-
-	return False
-
-
-@log_prefix
-def check_lsof_for_duplicate_process(string):
-	lsof_check = ""
-	try:
-		lsof_check = sh.grep(sh.lsof(), id)
-	except:
-		pass
-
-	if len(lsof_check) > 0:
-		print("lsof_check:", lsof_check)
-		print("Found", id, "in lsof output, skipping.")
-		return True
-
-	return False
+def check_if_video_exists_by_video_id(video_id):
+    pre_matches = glob.glob(cache_folder + '/*' + video_id + '*')
+    matches = []
+    for match in pre_matches:
+        if match.endswith('.description'):
+            continue
+        if match.endswith('.json'):
+            continue
+        if match.endswith('.part'):
+            continue
+        matches.append(match)
+    if matches:
+        return matches
+    return False
 
 
 def process_url_list(url_list):
+    ydl_opts = {
+        'verbose': True,
+        'forcefilename': True,
+        'socket_timeout': 30,
+        'noplaylist': True,
+        'outtmpl': "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
+        'ignore-errors': True,
+        'continue': True,
+        'writedescription': True,
+        'writeinfojson': True,
+        'allsubtitles': True,
+        'logger': MyLogger(),
+    }
 
-	#youtube-dl has it's own retry mechanism too
-	max_tries = 10
-	tries = 0
+    for url in url_list:
+        if len(url) == 0:
+            continue
+        else:
+            print("url:", url)
 
-#	print("url_list:", url_list)
+        id_from_url = extract_id_from_url(url)
+        print("id_from_url:", id_from_url)
+        if not id_from_url:
+            id_from_url = download_id_for_url(url)
 
-	for item in url_list:
+        existing_files = check_if_video_exists_by_video_id(id_from_url)
+        if not existing_files:
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
 
-		if len(item) == 0:
-			continue
-		else:
-			print("item:", item)
-
-		#check for a video that has a ID in the url, and then play it, without hitting the network
-		match = find_cached_file_by_id(item)
-		if match:
-			downloaded_video_list.add(match)
-			continue
+                files = check_if_video_exists_by_video_id(id_from_url)
+                for file in files:
+                    downloaded_video_list.append(file)
+        else:
+            for file in existing_files:
+                downloaded_video_list.append(file)
 
 
-		try:
-			try:
-				filename = get_template_filename(item)
-			except:
-				raise Exception("get_template_filename encountered an exception")
-	
-			destination = "/home/user/_youtube/" + filename
+def play(video_list):
+    if noplay:
+        return
+    for file in video_list:
+        pause("\nPress any key to play: " + str(file))
+        play = "y"
+        while play.lower() == "y":
+            mplayer(file)
+            print("Done playing.")
+            play = input("\nEnter y to replay: ")
 
-			while not os.path.isfile(destination) and tries <= max_tries:
 
-				if tries == max_tries:
-					print("---------LAST TRY---------")
-				try:
-					if download_with_full_template(item, destination):
-						continue
-				except sh.ErrorReturnCode_1:
-					tries += 1
+def mplayer(file):
+    cmd = sh.Command(video_command[0])
+    for arg in video_command[1:]:
+        cmd = cmd.bake(arg)
+    cmd(file)
 
-				except Exception as e:
-					print("Exception:", e)
-					print("Encountered unhanded exception. Exiting.")
-					pause()
-					os._exit(1)
 
-			downloaded_video_list.add(destination)
-
-		except:
-			print("Problem getting template defined filename for: ", item, "Either the extractor does not support one of the template fields (like --get-id) for this video provider, or the video 404... attempting to download without --get-id")
-
-			try:
-				filename = get_default_filename(item)
-			except:
-				download_with_full_template(item)				
-				continue
-
-			destination = "/home/user/_youtube/" + filename
-
-			while not os.path.isfile(destination) and tries <= max_tries:
-
-				if tries == max_tries:
-					print("---------LAST TRY---------")
-				try:
-					if download_default(item, destination):
-						continue
-				except sh.ErrorReturnCode_1:
-					tries += 1
-
-				except Exception as e:
-					print("Exception:", e)
-					print("Encountered unhanded exception. Exiting.")
-					pause()
-					os._exit(1)
-
-			downloaded_video_list.add(destination)
-
-		buffer_stdout = []
-		buffer_stderr = []
-		tries = 0
+def pause(message="Press any key to continue"):
+    print(message)
+    input()
 
 
 if __name__ == '__main__':
-	url_list = []
 
-	if len(sys.argv) == 1:
-		print("no args, checking clipboard for urls")
-		url_list = get_clipboard_urls()
+    if not is_non_zero_file(video_command[0]):
+        video_command = ['/usr/bin/mpv', '-fs']
 
-	else:
-		for item in sys.argv[1:]:
-			if item == 'noplay':
-				noplay = True
-			else:
-				url_list.append(item)
+    try:
+        os.chdir(cache_folder)
+    except:
+        print("Unable to os.chdir() to", cache_folder, "Press enter to retry.")
+        pause()
+        try:
+            os.chdir(cache_folder)
+        except:
+            print("Unable to os.chdir() to", cache_folder, "Exiting.")
+            os._exit(1)
 
-	print("url_list:", url_list)
-	process_url_list(url_list)
-	print(" ")
-	print(downloaded_video_list)
-	play(downloaded_video_list)
+    url_list = []
+    if len(sys.argv) == 1:
+        print("no args, checking clipboard for urls")
+        url_list = get_clipboard_urls()
 
-	if noplay == False:
-		#keep the terminal open if there was an error downloading
-		pause("\nPress any key to exit")
+    else:
+        for item in sys.argv[1:]:
+            if item == 'noplay':
+                noplay = True
+            else:
+                url_list.append(item)
+
+    print("url_list:", url_list)
+    process_url_list(url_list)
+    print(" ")
+    print(downloaded_video_list)
+    play(downloaded_video_list)
+
+    if not noplay:
+        pause("\nPress any key to exit")
