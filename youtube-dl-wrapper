@@ -126,7 +126,6 @@ def process_url_list(url_list):
         'verbose': True,
         'forcefilename': True,
         'socket_timeout': 30,
-        'noplaylist': True,
         'outtmpl': "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
         'ignore-errors': True,
         'continue': True,
@@ -135,6 +134,8 @@ def process_url_list(url_list):
         'allsubtitles': True,
         'logger': MyLogger(),
     }
+
+#        'noplaylist': True,
 
     for url in url_list:
         if len(url) == 0:
@@ -153,8 +154,9 @@ def process_url_list(url_list):
                 ydl.download([url])
 
                 files = check_if_video_exists_by_video_id(id_from_url)
-                for file in files:
-                    downloaded_video_list.append(file)
+                if files:
+                    for file in files:
+                        downloaded_video_list.append(file)
         else:
             for file in existing_files:
                 downloaded_video_list.append(file)
