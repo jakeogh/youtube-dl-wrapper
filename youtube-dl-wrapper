@@ -18,18 +18,21 @@ video_command = [compat_expanduser('~/cfg/appwrappers/mplayer')]
 downloaded_video_list = []
 noplay = False
 
-
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
         return True
     return False
-
 
 def extract_id_from_url(url):
     for e in extractors:
         try:
             regex = e._VALID_URL
             id = re.match(regex, url, re.VERBOSE).groups()[-1]
+#            print("using extractor:", e.IE_NAME) #youtube:user
+#            print(dir(e))
+            if 'youtube' in e.IE_NAME:
+                if len(id) != 11:
+                    return False 
             return id
         except re.error:
             pass
@@ -39,30 +42,26 @@ def extract_id_from_url(url):
             pass
     return False
 
-
 def download_id_for_url(url):
     ydl_opts = {
         'simulate': True,
         'skip_download': True
     }
-
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False, process=False)
-        if info['id']:
-            return info['id']
-        return False
-
+        try:
+            if info['id']:
+                return info['id']
+        except KeyError:
+            return False
 
 class MyLogger(object):
     def debug(self, msg):
         print(msg)
-
     def warning(self, msg):
         print(msg)
-
     def error(self, msg):
         print(msg)
-
 
 def get_clipboard():
     clipboard_text = subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
@@ -70,12 +69,10 @@ def get_clipboard():
     print("clipboard_text_utf8:", clipboard_text_utf8)
     return clipboard_text_utf8
 
-
 def get_clipboard_urls():
     clipboard_text = get_clipboard()
     urls = extract_urls_from_text(clipboard_text)
     return urls
-
 
 def extract_urls_from_text(intext):
     text = intext.split("\n")
@@ -90,7 +87,6 @@ def extract_urls_from_text(intext):
     url_set = set(extracted_url_list)
     return list(url_set)
 
-
 def check_lsof_for_duplicate_process(video_id):
     lsof_check = ""
     try:
@@ -104,22 +100,23 @@ def check_lsof_for_duplicate_process(video_id):
         return True
     return False
 
-
 def check_if_video_exists_by_video_id(video_id):
-    pre_matches = glob.glob(cache_folder + '/*' + video_id + '*')
-    matches = []
-    for match in pre_matches:
-        if match.endswith('.description'):
-            continue
-        if match.endswith('.json'):
-            continue
-        if match.endswith('.part'):
-            continue
-        matches.append(match)
-    if matches:
-        return matches
-    return False
-
+    try:
+        pre_matches = glob.glob(cache_folder + '/*' + video_id + '*')
+        matches = []
+        for match in pre_matches:
+            if match.endswith('.description'):
+                continue
+            if match.endswith('.json'):
+                continue
+            if match.endswith('.part'):
+                continue
+            matches.append(match)
+        if matches:
+            return matches
+        return False
+    except:
+        return False
 
 def process_url_list(url_list):
     ydl_opts = {
@@ -127,7 +124,7 @@ def process_url_list(url_list):
         'forcefilename': True,
         'socket_timeout': 30,
         'outtmpl': "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
-        'ignore-errors': True,
+        'ignoreerrors': True,
         'continue': True,
         'writedescription': True,
         'writeinfojson': True,
