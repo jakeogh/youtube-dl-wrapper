@@ -31,8 +31,11 @@ def extract_id_from_url(url):
 #            print("using extractor:", e.IE_NAME) #youtube:user
 #            print(dir(e))
             if 'youtube' in e.IE_NAME:
-                if len(id) != 11:
-                    return False 
+                try:
+                    if len(id) != 11:
+                        return False
+                except TypeError:
+                    return False
             return id
         except re.error:
             pass
