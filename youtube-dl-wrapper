@@ -15,6 +15,9 @@ extractors = gen_extractors()
 
 cache_folder = compat_expanduser('~/_youtube')
 video_command = [compat_expanduser('~/cfg/appwrappers/mplayer')]
+video_command_loop = ['/usr/bin/mpv', '-fs', '-loop', '0']
+video_command_audio_only = ['/usr/bin/mpv', '-fs', '--no-video']
+video_command_audio_only_loop = ['/usr/bin/mpv', '-fs', '-vo', 'none', '-loop', '0']
 downloaded_video_list = []
 noplay = False
 
@@ -168,10 +171,17 @@ def play(video_list):
     for file in video_list:
         pause("\nPress any key to play: " + str(file))
         play = "y"
-        while play.lower() == "y":
-            mplayer(file)
+        while play.lower().startswith( "y"):
+            if play.lower() == 'yy':
+                mplayer_audio_only(file)
+            elif play.lower() == 'yyy':
+                mplayer_audio_only_loop(file)
+            elif play.lower() == 'yyyy':
+                mplayer_loop(file)
+            else:
+                mplayer(file)
             print("Done playing.")
-            play = input("\nEnter y to replay: ")
+            play = input("\nEnter y to replay (yy to play audio only, yyy to loop audio, yyyy to loop a/v): ")
 
 
 def mplayer(file):
@@ -180,6 +190,23 @@ def mplayer(file):
         cmd = cmd.bake(arg)
     cmd(file)
 
+def mplayer_loop(file):
+    cmd = sh.Command(video_command_audio_only_loop[0])
+    for arg in video_command_loop[1:]:
+        cmd = cmd.bake(arg)
+    cmd(file)
+
+def mplayer_audio_only(file):
+    cmd = sh.Command(video_command_audio_only[0])
+    for arg in video_command_audio_only[1:]:
+        cmd = cmd.bake(arg)
+    cmd(file)
+
+def mplayer_audio_only_loop(file):
+    cmd = sh.Command(video_command_audio_only_loop[0])
+    for arg in video_command_audio_only_loop[1:]:
+        cmd = cmd.bake(arg)
+    cmd(file)
 
 def pause(message="Press any key to continue"):
     print(message)
