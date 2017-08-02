@@ -213,8 +213,7 @@ def pause(message="Press any key to continue"):
     input()
 
 
-if __name__ == '__main__':
-
+def youtube_dl_wrapper(cache_folder):
     if not is_non_zero_file(video_command[0]):
         video_command = ['/usr/bin/mpv', '-fs']
 
@@ -249,3 +248,9 @@ if __name__ == '__main__':
 
     if not noplay:
         pause("\nPress any key to exit")
+
+if __name__ == '__main__':
+    youtube_dl_wrapper(cache_folder)
+
+
+
