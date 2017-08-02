@@ -213,7 +213,7 @@ def pause(message="Press any key to continue"):
     input()
 
 
-def youtube_dl_wrapper(cache_folder=cache_folder):
+def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command):
     if not is_non_zero_file(video_command[0]):
         video_command = ['/usr/bin/mpv', '-fs']
 
