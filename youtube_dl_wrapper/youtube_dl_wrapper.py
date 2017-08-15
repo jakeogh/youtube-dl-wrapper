@@ -164,9 +164,7 @@ def process_url_list(url_list):
                 downloaded_video_list.append(file)
 
 
-def play_media(video_list, play=False):
-    if play:
-        return
+def play_media(video_list):
     for file in video_list:
         pause("\nPress any key to play: " + str(file))
         play = "y"
@@ -243,9 +241,9 @@ def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, p
     process_url_list(url_list)
     print(" ")
     print(downloaded_video_list)
-    play_media(downloaded_video_list, play=True)
+    play_media(downloaded_video_list)
 
-    if not play:
+    if play:
         pause("\nPress any key to exit")
 
 if __name__ == '__main__':
