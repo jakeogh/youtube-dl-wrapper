@@ -19,7 +19,7 @@ video_command_loop = ['/usr/bin/mpv', '-fs', '-loop', '0']
 video_command_audio_only = ['/usr/bin/mpv', '-fs', '--no-video']
 video_command_audio_only_loop = ['/usr/bin/mpv', '-fs', '-vo', 'none', '-loop', '0']
 downloaded_video_list = []
-noplay = False
+play = False
 
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
@@ -138,7 +138,7 @@ def process_url_list(url_list):
         'logger': MyLogger(),
     }
 
-#        'noplaylist': True,
+#        'playlist': True,
 
     for url in url_list:
         if len(url) == 0:
@@ -165,8 +165,8 @@ def process_url_list(url_list):
                 downloaded_video_list.append(file)
 
 
-def play(video_list):
-    if noplay:
+def play_media(video_list, play=False):
+    if play:
         return
     for file in video_list:
         pause("\nPress any key to play: " + str(file))
@@ -213,7 +213,7 @@ def pause(message="Press any key to continue"):
     input()
 
 
-def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command):
+def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, play=False):
     if not is_non_zero_file(video_command[0]):
         video_command = ['/usr/bin/mpv', '-fs']
 
@@ -235,8 +235,8 @@ def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command):
 
     else:
         for item in sys.argv[1:]:
-            if item == 'noplay':
-                noplay = True
+            if item == 'play':
+                play = True
             else:
                 url_list.append(item)
 
@@ -244,9 +244,9 @@ def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command):
     process_url_list(url_list)
     print(" ")
     print(downloaded_video_list)
-    play(downloaded_video_list)
+    play_media(downloaded_video_list)
 
-    if not noplay:
+    if not play:
         pause("\nPress any key to exit")
 
 if __name__ == '__main__':
