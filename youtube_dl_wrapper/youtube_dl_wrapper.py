@@ -19,7 +19,6 @@ video_command_loop = ['/usr/bin/mpv', '-fs', '-loop', '0']
 video_command_audio_only = ['/usr/bin/mpv', '-fs', '--no-video']
 video_command_audio_only_loop = ['/usr/bin/mpv', '-fs', '-vo', 'none', '-loop', '0']
 downloaded_video_list = []
-play = False
 
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
@@ -213,7 +212,7 @@ def pause(message="Press any key to continue"):
     input()
 
 
-def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, play=False):
+def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, play=True):
     if not is_non_zero_file(video_command[0]):
         video_command = ['/usr/bin/mpv', '-fs']
 
@@ -244,7 +243,7 @@ def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, p
     process_url_list(url_list)
     print(" ")
     print(downloaded_video_list)
-    play_media(downloaded_video_list)
+    play_media(downloaded_video_list, play=True)
 
     if not play:
         pause("\nPress any key to exit")
