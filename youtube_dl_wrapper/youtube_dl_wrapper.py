@@ -209,21 +209,9 @@ def pause(message="Press any key to continue"):
     print(message)
     input()
 
-
 def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, play=True):
     if not is_non_zero_file(video_command[0]):
         video_command = ['/usr/bin/mpv', '-fs']
-
-    try:
-        os.chdir(cache_folder)
-    except:
-        print("Unable to os.chdir() to", cache_folder, "Press enter to retry.")
-        pause()
-        try:
-            os.chdir(cache_folder)
-        except:
-            print("Unable to os.chdir() to", cache_folder, "Exiting.")
-            os._exit(1)
 
     url_list = []
     if len(sys.argv) == 1:
@@ -236,6 +224,18 @@ def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, p
                 play = True
             else:
                 url_list.append(item)
+
+    try:
+        os.chdir(cache_folder)
+    except:
+        print("Unable to os.chdir() to", cache_folder, "Press enter to retry.")
+        pause()
+        try:
+            os.chdir(cache_folder)
+        except:
+            print("Unable to os.chdir() to", cache_folder, "Exiting.")
+            os._exit(1)
+
 
     print("url_list:", url_list)
     process_url_list(url_list)
