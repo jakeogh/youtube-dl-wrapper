@@ -134,6 +134,7 @@ def process_url_list(url_list):
         'outtmpl': "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
         'ignoreerrors': True,
         'continue': True,
+        'retries': 10,
         'writedescription': True,
         'writeinfojson': True,
         'allsubtitles': True,
