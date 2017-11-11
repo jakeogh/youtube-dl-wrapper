@@ -135,6 +135,7 @@ def process_url_list(url_list):
         'ignoreerrors': True,
         'continue': True,
         'retries': 10,
+        'fragment_retries': 10,
         'writedescription': True,
         'writeinfojson': True,
         'allsubtitles': True,
