@@ -48,6 +48,7 @@ def extract_id_from_url(url):
     return False
 
 def download_id_for_url(url):
+    print("download_id_for_url():", url)
     ydl_opts = {
         'simulate': True,
         'skip_download': True
@@ -160,8 +161,9 @@ def process_url_list(url_list):
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 try:
                     result = ydl.download([url])
+                    print("try result:", result)
                 except Exception as e:
-                    print("exception:", e)
+                    print("Exception:", e)
                     print("result:", result)
 
 
