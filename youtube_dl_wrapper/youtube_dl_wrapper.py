@@ -158,7 +158,12 @@ def process_url_list(url_list):
         existing_files = check_if_video_exists_by_video_id(id_from_url)
         if not existing_files:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([url])
+                try:
+                    result = ydl.download([url])
+                except Exception as e:
+                    print("exception:", e)
+                    print("result:", result)
+
 
                 files = check_if_video_exists_by_video_id(id_from_url)
                 if files:
