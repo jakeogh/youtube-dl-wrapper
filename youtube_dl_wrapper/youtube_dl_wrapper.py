@@ -159,12 +159,19 @@ def process_url_list(url_list):
         existing_files = check_if_video_exists_by_video_id(id_from_url)
         if not existing_files:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                try:
-                    result = ydl.download([url])
-                    print("try result:", result)
-                except Exception as e:
-                    print("Exception:", e)
-                    print("result:", result)
+                result = 1
+                tries = 0
+                while result != 0:
+                    try:
+                        result = ydl.download([url])
+                        print("try result:", result)
+                    except Exception as e: # annoying that YoutubeDL is not raising exceptions when it fails
+                        print("Exception:", e)
+                        print("result:", result)
+                    sleep 2
+                    tries += 1
+                    if tries >= ydl_opts['retries']:
+                        break
 
 
                 files = check_if_video_exists_by_video_id(id_from_url)
