@@ -7,6 +7,7 @@ import re
 import glob
 import subprocess
 import youtube_dl
+import time
 
 from youtube_dl.compat import compat_expanduser
 
@@ -168,7 +169,7 @@ def process_url_list(url_list):
                     except Exception as e: # annoying that YoutubeDL is not raising exceptions when it fails
                         print("Exception:", e)
                         print("result:", result)
-                    sleep 2
+                    time.sleep(2)
                     tries += 1
                     if tries >= ydl_opts['retries']:
                         break
