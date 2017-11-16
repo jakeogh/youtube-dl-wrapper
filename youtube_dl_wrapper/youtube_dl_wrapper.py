@@ -118,9 +118,9 @@ def check_if_video_exists_by_video_id(video_id):
                 continue
             if match.endswith('.part'):
                 continue
-            match_ending = match.split(video_id)[-1]
-            if len(match_ending.split('.')) > 1:
-                continue
+            #match_ending = match.split(video_id)[-1]
+            #if len(match_ending.split('.')) > 1:
+            #    continue
             matches.append(match)
         if matches:
             return matches
@@ -136,7 +136,7 @@ def process_url_list(url_list):
         'outtmpl': "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
         'ignoreerrors': True,
         'continue': True,
-        'retries': 10,
+        'retries': 20,
         'fragment_retries': 10,
         'writedescription': True,
         'writeinfojson': True,
