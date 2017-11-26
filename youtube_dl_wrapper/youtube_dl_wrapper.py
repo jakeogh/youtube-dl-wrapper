@@ -141,6 +141,7 @@ def process_url_list(url_list):
         'writedescription': True,
         'writeinfojson': True,
         'allsubtitles': True,
+        'progress_with_newline': False,
         'logger': MyLogger(),
     }
 
