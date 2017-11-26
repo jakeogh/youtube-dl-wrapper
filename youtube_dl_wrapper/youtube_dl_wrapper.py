@@ -130,7 +130,7 @@ def check_if_video_exists_by_video_id(video_id):
 
 def process_url_list(url_list):
     ydl_opts = {
-        'verbose': True,
+        'verbose': False,
         'forcefilename': True,
         'socket_timeout': 30,
         'outtmpl': "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
@@ -268,6 +268,4 @@ def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, p
 
 if __name__ == '__main__':
     youtube_dl_wrapper(cache_folder)
-
-
 
