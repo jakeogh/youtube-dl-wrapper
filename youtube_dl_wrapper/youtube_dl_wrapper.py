@@ -167,6 +167,7 @@ def process_url_list(url_list):
             id_from_url = download_id_for_url(url)
 
         existing_files = check_if_video_exists_by_video_id(id_from_url)
+        import IPython; IPython.embed()
         if not existing_files:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 result = 1
