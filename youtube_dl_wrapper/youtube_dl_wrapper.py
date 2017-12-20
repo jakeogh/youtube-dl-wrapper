@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import click
 import sys
 import sh
 import os
@@ -10,15 +11,22 @@ import youtube_dl
 import time
 
 from youtube_dl.compat import compat_expanduser
-
 from youtube_dl.extractor import gen_extractors
 extractors = gen_extractors()
 
-cache_folder = compat_expanduser('~/_youtube')
-video_command = [compat_expanduser('~/cfg/appwrappers/mplayer')]
-video_command_loop = ['/usr/bin/mpv', '-fs', '-loop', '0']
-video_command_audio_only = ['/usr/bin/mpv', '-fs', '--no-video']
-video_command_audio_only_loop = ['/usr/bin/mpv', '-fs', '-vo', 'none', '-loop', '0']
+VIDEO_CMD = [
+'/usr/bin/mpv',
+'--cache-pause',
+'--no-audio-display',
+"--hwdec='vdpau'",
+'--cache-initial=75000',
+'--cache-default=275000'
+]
+
+CACHE_FOLDER = compat_expanduser('~/_youtube')
+VIDEO_CMD_LOOP = VIDEO_CMD + ['-fs', '-loop', '0']
+VIDEO_CMD_AUDIO_ONLY = VIDEO_CMD + ['-fs', '--no-video']
+VIDEO_CMD_AUDIO_ONLY_LOOP = VIDEO_CMD + ['-fs', '-vo', 'none', '-loop', '0']
 downloaded_video_list = []
 
 def is_non_zero_file(fpath):
@@ -109,7 +117,7 @@ def check_lsof_for_duplicate_process(video_id):
 
 def check_if_video_exists_by_video_id(video_id):
     try:
-        pre_matches = glob.glob(cache_folder + '/*' + video_id + '*')
+        pre_matches = glob.glob(CACHE_FOLDER + '/*' + video_id + '*')
         matches = []
         for match in pre_matches:
             if match.endswith('.description'):
@@ -178,59 +186,62 @@ def process_url_list(url_list):
 
                 files = check_if_video_exists_by_video_id(id_from_url)
                 if files:
-                    for file in files:
-                        downloaded_video_list.append(file)
+                    for infile in files:
+                        downloaded_video_list.append(infile)
         else:
-            for file in existing_files:
-                downloaded_video_list.append(file)
+            for infile in existing_files:
+                downloaded_video_list.append(infile)
 
 
 def play_media(video_list):
-    for file in video_list:
-        pause("\nPress any key to play: " + str(file))
+    for infile in video_list:
+        pause("\nPress any key to play: " + str(infile))
         play = "y"
         while play.lower().startswith( "y"):
             if play.lower() == 'yy':
-                mplayer_audio_only(file)
+                mplayer_audio_only(infile)
             elif play.lower() == 'yyy':
-                mplayer_audio_only_loop(file)
+                mplayer_audio_only_loop(infile)
             elif play.lower() == 'yyyy':
-                mplayer_loop(file)
+                mplayer_loop(infile)
             else:
-                mplayer(file)
+                mplayer(infile)
             print("Done playing.")
             play = input("\nEnter y to replay (yy to play audio only, yyy to loop audio, yyyy to loop a/v): ")
 
 
-def mplayer(file):
-    cmd = sh.Command(video_command[0])
-    for arg in video_command[1:]:
+def mplayer(infile):
+    cmd = sh.Command(VIDEO_CMD[0])
+    for arg in VIDEO_CMD[1:]:
         cmd = cmd.bake(arg)
-    cmd(file)
+    cmd(infile)
 
-def mplayer_loop(file):
-    cmd = sh.Command(video_command_audio_only_loop[0])
-    for arg in video_command_loop[1:]:
+def mplayer_loop(infile):
+    cmd = sh.Command(VIDEO_CMD_AUDIO_ONLY_LOOP[0])
+    for arg in VIDEO_CMD_LOOP[1:]:
         cmd = cmd.bake(arg)
-    cmd(file)
+    cmd(infile)
 
-def mplayer_audio_only(file):
-    cmd = sh.Command(video_command_audio_only[0])
-    for arg in video_command_audio_only[1:]:
+def mplayer_audio_only(infile):
+    cmd = sh.Command(VIDEO_CMD_AUDIO_ONLY[0])
+    for arg in VIDEO_CMD_AUDIO_ONLY[1:]:
         cmd = cmd.bake(arg)
-    cmd(file)
+    cmd(infile)
 
-def mplayer_audio_only_loop(file):
-    cmd = sh.Command(video_command_audio_only_loop[0])
-    for arg in video_command_audio_only_loop[1:]:
+def mplayer_audio_only_loop(infile):
+    cmd = sh.Command(VIDEO_CMD_AUDIO_ONLY_LOOP[0])
+    for arg in VIDEO_CMD_AUDIO_ONLY_LOOP[1:]:
         cmd = cmd.bake(arg)
-    cmd(file)
+    cmd(infile)
 
 def pause(message="Press any key to continue"):
     print(message)
     input()
 
-def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, play=True):
+
+
+@click.command()
+def youtube_dl_wrapper(cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD, play=True):
     if not is_non_zero_file(video_command[0]):
         video_command = ['/usr/bin/mpv', '-fs']
 
@@ -251,12 +262,7 @@ def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, p
     except:
         print("Unable to os.chdir() to", cache_folder, "Press enter to retry.")
         pause()
-        try:
-            os.chdir(cache_folder)
-        except:
-            print("Unable to os.chdir() to", cache_folder, "Exiting.")
-            os._exit(1)
-
+        os.chdir(cache_folder)
 
     print("url_list:", url_list)
     process_url_list(url_list)
@@ -267,6 +273,6 @@ def youtube_dl_wrapper(cache_folder=cache_folder, video_command=video_command, p
     if play:
         pause("\nPress any key to exit")
 
-if __name__ == '__main__':
-    youtube_dl_wrapper(cache_folder)
+#if __name__ == '__main__':
+#    youtube_dl_wrapper(CACHE_FOLDER)
 
