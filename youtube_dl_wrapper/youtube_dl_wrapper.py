@@ -242,11 +242,11 @@ def pause(message="Press any key to continue"):
 
 
 @click.command()
-def youtube_dl_wrapper(cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD, play=True):
-    if not is_non_zero_file(video_command[0]):
-        video_command = ['/usr/bin/mpv', '-fs']
-
+@click.argument('uri')
+def youtube_dl_wrapper(uri, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD, play=True):
+    assert isinstance(uri, [])
     url_list = []
+
     if len(sys.argv) == 1:
         print("no args, checking clipboard for urls")
         url_list = get_clipboard_urls()
