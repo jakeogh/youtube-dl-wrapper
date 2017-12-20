@@ -240,21 +240,13 @@ def pause(message="Press any key to continue"):
     input()
 
 
-
 @click.command()
 @click.argument('uris', nargs=-1)
 @click.option('--play', is_flag=True)
-def youtube_dl_wrapper(uri, play, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
-    assert isinstance(uri, tuple)
-    url_list = []
-
-    if len(sys.argv) == 1:
+def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
+    if not uris:
         print("no args, checking clipboard for urls")
         url_list = get_clipboard_urls()
-
-    else:
-        for item in uris:
-            url_list.append(item)
 
     try:
         os.chdir(cache_folder)
@@ -263,8 +255,8 @@ def youtube_dl_wrapper(uri, play, cache_folder=CACHE_FOLDER, video_command=VIDEO
         pause()
         os.chdir(cache_folder)
 
-    print("url_list:", url_list)
-    process_url_list(url_list)
+    print("uris:", uris)
+    process_url_list(uris)
     print(" ")
     print(downloaded_video_list)
     play_media(downloaded_video_list)
