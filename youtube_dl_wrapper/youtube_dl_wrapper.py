@@ -242,10 +242,10 @@ def pause(message="Press any key to continue"):
 
 
 @click.command()
-@click.argument('uri', nargs=-1)
-def youtube_dl_wrapper(uri, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD, play=True):
-    print(type(uri))
-    assert isinstance(uri, list)
+@click.argument('uris', nargs=-1)
+@click.option('--play', is_flag=True)
+def youtube_dl_wrapper(uri, play, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
+    assert isinstance(uri, tuple)
     url_list = []
 
     if len(sys.argv) == 1:
@@ -253,11 +253,8 @@ def youtube_dl_wrapper(uri, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD, 
         url_list = get_clipboard_urls()
 
     else:
-        for item in sys.argv[1:]:
-            if item == 'play':
-                play = True
-            else:
-                url_list.append(item)
+        for item in uris:
+            url_list.append(item)
 
     try:
         os.chdir(cache_folder)
@@ -274,7 +271,3 @@ def youtube_dl_wrapper(uri, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD, 
 
     if play:
         pause("\nPress any key to exit")
-
-#if __name__ == '__main__':
-#    youtube_dl_wrapper(CACHE_FOLDER)
-
