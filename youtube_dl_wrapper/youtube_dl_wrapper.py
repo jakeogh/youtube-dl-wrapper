@@ -242,7 +242,7 @@ def pause(message="Press any key to continue"):
 
 
 @click.command()
-@click.argument('uri')
+@click.argument('uri', nargs=-1)
 def youtube_dl_wrapper(uri, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD, play=True):
     assert isinstance(uri, list)
     url_list = []
