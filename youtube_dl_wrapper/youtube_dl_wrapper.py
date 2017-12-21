@@ -64,6 +64,7 @@ def download_id_for_url(url):
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False, process=False)
+        import IPython; IPython.embed()
         try:
             if info['id']:
                 return info['id']
