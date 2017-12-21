@@ -18,7 +18,7 @@ VIDEO_CMD = [
 '/usr/bin/mpv',
 '--cache-pause',
 '--no-audio-display',
-"--hwdec='vdpau'",
+"--hwdec=vdpau",
 '--cache-initial=75000',
 '--cache-default=275000'
 ]
