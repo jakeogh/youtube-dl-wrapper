@@ -247,7 +247,7 @@ def pause(message="Press any key to continue"):
 def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
     if not uris:
         print("no args, checking clipboard for urls")
-        url_list = get_clipboard_urls()
+        uris = get_clipboard_urls()
 
     try:
         os.chdir(cache_folder)
