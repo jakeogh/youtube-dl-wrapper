@@ -40,7 +40,6 @@ def extract_id_from_url(url):
             regex = e._VALID_URL
             id = re.match(regex, url, re.VERBOSE).groups()[-1]
 #            print("using extractor:", e.IE_NAME) #youtube:user
-#            print(dir(e))
             if 'youtube' in e.IE_NAME:
                 try:
                     if len(id) != 11:
@@ -64,7 +63,7 @@ def download_id_for_url(url):
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False, process=False)
-        import IPython; IPython.embed()
+        #import IPython; IPython.embed()
         try:
             if info['id']:
                 return info['id']
