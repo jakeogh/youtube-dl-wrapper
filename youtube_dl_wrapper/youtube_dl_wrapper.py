@@ -12,6 +12,8 @@ import time
 
 from youtube_dl.compat import compat_expanduser
 from youtube_dl.extractor import gen_extractors
+from kcl.printops import eprint
+
 extractors = gen_extractors()
 
 VIDEO_CMD = [
@@ -242,7 +244,7 @@ def pause(message="Press any key to continue"):
 @click.option('--extractor', is_flag=True)
 def youtube_dl_wrapper(uris, play, extractor, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
     if not uris:
-        print("no args, checking clipboard for urls")
+        eprint("no args, checking clipboard for urls")
         uris = get_clipboard_urls()
 
     try:
