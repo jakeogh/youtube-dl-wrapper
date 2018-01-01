@@ -137,6 +137,7 @@ def check_if_video_exists_by_video_id(video_id):
         return False
 
 def process_url(url):
+    assert url
     ydl_opts = {
         'verbose': False,
         'forcefilename': True,
@@ -155,11 +156,7 @@ def process_url(url):
 
 #        'playlist': True,
 
-    if len(url) == 0:
-        continue
-    else:
-        print("url:", url)
-
+    print("url:", url)
     id_from_url = extract_id_from_url(url)
     print("id_from_url:", id_from_url)
     if not id_from_url:
