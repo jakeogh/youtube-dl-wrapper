@@ -255,7 +255,7 @@ def youtube_dl_wrapper(uris, play, extractor, cache_folder=CACHE_FOLDER, video_c
     for url in uris:
         print(url)
         if extractor:
-            video_id = extract_id_from_url()
+            video_id = extract_id_from_url(url)
             print(video_id)
         else:
             process_url(url)
