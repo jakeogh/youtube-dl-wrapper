@@ -136,7 +136,7 @@ def check_if_video_exists_by_video_id(video_id):
     except:
         return False
 
-def process_url_list(url_list):
+def process_url(url):
     ydl_opts = {
         'verbose': False,
         'forcefilename': True,
@@ -155,44 +155,42 @@ def process_url_list(url_list):
 
 #        'playlist': True,
 
-    for url in url_list:
-        if len(url) == 0:
-            continue
-        else:
-            print("url:", url)
+    if len(url) == 0:
+        continue
+    else:
+        print("url:", url)
 
-        id_from_url = extract_id_from_url(url)
-        print("id_from_url:", id_from_url)
-        if not id_from_url:
-            id_from_url = download_id_for_url(url)
+    id_from_url = extract_id_from_url(url)
+    print("id_from_url:", id_from_url)
+    if not id_from_url:
+        id_from_url = download_id_for_url(url)
 
-
-        existing_files = check_if_video_exists_by_video_id(id_from_url)
-        #import IPython; IPython.embed()
-        if not existing_files:
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                result = 1
-                tries = 0
-                while result != 0:
-                    try:
-                        result = ydl.download([url])
-                        print("try result:", result)
-                    except Exception as e: # annoying that YoutubeDL is not raising exceptions when it fails
-                        print("Exception:", e)
-                        print("result:", result)
-                    time.sleep(2)
-                    tries += 1
-                    if tries >= ydl_opts['retries']:
-                        break
+    existing_files = check_if_video_exists_by_video_id(id_from_url)
+    #import IPython; IPython.embed()
+    if not existing_files:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            result = 1
+            tries = 0
+            while result != 0:
+                try:
+                    result = ydl.download([url])
+                    print("try result:", result)
+                except Exception as e: # annoying that YoutubeDL is not raising exceptions when it fails
+                    print("Exception:", e)
+                    print("result:", result)
+                time.sleep(2)
+                tries += 1
+                if tries >= ydl_opts['retries']:
+                    break
 
 
-                files = check_if_video_exists_by_video_id(id_from_url)
-                if files:
-                    for infile in files:
-                        downloaded_video_list.append(infile)
-        else:
-            for infile in existing_files:
-                downloaded_video_list.append(infile)
+            files = check_if_video_exists_by_video_id(id_from_url)
+            if files:
+                for infile in files:
+                    downloaded_video_list.append(infile)
+    else:
+        for infile in existing_files:
+            downloaded_video_list.append(infile)
 
 
 def play_media(video_list):
@@ -244,7 +242,8 @@ def pause(message="Press any key to continue"):
 @click.command()
 @click.argument('uris', nargs=-1)
 @click.option('--play', is_flag=True)
-def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
+@click.option('--extractor', is_flag=True)
+def youtube_dl_wrapper(uris, play, extractor, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
     if not uris:
         print("no args, checking clipboard for urls")
         uris = get_clipboard_urls()
@@ -257,10 +256,17 @@ def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDE
         os.chdir(cache_folder)
 
     print("uris:", uris)
-    process_url_list(uris)
-    print(" ")
+
+    for url in uris:
+        if extractor:
+            video_id = extract_id_from_url()
+            print(video_id)
+        else:
+            process_url(url)
+        print(" ")
+
     print(downloaded_video_list)
-    play_media(downloaded_video_list)
 
     if play:
+        play_media(downloaded_video_list)
         pause("\nPress any key to exit")
