@@ -266,7 +266,7 @@ def youtube_dl_wrapper(uris, play, extractor, cache_folder=CACHE_FOLDER, video_c
         if extractor:
             print("extractor:", video_extractor, "id:", video_id)
         else:
-            output_dir = CACHE_FOLDER + '/' + extractor + '/' + id_from_url[0]
+            output_dir = cache_folder + '/' + extractor + '/' + video_id
             os.makedirs(output_dir, exist_ok=True)
             os.chdir(output_dir)
             download_url(url)
