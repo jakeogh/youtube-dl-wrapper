@@ -120,8 +120,9 @@ def check_lsof_for_duplicate_process(video_id):
 
 def check_if_video_exists_by_video_id(video_id):
     try:
-        pre_matches = glob.glob(CACHE_FOLDER + '/*' + video_id + '*')
+        pre_matches = glob.glob('./*' + video_id + '*')
         matches = []
+        eprint("pre_matches:", pre_matches)
         for match in pre_matches:
             if match.endswith('.description'):
                 continue
@@ -139,7 +140,7 @@ def check_if_video_exists_by_video_id(video_id):
     except:
         return False
 
-def process_url(url):
+def download_url(url):
     assert url
     ydl_opts = {
         'verbose': False,
@@ -166,9 +167,6 @@ def process_url(url):
         id_from_url = download_id_for_url(url)
 
     assert id_from_url
-    output_dir = CACHE_FOLDER + '/' + extractor + '/' + id_from_url[0]
-    os.makedirs(output_dir, exist_ok=True)
-    os.chdir(output_dir)
     existing_files = check_if_video_exists_by_video_id(id_from_url)
     #import IPython; IPython.embed()
     if not existing_files:
@@ -194,7 +192,6 @@ def process_url(url):
     else:
         for infile in existing_files:
             downloaded_video_list.append(infile)
-    os.chdir(CACHE_FOLDER)
 
 
 def play_media(video_list):
@@ -261,12 +258,16 @@ def youtube_dl_wrapper(uris, play, extractor, cache_folder=CACHE_FOLDER, video_c
 
     for url in uris:
         print(url)
+        video_id, video_extractor = extract_id_from_url(url)
         if extractor:
-            video_id, extractor = extract_id_from_url(url)
-            assert extractor
-            print("extractor:", extractor, "id:", video_id)
+            print("extractor:", video_extractor, "id:", video_id)
         else:
-            process_url(url)
+            output_dir = CACHE_FOLDER + '/' + extractor + '/' + id_from_url[0]
+            os.makedirs(output_dir, exist_ok=True)
+            os.chdir(output_dir)
+            download_url(url)
+            os.chdir(CACHE_FOLDER)
+
         print(" ")
 
     if downloaded_video_list:
