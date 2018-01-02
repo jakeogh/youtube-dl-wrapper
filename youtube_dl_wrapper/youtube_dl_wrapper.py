@@ -194,12 +194,9 @@ def download_url(url):
                 if tries >= ydl_opts['retries']:
                     break
 
-#            files = check_if_video_exists_by_video_id(id_from_url)
-#            if files:
-#                for infile in files:
-#                    downloaded_video_list.append(infile)
-    else:
-        return existing_file
+            existing_file = check_if_video_exists_by_video_id(id_from_url)
+
+    return existing_file
 
 
 def play_media(video_list):
