@@ -264,7 +264,7 @@ def youtube_dl_wrapper(uris, play, id_from_url, cache_folder=CACHE_FOLDER, video
         uris = get_clipboard_urls()
 
     if id_from_url:
-        print(download_id_from_url)
+        print(download_id_for_url)
         quit(0)
 
     try:
