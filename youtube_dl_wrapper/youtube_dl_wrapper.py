@@ -255,13 +255,13 @@ def pause(message="Press any key to continue"):
 
 
 @click.command()
-@click.argument('uris', nargs=-1)
+@click.argument('urls', nargs=-1)
 @click.option('--play', is_flag=True)
 @click.option('--id-from-url', is_flag=True)
-def youtube_dl_wrapper(uris, play, id_from_url, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
-    if not uris:
+def youtube_dl_wrapper(urls, play, id_from_url, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
+    if not urls:
         eprint("no args, checking clipboard for urls")
-        uris = get_clipboard_urls()
+        urls = get_clipboard_urls()
 
 
     try:
@@ -271,13 +271,13 @@ def youtube_dl_wrapper(uris, play, id_from_url, cache_folder=CACHE_FOLDER, video
         pause()
         os.chdir(cache_folder)
 
-    for url in uris:
+    for url in urls:
         print(url)
         video_id, video_extractor = extract_id_from_url(url)
         print("extractor:", video_extractor, "id:", video_id)
         output_dir = cache_folder + '/sources/' + video_extractor + '/' + video_id[0] + '/' + video_id[1]
         if id_from_url:
-            print(download_id_for_url(uri))
+            print(download_id_for_url(url))
             continue
         os.makedirs(output_dir, exist_ok=True)
         os.chdir(output_dir)
