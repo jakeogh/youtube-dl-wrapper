@@ -183,31 +183,31 @@ def download_url(url, cache_dir):
 
 
     print("url:", url)
-    id_from_url, extractor = extract_id_from_url(url)
-    print("id_from_url:", id_from_url)
-    if not id_from_url:
-        id_from_url = download_id_for_url(url)
+    #id_from_url, extractor = extract_id_from_url(url)
+    #print("id_from_url:", id_from_url)
+    #if not id_from_url:
+    #    id_from_url = download_id_for_url(url)
 
-    assert id_from_url
-    try:
-        existing_file = check_if_video_exists_by_video_id(id_from_url) #broken
-    except NoMatchException:
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            result = 1
-            tries = 0
-            while result != 0:
-                try:
-                    result = ydl.download([url])
-                    print("try result:", result)
-                except Exception as e: # annoying that YoutubeDL is not raising exceptions when it fails
-                    print("Exception:", e)
-                    print("result:", result)
-                time.sleep(2)
-                tries += 1
-                if tries >= ydl_opts['retries']:
-                    break
+    #assert id_from_url
+    #try:
+    #    existing_file = check_if_video_exists_by_video_id(id_from_url) #broken
+    #except NoMatchException:
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        result = 1
+        tries = 0
+        while result != 0:
+            try:
+                result = ydl.download([url])
+                print("try result:", result)
+            except Exception as e: # annoying that YoutubeDL is not raising exceptions when it fails
+                print("Exception:", e)
+                print("result:", result)
+            time.sleep(2)
+            tries += 1
+            if tries >= ydl_opts['retries']:
+                break
 
-            #existing_file = check_if_video_exists_by_video_id(id_from_url)
+        #existing_file = check_if_video_exists_by_video_id(id_from_url)
 
     #downloaded_video_list.append(existing_file)
     #return existing_file
@@ -281,8 +281,8 @@ def youtube_dl_wrapper(urls, play, id_from_url, cache_folder=CACHE_FOLDER, video
 
     for url in urls:
         print(url)
-        video_id, video_extractor = extract_id_from_url(url)
-        print("extractor:", video_extractor, "id:", video_id)
+        #video_id, video_extractor = extract_id_from_url(url)
+        #print("extractor:", video_extractor, "id:", video_id)
         #output_dir = cache_folder + '/sources/' + video_extractor + '/' + video_id[0] + '/' + video_id[1]
         if id_from_url:
             print(download_id_for_url(url))
