@@ -165,8 +165,10 @@ def process_url(url):
     if not id_from_url:
         id_from_url = download_id_for_url(url)
 
-    os.makedirs(extractor, exist_ok=True)
-    os.chdir(extractor)
+    assert id_from_url
+    output_dir = CACHE_FOLDER + '/' + extractor + '/' + id_from_url[0]
+    os.makedirs(output_dir, exist_ok=True)
+    os.chdir(output_dir)
     existing_files = check_if_video_exists_by_video_id(id_from_url)
     #import IPython; IPython.embed()
     if not existing_files:
@@ -192,7 +194,7 @@ def process_url(url):
     else:
         for infile in existing_files:
             downloaded_video_list.append(infile)
-    os.chdir('../')
+    os.chdir(CACHE_FOLDER)
 
 
 def play_media(video_list):
