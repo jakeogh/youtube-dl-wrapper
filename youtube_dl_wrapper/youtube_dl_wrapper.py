@@ -201,6 +201,7 @@ def download_url(url):
 
             existing_file = check_if_video_exists_by_video_id(id_from_url)
 
+    downloaded_video_list.append(existing_file)
     return existing_file
 
 
@@ -283,8 +284,6 @@ def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDE
 
         print(" ")
 
-    if downloaded_video_list:
-        #print(downloaded_video_list)
-        if play:
-            play_media(downloaded_video_list)
-            pause("\nPress any key to exit")
+    if play:
+        play_media(downloaded_video_list)
+        pause("\nPress any key to exit")
