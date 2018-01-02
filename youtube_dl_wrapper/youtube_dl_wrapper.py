@@ -153,16 +153,17 @@ def check_if_video_exists_by_video_id(video_id):
     raise NoMatchException
 
 
-def download_url(url):
+def download_url(url, output_dir):
     assert url
     ydl_opts = {
         'verbose': False,
         'forcefilename': True,
         'socket_timeout': 30,
-        'outtmpl': "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
+        'outtmpl': output_dir + "/%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
         'ignoreerrors': True,
         'continue': True,
         'retries': 20,
+        'playlist': False,
         'fragment_retries': 10,
         'writedescription': True,
         'writeinfojson': True,
@@ -171,7 +172,6 @@ def download_url(url):
         'logger': MyLogger(),
     }
 
-#        'playlist': True,
 
     print("url:", url)
     id_from_url, extractor = extract_id_from_url(url)
@@ -277,7 +277,7 @@ def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDE
         output_dir = cache_folder + '/sources/' + video_extractor + '/' + video_id[0] + '/' + video_id[1]
         os.makedirs(output_dir, exist_ok=True)
         os.chdir(output_dir)
-        video_file = download_url(url)
+        video_file = download_url(url=url, output_dir=output_dir)
         assert video_file
         os.chdir(CACHE_FOLDER)
 
