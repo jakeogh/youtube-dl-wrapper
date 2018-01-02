@@ -20,7 +20,8 @@ VIDEO_CMD = ['/usr/bin/mpv',
              '--cache-pause',
              '--hwdec=vdpau',
              '--cache-initial=75000',
-             '--cache-default=275000']
+             '--cache-default=275000',
+             '--pause']
 
 CACHE_FOLDER = compat_expanduser('~/_youtube')
 VIDEO_CMD_LOOP = VIDEO_CMD + ['-fs', '-loop', '0']
@@ -155,7 +156,7 @@ def check_if_video_exists_by_video_id(video_id):
 
 def download_url(url, cache_dir):
     assert url
-    exec_cmd = ' '.join(VIDEO_CMD.append('--pause')) + ' {}'
+    exec_cmd = ' '.join(VIDEO_CMD) + ' {}'
 #    'outtmpl': output_dir + "/%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
     ydl_opts = {
         'verbose': False,
