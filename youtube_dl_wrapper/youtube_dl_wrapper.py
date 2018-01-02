@@ -185,7 +185,6 @@ def process_url(url):
                 if tries >= ydl_opts['retries']:
                     break
 
-
             files = check_if_video_exists_by_video_id(id_from_url)
             if files:
                 for infile in files:
@@ -199,7 +198,7 @@ def play_media(video_list):
     for infile in video_list:
         pause("\nPress any key to play: " + str(infile))
         play = "y"
-        while play.lower().startswith( "y"):
+        while play.lower().startswith("y"):
             if play.lower() == 'yy':
                 mplayer_audio_only(infile)
             elif play.lower() == 'yyy':
