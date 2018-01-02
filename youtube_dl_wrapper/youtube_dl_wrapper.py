@@ -156,7 +156,7 @@ def check_if_video_exists_by_video_id(video_id):
 
 def download_url(url, cache_dir):
     assert url
-    exec_cmd = ' '.join(VIDEO_CMD) + ' {}'
+    exec_cmd = ' '.join(VIDEO_CMD) + ' {} &'
 #    'outtmpl': output_dir + "/%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
     ydl_opts = {
         'verbose': False,
