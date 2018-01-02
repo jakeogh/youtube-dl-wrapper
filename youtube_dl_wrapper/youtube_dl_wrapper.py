@@ -153,13 +153,14 @@ def check_if_video_exists_by_video_id(video_id):
     raise NoMatchException
 
 
-def download_url(url, output_dir):
+def download_url(url, cache_dir):
     assert url
+#    'outtmpl': output_dir + "/%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
     ydl_opts = {
         'verbose': False,
         'forcefilename': True,
         'socket_timeout': 30,
-        'outtmpl': output_dir + "/%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
+        'outtmpl': cache_dir + '/' + '%(extractor)s' +'/' + '%(uploader)s' + '/' + "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
         'ignoreerrors': True,
         'continue': True,
         'retries': 20,
@@ -263,7 +264,6 @@ def youtube_dl_wrapper(urls, play, id_from_url, cache_folder=CACHE_FOLDER, video
         eprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
 
-
     try:
         os.chdir(cache_folder)
     except:
@@ -275,15 +275,16 @@ def youtube_dl_wrapper(urls, play, id_from_url, cache_folder=CACHE_FOLDER, video
         print(url)
         video_id, video_extractor = extract_id_from_url(url)
         print("extractor:", video_extractor, "id:", video_id)
-        output_dir = cache_folder + '/sources/' + video_extractor + '/' + video_id[0] + '/' + video_id[1]
+        #output_dir = cache_folder + '/sources/' + video_extractor + '/' + video_id[0] + '/' + video_id[1]
         if id_from_url:
             print(download_id_for_url(url))
             continue
-        os.makedirs(output_dir, exist_ok=True)
-        os.chdir(output_dir)
-        video_file = download_url(url=url, output_dir=output_dir)
+        #os.makedirs(output_dir, exist_ok=True)
+        #os.chdir(output_dir)
+        #video_file = download_url(url=url, output_dir=output_dir)
+        video_file = download_url(url=url, cache_dir=CACHE_FOLDER)
         assert video_file
-        os.chdir(CACHE_FOLDER)
+        #os.chdir(CACHE_FOLDER)
 
         print(" ")
 
