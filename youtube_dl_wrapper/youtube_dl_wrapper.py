@@ -147,6 +147,7 @@ def check_if_video_exists_by_video_id(video_id):
         #    continue
         matches.append(match)
     if matches:
+        eprint("matches:", matches)
         return matches
     raise NoMatchException
 
