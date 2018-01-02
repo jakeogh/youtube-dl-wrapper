@@ -18,7 +18,6 @@ extractors = gen_extractors()
 
 VIDEO_CMD = ['/usr/bin/mpv',
              '--cache-pause',
-             '--audio-dsplay=no',
              '--hwdec=vdpau',
              '--cache-initial=75000',
              '--cache-default=275000']
