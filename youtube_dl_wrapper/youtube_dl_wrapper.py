@@ -166,7 +166,7 @@ def process_url(url):
         id_from_url = download_id_for_url(url)
 
     os.makedirs(extractor)
-    os.chdir(extracor)
+    os.chdir(extractor)
     existing_files = check_if_video_exists_by_video_id(id_from_url)
     #import IPython; IPython.embed()
     if not existing_files:
