@@ -134,7 +134,8 @@ def check_if_video_exists_by_video_id(video_id):
                 continue
             if match.endswith('.part'):
                 continue
-            #match_ending = match.split(video_id)[-1]
+            match_ending = match.split(video_id)[-1]
+            print("match_ending:", match_ending)
             #if len(match_ending.split('.')) > 1:
             #    continue
             matches.append(match)
