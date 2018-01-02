@@ -264,12 +264,11 @@ def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDE
         print(url)
         video_id, video_extractor = extract_id_from_url(url)
         print("extractor:", video_extractor, "id:", video_id)
-        else:
-            output_dir = cache_folder + '/' + extractor + '/' + video_id
-            os.makedirs(output_dir, exist_ok=True)
-            os.chdir(output_dir)
-            download_url(url)
-            os.chdir(CACHE_FOLDER)
+        output_dir = cache_folder + '/' + extractor + '/' + video_id
+        os.makedirs(output_dir, exist_ok=True)
+        os.chdir(output_dir)
+        download_url(url)
+        os.chdir(CACHE_FOLDER)
 
         print(" ")
 
