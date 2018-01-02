@@ -267,7 +267,7 @@ def youtube_dl_wrapper(uris, play, extractor, cache_folder=CACHE_FOLDER, video_c
         print(" ")
 
     if downloaded_video_list:
-        print(downloaded_video_list)
+        #print(downloaded_video_list)
         if play:
             play_media(downloaded_video_list)
             pause("\nPress any key to exit")
