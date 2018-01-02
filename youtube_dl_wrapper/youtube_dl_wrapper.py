@@ -135,6 +135,7 @@ def check_if_video_exists_by_video_id(video_id):
     matches = []
     eprint("pre_matches:", pre_matches)
     for match in pre_matches:
+        match = os.path.realpath(match)
         if match.endswith('.description'):
             continue
         if match.endswith('.json'):
