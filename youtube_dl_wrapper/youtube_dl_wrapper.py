@@ -16,7 +16,9 @@ from kcl.printops import eprint
 
 extractors = gen_extractors()
 
-VIDEO_CMD = ['/usr/bin/mpv',
+VIDEO_CMD = ['/usr/bin/xterm',
+             '-e',
+             '/usr/bin/mpv',
              '--cache-pause',
              '--hwdec=vdpau',
              '--cache-initial=75000',
