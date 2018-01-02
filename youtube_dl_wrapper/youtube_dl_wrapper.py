@@ -36,6 +36,10 @@ def is_non_zero_file(fpath):
         return True
     return False
 
+def NoIDException(Exception):
+    pass
+
+
 def extract_id_from_url(url):
     for e in extractors:
         try:
@@ -56,7 +60,7 @@ def extract_id_from_url(url):
             pass
         except IndexError:
             pass
-    return False
+    raise NoIDException
 
 def download_id_for_url(url):
     print("download_id_for_url():", url)
