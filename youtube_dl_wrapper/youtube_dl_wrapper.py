@@ -188,7 +188,7 @@ def download_url(url, cache_dir):
 
     assert id_from_url
     try:
-        existing_file = check_if_video_exists_by_video_id(id_from_url)
+        existing_file = check_if_video_exists_by_video_id(id_from_url) #broken
     except NoMatchException:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             result = 1
@@ -205,10 +205,10 @@ def download_url(url, cache_dir):
                 if tries >= ydl_opts['retries']:
                     break
 
-            existing_file = check_if_video_exists_by_video_id(id_from_url)
+            #existing_file = check_if_video_exists_by_video_id(id_from_url)
 
-    downloaded_video_list.append(existing_file)
-    return existing_file
+    #downloaded_video_list.append(existing_file)
+    #return existing_file
 
 
 def play_media(video_list):
@@ -289,11 +289,11 @@ def youtube_dl_wrapper(urls, play, id_from_url, cache_folder=CACHE_FOLDER, video
         #os.chdir(output_dir)
         #video_file = download_url(url=url, output_dir=output_dir)
         video_file = download_url(url=url, cache_dir=CACHE_FOLDER)
-        assert video_file
+        #assert video_file
         #os.chdir(CACHE_FOLDER)
 
         print(" ")
 
-    if play:
-        play_media(downloaded_video_list)
-        pause("\nPress any key to exit")
+    #if play:
+    #    play_media(downloaded_video_list)
+    #    pause("\nPress any key to exit")
