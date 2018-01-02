@@ -247,8 +247,8 @@ def pause(message="Press any key to continue"):
 @click.command()
 @click.argument('uris', nargs=-1)
 @click.option('--play', is_flag=True)
-@click.option('--extractor', is_flag=True)
-def youtube_dl_wrapper(uris, play, extractor, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
+#@click.option('--extractor', is_flag=True)
+def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
     if not uris:
         eprint("no args, checking clipboard for urls")
         uris = get_clipboard_urls()
@@ -263,8 +263,7 @@ def youtube_dl_wrapper(uris, play, extractor, cache_folder=CACHE_FOLDER, video_c
     for url in uris:
         print(url)
         video_id, video_extractor = extract_id_from_url(url)
-        if extractor:
-            print("extractor:", video_extractor, "id:", video_id)
+        print("extractor:", video_extractor, "id:", video_id)
         else:
             output_dir = cache_folder + '/' + extractor + '/' + video_id
             os.makedirs(output_dir, exist_ok=True)
