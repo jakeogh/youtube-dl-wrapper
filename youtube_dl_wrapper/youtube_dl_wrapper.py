@@ -273,6 +273,7 @@ def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDE
         os.makedirs(output_dir, exist_ok=True)
         os.chdir(output_dir)
         video_file = download_url(url)
+        assert video_file
         os.chdir(CACHE_FOLDER)
 
         print(" ")
