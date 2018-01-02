@@ -171,7 +171,7 @@ def download_url(url, cache_dir):
         'allsubtitles': True,
         'progress_with_newline': False,
         'logger': MyLogger(),
-        'exec': 'ls {}',
+        'exec_cmd': 'ls {}',
     }
 
 
