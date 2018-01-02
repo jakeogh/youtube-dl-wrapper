@@ -41,6 +41,7 @@ def extract_id_from_url(url):
         try:
             regex = e._VALID_URL
             id = re.match(regex, url, re.VERBOSE).groups()[-1]
+            extractor = e.IE_NAME
 #            print("using extractor:", e.IE_NAME) #youtube:user
             if 'youtube' in e.IE_NAME:
                 try:
@@ -48,7 +49,7 @@ def extract_id_from_url(url):
                         return False
                 except TypeError:
                     return False
-            return id
+            return id, extractor
         except re.error:
             pass
         except AttributeError:
@@ -159,11 +160,13 @@ def process_url(url):
 #        'playlist': True,
 
     print("url:", url)
-    id_from_url = extract_id_from_url(url)
+    id_from_url, extractor = extract_id_from_url(url)
     print("id_from_url:", id_from_url)
     if not id_from_url:
         id_from_url = download_id_for_url(url)
 
+    os.mkdirs(extractor)
+    os.chdir(extracor)
     existing_files = check_if_video_exists_by_video_id(id_from_url)
     #import IPython; IPython.embed()
     if not existing_files:
@@ -257,14 +260,14 @@ def youtube_dl_wrapper(uris, play, extractor, cache_folder=CACHE_FOLDER, video_c
     for url in uris:
         print(url)
         if extractor:
-            video_id = extract_id_from_url(url)
-            print(video_id)
+            video_id, extractor = extract_id_from_url(url)
+            print(extractor, video_id)
         else:
             process_url(url)
         print(" ")
 
-    print(downloaded_video_list)
-
-    if play:
-        play_media(downloaded_video_list)
-        pause("\nPress any key to exit")
+    if downloaded_video_list:
+        print(downloaded_video_list)
+        if play:
+            play_media(downloaded_video_list)
+            pause("\nPress any key to exit")
