@@ -180,9 +180,9 @@ def download_url(url):
         id_from_url = download_id_for_url(url)
 
     assert id_from_url
-    existing_file = check_if_video_exists_by_video_id(id_from_url)
-    #import IPython; IPython.embed()
-    if not existing_file:
+    try:
+        existing_file = check_if_video_exists_by_video_id(id_from_url)
+    except NoMatchException:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             result = 1
             tries = 0
