@@ -36,7 +36,7 @@ def is_non_zero_file(fpath):
         return True
     return False
 
-def NoIDException(Exception):
+def NoIDException(BaseException):
     pass
 
 
