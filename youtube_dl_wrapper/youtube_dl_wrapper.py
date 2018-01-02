@@ -129,27 +129,25 @@ def check_lsof_for_duplicate_process(video_id):
 
 
 def check_if_video_exists_by_video_id(video_id):
-    try:
-        pre_matches = glob.glob('./*' + video_id + '*')
-        matches = []
-        eprint("pre_matches:", pre_matches)
-        for match in pre_matches:
-            if match.endswith('.description'):
-                continue
-            if match.endswith('.json'):
-                continue
-            if match.endswith('.part'):
-                continue
-            match_ending = match.split(video_id)[-1]
-            print("match_ending:", match_ending)
-            #if len(match_ending.split('.')) > 1:
-            #    continue
-            matches.append(match)
-        if matches:
-            return matches
-        return False
-    except:
-        return False
+    pre_matches = glob.glob('./*' + video_id + '*')
+    matches = []
+    eprint("pre_matches:", pre_matches)
+    for match in pre_matches:
+        if match.endswith('.description'):
+            continue
+        if match.endswith('.json'):
+            continue
+        if match.endswith('.part'):
+            continue
+        match_ending = match.split(video_id)[-1]
+        print("match_ending:", match_ending)
+        #if len(match_ending.split('.')) > 1:
+        #    continue
+        matches.append(match)
+    if matches:
+        return matches
+    return False
+
 
 def download_url(url):
     assert url
@@ -178,9 +176,9 @@ def download_url(url):
         id_from_url = download_id_for_url(url)
 
     assert id_from_url
-    existing_files = check_if_video_exists_by_video_id(id_from_url)
+    existing_file = check_if_video_exists_by_video_id(id_from_url)
     #import IPython; IPython.embed()
-    if not existing_files:
+    if not existing_file:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             result = 1
             tries = 0
@@ -196,13 +194,12 @@ def download_url(url):
                 if tries >= ydl_opts['retries']:
                     break
 
-            files = check_if_video_exists_by_video_id(id_from_url)
-            if files:
-                for infile in files:
-                    downloaded_video_list.append(infile)
+#            files = check_if_video_exists_by_video_id(id_from_url)
+#            if files:
+#                for infile in files:
+#                    downloaded_video_list.append(infile)
     else:
-        for infile in existing_files:
-            downloaded_video_list.append(infile)
+        return existing_file
 
 
 def play_media(video_list):
@@ -228,11 +225,13 @@ def mplayer(infile):
         cmd = cmd.bake(arg)
     cmd(infile)
 
+
 def mplayer_loop(infile):
     cmd = sh.Command(VIDEO_CMD_AUDIO_ONLY_LOOP[0])
     for arg in VIDEO_CMD_LOOP[1:]:
         cmd = cmd.bake(arg)
     cmd(infile)
+
 
 def mplayer_audio_only(infile):
     cmd = sh.Command(VIDEO_CMD_AUDIO_ONLY[0])
@@ -240,11 +239,13 @@ def mplayer_audio_only(infile):
         cmd = cmd.bake(arg)
     cmd(infile)
 
+
 def mplayer_audio_only_loop(infile):
     cmd = sh.Command(VIDEO_CMD_AUDIO_ONLY_LOOP[0])
     for arg in VIDEO_CMD_AUDIO_ONLY_LOOP[1:]:
         cmd = cmd.bake(arg)
     cmd(infile)
+
 
 def pause(message="Press any key to continue"):
     print(message)
@@ -274,7 +275,7 @@ def youtube_dl_wrapper(uris, play, cache_folder=CACHE_FOLDER, video_command=VIDE
         output_dir = cache_folder + '/' + video_extractor + '/' + video_id
         os.makedirs(output_dir, exist_ok=True)
         os.chdir(output_dir)
-        download_url(url)
+        video_file = download_url(url)
         os.chdir(CACHE_FOLDER)
 
         print(" ")
