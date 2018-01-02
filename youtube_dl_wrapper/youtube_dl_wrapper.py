@@ -39,6 +39,8 @@ def is_non_zero_file(fpath):
 class NoIDException(ValueError):
     pass
 
+class NoMatchException(ValueError):
+    pass
 
 def extract_id_from_url(url):
     for e in extractors:
@@ -146,7 +148,7 @@ def check_if_video_exists_by_video_id(video_id):
         matches.append(match)
     if matches:
         return matches
-    return False
+    raise NoMatchException
 
 
 def download_url(url):
