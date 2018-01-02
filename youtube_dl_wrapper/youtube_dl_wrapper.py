@@ -263,9 +263,6 @@ def youtube_dl_wrapper(uris, play, id_from_url, cache_folder=CACHE_FOLDER, video
         eprint("no args, checking clipboard for urls")
         uris = get_clipboard_urls()
 
-    if id_from_url:
-        print(download_id_for_url)
-        quit(0)
 
     try:
         os.chdir(cache_folder)
@@ -279,6 +276,9 @@ def youtube_dl_wrapper(uris, play, id_from_url, cache_folder=CACHE_FOLDER, video
         video_id, video_extractor = extract_id_from_url(url)
         print("extractor:", video_extractor, "id:", video_id)
         output_dir = cache_folder + '/sources/' + video_extractor + '/' + video_id[0] + '/' + video_id[1]
+        if id_from_url:
+            print(download_id_for_url(uri))
+            continue
         os.makedirs(output_dir, exist_ok=True)
         os.chdir(output_dir)
         video_file = download_url(url=url, output_dir=output_dir)
