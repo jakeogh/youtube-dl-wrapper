@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import click
-import sys
+#import sys
 import sh
 import os
 import re
@@ -16,14 +16,12 @@ from kcl.printops import eprint
 
 extractors = gen_extractors()
 
-VIDEO_CMD = [
-'/usr/bin/mpv',
-'--cache-pause',
-'--no-audio-display',
-"--hwdec=vdpau",
-'--cache-initial=75000',
-'--cache-default=275000'
-]
+VIDEO_CMD = ['/usr/bin/mpv',
+             '--cache-pause',
+             '--no-audio-dsplay',
+             '--hwdec=vdpau',
+             '--cache-initial=75000',
+             '--cache-default=275000']
 
 CACHE_FOLDER = compat_expanduser('~/_youtube')
 VIDEO_CMD_LOOP = VIDEO_CMD + ['-fs', '-loop', '0']
@@ -31,10 +29,12 @@ VIDEO_CMD_AUDIO_ONLY = VIDEO_CMD + ['-fs', '--no-video']
 VIDEO_CMD_AUDIO_ONLY_LOOP = VIDEO_CMD + ['-fs', '-vo', 'none', '-loop', '0']
 downloaded_video_list = []
 
+
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
         return True
     return False
+
 
 class NoIDException(ValueError):
     pass
@@ -62,6 +62,7 @@ def extract_id_from_url(url):
             pass
     raise NoIDException
 
+
 def download_id_for_url(url):
     print("download_id_for_url():", url)
     ydl_opts = {
@@ -70,12 +71,12 @@ def download_id_for_url(url):
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False, process=False)
-        #import IPython; IPython.embed()
         try:
             if info['id']:
                 return info['id']
         except KeyError:
             return False
+
 
 class MyLogger(object):
     def debug(self, msg):
@@ -85,16 +86,19 @@ class MyLogger(object):
     def error(self, msg):
         print(msg)
 
+
 def get_clipboard():
     clipboard_text = subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
     clipboard_text_utf8 = clipboard_text.decode("utf-8")
     print("clipboard_text_utf8:", clipboard_text_utf8)
     return clipboard_text_utf8
 
+
 def get_clipboard_urls():
     clipboard_text = get_clipboard()
     urls = extract_urls_from_text(clipboard_text)
     return urls
+
 
 def extract_urls_from_text(intext):
     text = intext.split("\n")
@@ -109,6 +113,7 @@ def extract_urls_from_text(intext):
     url_set = set(extracted_url_list)
     return list(url_set)
 
+
 def check_lsof_for_duplicate_process(video_id):
     lsof_check = ""
     try:
@@ -121,6 +126,7 @@ def check_lsof_for_duplicate_process(video_id):
         print("Found", video_id, "in lsof output, skipping.")
         return True
     return False
+
 
 def check_if_video_exists_by_video_id(video_id):
     try:
