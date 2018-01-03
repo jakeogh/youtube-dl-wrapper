@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 
 import click
-#import sys
 import sh
 import os
 import re
 import glob
 import subprocess
 import youtube_dl
-import time
 
 from youtube_dl.compat import compat_expanduser
 from youtube_dl.extractor import gen_extractors
@@ -41,8 +39,10 @@ def is_non_zero_file(fpath):
 class NoIDException(ValueError):
     pass
 
+
 class NoMatchException(ValueError):
     pass
+
 
 def extract_id_from_url(url):
     for e in extractors:
@@ -120,10 +120,7 @@ def extract_urls_from_text(intext):
 
 def check_lsof_for_duplicate_process(video_id):
     lsof_check = ""
-    try:
-        lsof_check = sh.grep(sh.lsof(), video_id)
-    except:
-        pass
+    lsof_check = sh.grep(sh.lsof(), video_id)
 
     if len(lsof_check) > 0:
         print("lsof_check:", lsof_check)
@@ -159,7 +156,6 @@ def check_if_video_exists_by_video_id(video_id):
 def download_url(url, cache_dir):
     assert url
     exec_cmd = ' '.join(VIDEO_CMD) + ' {} &'
-#    'outtmpl': output_dir + "/%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
     ydl_opts = {
         'verbose': False,
         'forcefilename': True,
@@ -181,36 +177,9 @@ def download_url(url, cache_dir):
         'logger': MyLogger(),
     }
 
-
     print("url:", url)
-    #id_from_url, extractor = extract_id_from_url(url)
-    #print("id_from_url:", id_from_url)
-    #if not id_from_url:
-    #    id_from_url = download_id_for_url(url)
-
-    #assert id_from_url
-    #try:
-    #    existing_file = check_if_video_exists_by_video_id(id_from_url) #broken
-    #except NoMatchException:
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        #result = 1
-        #tries = 0
-        #while result != 0:
-        #    try:
-        result = ydl.download([url])
-        #        print("try result:", result)
-        #    except Exception as e: # annoying that YoutubeDL is not raising exceptions when it fails
-        #        print("Exception:", e)
-        #        print("result:", result)
-            #time.sleep(2)
-            #tries += 1
-            #if tries >= ydl_opts['retries']:
-            #    break
-
-        #existing_file = check_if_video_exists_by_video_id(id_from_url)
-
-    #downloaded_video_list.append(existing_file)
-    #return existing_file
+        ydl.download([url])
 
 
 def play_media(video_list):
@@ -281,21 +250,8 @@ def youtube_dl_wrapper(urls, play, id_from_url, cache_folder=CACHE_FOLDER, video
 
     for url in urls:
         print(url)
-        #video_id, video_extractor = extract_id_from_url(url)
-        #print("extractor:", video_extractor, "id:", video_id)
-        #output_dir = cache_folder + '/sources/' + video_extractor + '/' + video_id[0] + '/' + video_id[1]
         if id_from_url:
             print(download_id_for_url(url))
             continue
-        #os.makedirs(output_dir, exist_ok=True)
-        #os.chdir(output_dir)
-        #video_file = download_url(url=url, output_dir=output_dir)
-        video_file = download_url(url=url, cache_dir=CACHE_FOLDER)
-        #assert video_file
-        #os.chdir(CACHE_FOLDER)
-
+        download_url(url=url, cache_dir=CACHE_FOLDER)
         print(" ")
-
-    #if play:
-    #    play_media(downloaded_video_list)
-    #    pause("\nPress any key to exit")
