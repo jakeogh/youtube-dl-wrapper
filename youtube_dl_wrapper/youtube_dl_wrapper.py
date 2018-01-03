@@ -236,17 +236,17 @@ def pause(message="Press any key to continue"):
 @click.argument('urls', nargs=-1)
 @click.option('--play', is_flag=True)
 @click.option('--id-from-url', is_flag=True)
-def youtube_dl_wrapper(urls, play, id_from_url, cache_folder=CACHE_FOLDER, video_command=VIDEO_CMD):
+def youtube_dl_wrapper(urls, play, id_from_url):
     if not urls:
         eprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
 
     try:
-        os.chdir(cache_folder)
-    except:
-        print("Unable to os.chdir() to", cache_folder, "Press enter to retry.")
+        os.chdir(CACHE_FOLDER)
+    except FileNotFoundError:
+        print("Unable to os.chdir() to", CACHE_FOLDER, "Press enter to retry.")
         pause()
-        os.chdir(cache_folder)
+        os.chdir(CACHE_FOLDER)
 
     for url in urls:
         print(url)
