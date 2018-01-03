@@ -193,19 +193,19 @@ def download_url(url, cache_dir):
     #    existing_file = check_if_video_exists_by_video_id(id_from_url) #broken
     #except NoMatchException:
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        result = 1
-        tries = 0
-        while result != 0:
-            try:
-                result = ydl.download([url])
-                print("try result:", result)
-            except Exception as e: # annoying that YoutubeDL is not raising exceptions when it fails
-                print("Exception:", e)
-                print("result:", result)
-            time.sleep(2)
-            tries += 1
-            if tries >= ydl_opts['retries']:
-                break
+        #result = 1
+        #tries = 0
+        #while result != 0:
+        #    try:
+        result = ydl.download([url])
+        #        print("try result:", result)
+        #    except Exception as e: # annoying that YoutubeDL is not raising exceptions when it fails
+        #        print("Exception:", e)
+        #        print("result:", result)
+            #time.sleep(2)
+            #tries += 1
+            #if tries >= ydl_opts['retries']:
+            #    break
 
         #existing_file = check_if_video_exists_by_video_id(id_from_url)
 
