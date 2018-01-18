@@ -23,6 +23,8 @@ VIDEO_CMD = ['/usr/bin/xterm',
              '--cache-default=275000',
              '--pause']
 
+QUEUE_CMD = ['/home/cfg/media/queue']
+
 CACHE_FOLDER = compat_expanduser('~/_youtube')
 VIDEO_CMD_LOOP = VIDEO_CMD + ['-fs', '-loop', '0']
 VIDEO_CMD_AUDIO_ONLY = VIDEO_CMD + ['-fs', '--no-video']
@@ -155,7 +157,8 @@ def check_if_video_exists_by_video_id(video_id):
 
 def download_url(url, cache_dir):
     assert url
-    exec_cmd = ' '.join(VIDEO_CMD) + ' {} &'
+    #exec_cmd = ' '.join(VIDEO_CMD) + ' {} &'
+    exec_cmd = ' '.join(QUEUE_CMD) + ' {} &'
     ydl_opts = {
         'verbose': False,
         'forcefilename': True,
