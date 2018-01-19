@@ -171,6 +171,7 @@ def download_url(url, cache_dir):
         'playlist': False,
         'fragment_retries': 10,
         'writedescription': True,
+        'playlistrandom': True,
         'writeinfojson': True,
         'allsubtitles': True,
         'progress_with_newline': False,
