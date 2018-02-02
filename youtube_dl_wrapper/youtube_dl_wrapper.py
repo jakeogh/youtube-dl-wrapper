@@ -23,7 +23,7 @@ VIDEO_CMD = ['/usr/bin/xterm',
              '--cache-default=275000',
              '--pause']
 
-QUEUE_CMD = ['/home/cfg/redis/add',
+QUEUE_CMD = ['/home/cfg/redis/rpush',
              'mpv']
 
 CACHE_FOLDER = compat_expanduser('~/_youtube')
