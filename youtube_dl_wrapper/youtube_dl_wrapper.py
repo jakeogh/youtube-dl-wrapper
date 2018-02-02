@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import click
 import sh
@@ -14,22 +14,9 @@ from kcl.printops import eprint
 
 extractors = gen_extractors()
 
-VIDEO_CMD = ['/usr/bin/xterm',
-             '-e',
-             '/usr/bin/mpv',
-             '--cache-pause',
-             '--hwdec=vdpau',
-             '--cache-initial=75000',
-             '--cache-default=275000',
-             '--pause']
-
-QUEUE_CMD = ['/home/cfg/redis/rpush',
-             'mpv']
+QUEUE_CMD = ['/home/cfg/redis/rpush', 'mpv']
 
 CACHE_FOLDER = compat_expanduser('~/_youtube')
-VIDEO_CMD_LOOP = VIDEO_CMD + ['-fs', '-loop', '0']
-VIDEO_CMD_AUDIO_ONLY = VIDEO_CMD + ['-fs', '--no-video']
-VIDEO_CMD_AUDIO_ONLY_LOOP = VIDEO_CMD + ['-fs', '-vo', 'none', '-loop', '0']
 downloaded_video_list = []
 
 
@@ -146,19 +133,15 @@ def check_if_video_exists_by_video_id(video_id):
             continue
         match_ending = match.split(video_id)[-1]
         print("match_ending:", match_ending)
-        #if len(match_ending.split('.')) > 1:
-        #    continue
         matches.append(match)
     if matches:
         eprint("matches:", matches)
-        #assert len(matches) == 1
         return matches[0]
     raise NoMatchException
 
 
 def download_url(url, cache_dir):
     assert url
-    #exec_cmd = ' '.join(VIDEO_CMD) + ' {} &'
     exec_cmd = ' '.join(QUEUE_CMD) + ' {} &'
     ydl_opts = {
         'verbose': False,
@@ -176,8 +159,8 @@ def download_url(url, cache_dir):
         'allsubtitles': True,
         'progress_with_newline': False,
         'postprocessors': [{
-        'key': 'ExecAfterDownload',
-        'exec_cmd': exec_cmd,
+            'key': 'ExecAfterDownload',
+            'exec_cmd': exec_cmd,
         }],
         'logger': MyLogger(),
     }
@@ -187,61 +170,11 @@ def download_url(url, cache_dir):
         ydl.download([url])
 
 
-def play_media(video_list):
-    for infile in video_list:
-        pause("\nPress any key to play: " + str(infile))
-        play = "y"
-        while play.lower().startswith("y"):
-            if play.lower() == 'yy':
-                mplayer_audio_only(infile)
-            elif play.lower() == 'yyy':
-                mplayer_audio_only_loop(infile)
-            elif play.lower() == 'yyyy':
-                mplayer_loop(infile)
-            else:
-                mplayer(infile)
-            print("Done playing.")
-            play = input("\nEnter y to replay (yy to play audio only, yyy to loop audio, yyyy to loop a/v): ")
-
-
-def mplayer(infile):
-    cmd = sh.Command(VIDEO_CMD[0])
-    for arg in VIDEO_CMD[1:]:
-        cmd = cmd.bake(arg)
-    cmd(infile)
-
-
-def mplayer_loop(infile):
-    cmd = sh.Command(VIDEO_CMD_AUDIO_ONLY_LOOP[0])
-    for arg in VIDEO_CMD_LOOP[1:]:
-        cmd = cmd.bake(arg)
-    cmd(infile)
-
-
-def mplayer_audio_only(infile):
-    cmd = sh.Command(VIDEO_CMD_AUDIO_ONLY[0])
-    for arg in VIDEO_CMD_AUDIO_ONLY[1:]:
-        cmd = cmd.bake(arg)
-    cmd(infile)
-
-
-def mplayer_audio_only_loop(infile):
-    cmd = sh.Command(VIDEO_CMD_AUDIO_ONLY_LOOP[0])
-    for arg in VIDEO_CMD_AUDIO_ONLY_LOOP[1:]:
-        cmd = cmd.bake(arg)
-    cmd(infile)
-
-
-def pause(message="Press any key to continue"):
-    print(message)
-    input()
-
 
 @click.command()
 @click.argument('urls', nargs=-1)
-@click.option('--play', is_flag=True)
 @click.option('--id-from-url', is_flag=True)
-def youtube_dl_wrapper(urls, play, id_from_url):
+def youtube_dl_wrapper(urls, id_from_url):
     if not urls:
         eprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
