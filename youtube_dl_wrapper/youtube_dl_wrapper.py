@@ -13,9 +13,7 @@ from youtube_dl.extractor import gen_extractors
 from kcl.printops import eprint
 
 extractors = gen_extractors()
-
 QUEUE_CMD = ['/home/cfg/redis/rpush', 'mpv']
-
 CACHE_FOLDER = compat_expanduser('~/_youtube')
 downloaded_video_list = []
 
@@ -154,7 +152,6 @@ def download_url(url, cache_dir):
             'exec_cmd': exec_cmd,
         }],
     }
-
     print("url:", url)
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
