@@ -72,15 +72,6 @@ def download_id_for_url(url):
             return False
 
 
-class MyLogger(object):
-    def debug(self, msg):
-        print(msg)
-    def warning(self, msg):
-        print(msg)
-    def error(self, msg):
-        print(msg)
-
-
 def get_clipboard():
     clipboard_text = subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
     clipboard_text_utf8 = clipboard_text.decode("utf-8")
@@ -162,13 +153,11 @@ def download_url(url, cache_dir):
             'key': 'ExecAfterDownload',
             'exec_cmd': exec_cmd,
         }],
-        'logger': MyLogger(),
     }
 
     print("url:", url)
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-
 
 
 @click.command()
@@ -183,7 +172,7 @@ def youtube_dl_wrapper(urls, id_from_url):
         os.chdir(CACHE_FOLDER)
     except FileNotFoundError:
         print("Unable to os.chdir() to", CACHE_FOLDER, "Press enter to retry.")
-        pause()
+        os.sys('pause')
         os.chdir(CACHE_FOLDER)
 
     for url in urls:
