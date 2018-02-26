@@ -146,6 +146,7 @@ def download_url(url, cache_dir):
         'playlistrandom': True,
         'writeinfojson': True,
         'allsubtitles': True,
+        "source_address": "0.0.0.0",
         'progress_with_newline': False,
         'postprocessors': [{
             'key': 'ExecAfterDownload',
