@@ -17,6 +17,16 @@ QUEUE_CMD = ['/home/cfg/redis/rpush', 'mpv']
 CACHE_FOLDER = compat_expanduser('~/_youtube')
 downloaded_video_list = []
 
+VIDEO_CMD = ['/usr/bin/xterm',
+             '-e',
+             '/usr/bin/mpv',
+             '--cache-pause',
+             '--hwdec=vdpau',
+             '--cache-initial=75000',
+             '--cache-default=275000',
+             '--pause']
+
+
 
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
@@ -129,9 +139,12 @@ def check_if_video_exists_by_video_id(video_id):
     raise NoMatchException
 
 
-def download_url(url, cache_dir):
+def download_url(url, cache_dir, play):
     assert url
-    exec_cmd = ' '.join(QUEUE_CMD) + ' {} &'
+    if play:
+        exec_cmd = ' '.join(VIDEO_CMD) + ' {} &'
+    else:
+        exec_cmd = ' '.join(QUEUE_CMD) + ' {} &'
     ydl_opts = {
         'verbose': False,
         'forcefilename': True,
@@ -161,7 +174,8 @@ def download_url(url, cache_dir):
 @click.command()
 @click.argument('urls', nargs=-1)
 @click.option('--id-from-url', is_flag=True)
-def youtube_dl_wrapper(urls, id_from_url):
+@click.option('--play', is_flag=True)
+def youtube_dl_wrapper(urls, id_from_url, play):
     if not urls:
         eprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
@@ -178,5 +192,5 @@ def youtube_dl_wrapper(urls, id_from_url):
         if id_from_url:
             print(download_id_for_url(url))
             continue
-        download_url(url=url, cache_dir=CACHE_FOLDER)
+        download_url(url=url, cache_dir=CACHE_FOLDER, play=play)
         print(" ")
