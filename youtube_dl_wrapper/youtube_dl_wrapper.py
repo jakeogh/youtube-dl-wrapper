@@ -155,6 +155,7 @@ def download_url(url, cache_dir, play):
         'retries': 20,
         'playlist': False,
         'fragment_retries': 10,
+        'download_archive': '/home/user/youtube-dl.archive',
         'writedescription': True,
         'playlistrandom': True,
         'writeinfojson': True,
