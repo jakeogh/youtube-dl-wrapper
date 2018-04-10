@@ -10,7 +10,7 @@ import youtube_dl
 
 from youtube_dl.compat import compat_expanduser
 from youtube_dl.extractor import gen_extractors
-from kcl.printops import eprint
+from kcl.printops import ceprint
 
 extractors = gen_extractors()
 QUEUE_CMD = ['/home/cfg/redis/rpush', 'mpv']
@@ -120,7 +120,7 @@ def check_lsof_for_duplicate_process(video_id):
 def check_if_video_exists_by_video_id(video_id):
     pre_matches = glob.glob('./*' + video_id + '*')
     matches = []
-    eprint("pre_matches:", pre_matches)
+    ceprint("pre_matches:", pre_matches)
     for match in pre_matches:
         match = os.path.realpath(match)
         if match.endswith('.description'):
@@ -133,7 +133,7 @@ def check_if_video_exists_by_video_id(video_id):
         print("match_ending:", match_ending)
         matches.append(match)
     if matches:
-        eprint("matches:", matches)
+        ceprint("matches:", matches)
         return matches[0]
     raise NoMatchException
 
@@ -182,7 +182,7 @@ def download_url(url, cache_dir, play):
 @click.option('--play', is_flag=True)
 def youtube_dl_wrapper(urls, id_from_url, play):
     if not urls:
-        eprint("no args, checking clipboard for urls")
+        ceprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
 
     try:
