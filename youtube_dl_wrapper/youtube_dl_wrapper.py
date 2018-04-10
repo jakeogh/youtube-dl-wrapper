@@ -147,7 +147,8 @@ def download_url(url, cache_dir, play):
         exec_cmd = queue_command + ' ; ' + play_command
     else:
         exec_cmd = queue_command
-        #exec_cmd = ' '.join(QUEUE_CMD) + ' {} &'
+
+    ceprint("exec_cmd:", exec_cmd)
     ydl_opts = {
         'verbose': False,
         'forcefilename': True,
