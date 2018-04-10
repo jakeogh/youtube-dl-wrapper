@@ -27,7 +27,6 @@ VIDEO_CMD = ['/usr/bin/xterm',
              '--pause']
 
 
-
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
         return True
@@ -141,10 +140,14 @@ def check_if_video_exists_by_video_id(video_id):
 
 def download_url(url, cache_dir, play):
     assert url
+    play_command = ' '.join(VIDEO_CMD) + ' {} &'
+    queue_command = ' '.join(QUEUE_CMD) + ' {} &'
+
     if play:
-        exec_cmd = ' '.join(VIDEO_CMD) + ' {} &'
+        exec_cmd = queue_command + ' ; ' + play_command
     else:
-        exec_cmd = ' '.join(QUEUE_CMD) + ' {} &'
+        exec_cmd = queue_command
+        #exec_cmd = ' '.join(QUEUE_CMD) + ' {} &'
     ydl_opts = {
         'verbose': False,
         'forcefilename': True,
