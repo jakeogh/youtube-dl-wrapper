@@ -144,7 +144,7 @@ def download_url(url, cache_dir, play):
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
 
     if play:
-        exec_cmd = queue_command + ' ; ' + play_command
+        exec_cmd = queue_command + ' ; ' + play_command + ' & '
     else:
         exec_cmd = queue_command
 
