@@ -140,8 +140,8 @@ def check_if_video_exists_by_video_id(video_id):
 
 def download_url(url, cache_dir, play):
     assert url
-    play_command = ' '.join(VIDEO_CMD) + ' {} &'
-    queue_command = ' '.join(QUEUE_CMD) + ' {} &'
+    play_command = ' '.join(VIDEO_CMD) + ' {}'
+    queue_command = ' '.join(QUEUE_CMD) + ' {}'
 
     if play:
         exec_cmd = queue_command + ' ; ' + play_command
@@ -153,7 +153,7 @@ def download_url(url, cache_dir, play):
         'verbose': False,
         'forcefilename': True,
         'socket_timeout': 30,
-        'outtmpl': cache_dir + '/sources/' + '%(extractor)s' +'/' + '%(uploader)s' + '/' + "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
+        'outtmpl': cache_dir + '/sources/' + '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
         'ignoreerrors': True,
         'continue': True,
         'retries': 20,
