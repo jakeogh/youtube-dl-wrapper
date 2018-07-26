@@ -190,7 +190,7 @@ def youtube_dl_wrapper(urls, id_from_url, play, destdir):
         os.chdir(cache_folder)
     except FileNotFoundError:
         print("Unable to os.chdir() to", cache_folder, "Press enter to retry.")
-        os.sys('pause')
+        input('pause')
         os.chdir(cache_folder)
 
     for url in urls:
