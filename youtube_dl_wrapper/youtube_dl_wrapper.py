@@ -14,7 +14,6 @@ from kcl.printops import ceprint
 
 extractors = gen_extractors()
 QUEUE_CMD = ['/home/cfg/redis/rpush', 'mpv']
-CACHE_FOLDER = compat_expanduser('~/_youtube')
 downloaded_video_list = []
 
 VIDEO_CMD = ['/usr/bin/xterm',
@@ -180,22 +179,24 @@ def download_url(url, cache_dir, play):
 @click.argument('urls', nargs=-1)
 @click.option('--id-from-url', is_flag=True)
 @click.option('--play', is_flag=True)
-def youtube_dl_wrapper(urls, id_from_url, play):
+@click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
+def youtube_dl_wrapper(urls, id_from_url, play, destdir):
     if not urls:
         ceprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
 
+    cache_folder = compat_expanduser(destdir)
     try:
-        os.chdir(CACHE_FOLDER)
+        os.chdir(cache_folder)
     except FileNotFoundError:
-        print("Unable to os.chdir() to", CACHE_FOLDER, "Press enter to retry.")
+        print("Unable to os.chdir() to", cache_folder, "Press enter to retry.")
         os.sys('pause')
-        os.chdir(CACHE_FOLDER)
+        os.chdir(cache_folder)
 
     for url in urls:
         print(url)
         if id_from_url:
             print(download_id_for_url(url))
             continue
-        download_url(url=url, cache_dir=CACHE_FOLDER, play=play)
+        download_url(url=url, cache_dir=cache_folder, play=play)
         print(" ")
