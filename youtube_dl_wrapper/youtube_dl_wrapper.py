@@ -79,7 +79,8 @@ def download_id_for_url(url):
 
 
 def get_clipboard():
-    clipboard_text = subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
+    clipboard_text = \
+        subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
     clipboard_text_utf8 = clipboard_text.decode("utf-8")
     print("clipboard_text_utf8:", clipboard_text_utf8)
     return clipboard_text_utf8
