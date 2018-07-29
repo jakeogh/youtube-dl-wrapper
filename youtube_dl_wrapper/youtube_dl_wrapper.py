@@ -152,7 +152,7 @@ def download_url(url, cache_dir, play):
         'verbose': False,
         'forcefilename': True,
         'socket_timeout': 30,
-        'outtmpl': cache_dir + '/sources/' + '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader)s__%(uploader_id)s__%(upload_date)s__%(title)s__%(extractor)s__%(id)s.%(ext)s",
+        'outtmpl': cache_dir + '/sources/' + '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(title)s__%(id)s.%(ext)s",
         'ignoreerrors': True,
         'continue': True,
         'retries': 20,
