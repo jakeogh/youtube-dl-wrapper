@@ -143,7 +143,7 @@ def check_if_video_exists_by_video_id(video_id):
     raise NoMatchException
 
 
-def download_url(url, cache_dir, play):
+def download_url(url, cache_dir, ignore_download_archive, play):
     assert url
     play_command = ' '.join(VIDEO_CMD) + ' {}'
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
@@ -152,6 +152,9 @@ def download_url(url, cache_dir, play):
         exec_cmd = queue_command + ' ; ' + play_command + ' & '
     else:
         exec_cmd = queue_command
+
+
+    #'download_archive': '/home/user/youtube-dl.archive',
 
     ceprint("exec_cmd:", exec_cmd)
     ydl_opts = {
@@ -164,7 +167,6 @@ def download_url(url, cache_dir, play):
         'retries': 20,
         'playlist': False,
         'fragment_retries': 10,
-        'download_archive': '/home/user/youtube-dl.archive',
         'writedescription': True,
         'playlistrandom': True,
         'writeinfojson': True,
@@ -176,6 +178,8 @@ def download_url(url, cache_dir, play):
             'exec_cmd': exec_cmd,
         }],
     }
+    if not ignore_download_archive:
+        ytdl_ops['download_archive'] = '/home/user/youtube-dl.archive'
     print("url:", url)
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -193,9 +197,10 @@ def construct_youtube_url_from_id(ytid):
 @click.command()
 @click.argument('urls', nargs=-1)
 @click.option('--id-from-url', is_flag=True)
+@click.option('--ignore-download-archive', is_flag=True)
 @click.option('--play', is_flag=True)
 @click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
-def youtube_dl_wrapper(urls, id_from_url, play, destdir):
+def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, destdir):
     if not urls:
         ceprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
@@ -213,5 +218,5 @@ def youtube_dl_wrapper(urls, id_from_url, play, destdir):
         if id_from_url:
             print(download_id_for_url(url))
             continue
-        download_url(url=url, cache_dir=cache_folder, play=play)
+        download_url(url=url, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play)
         print(" ")
