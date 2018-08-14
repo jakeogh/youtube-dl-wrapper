@@ -5,6 +5,7 @@ import sh
 import os
 import re
 import glob
+import string
 import subprocess
 import youtube_dl
 
@@ -196,6 +197,11 @@ def youtube_dl_wrapper(urls, id_from_url, play, destdir):
 
     for url in urls:
         print(url)
+        if len(url) == 11:
+            allowed = set(string.ascii_lowercase + string.ascii_uppercase + string.digits + '_')
+            if set(url) <= allowed:
+                ceprint("found bare youtube id:", url)
+                url = 'https://www.youtube.com/watch?v=' + url
         if id_from_url:
             print(download_id_for_url(url))
             continue
