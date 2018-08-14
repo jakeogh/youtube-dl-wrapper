@@ -100,6 +100,10 @@ def extract_urls_from_text(intext):
     for line in clean_text:
         for word in line.split(' '):
             urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', word)
+            if len(urls) == 0:
+                constructed_url = construct_youtube_url_from_id(ytid=word)
+                if constructed_url:
+                    urls.append(constructed_url)
             for url in urls:
                 extracted_url_list.append(url)
 
@@ -176,6 +180,15 @@ def download_url(url, cache_dir, play):
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
+def construct_youtube_url_from_id(ytid):
+    if len(ytid) == 11:
+        allowed = set(string.ascii_lowercase + string.ascii_uppercase + string.digits + '_')
+        if set(ytid) <= allowed:
+            ceprint("found bare youtube id:", ytid)
+            url = 'https://www.youtube.com/watch?v=' + ytid
+            return url
+    return False
+
 
 @click.command()
 @click.argument('urls', nargs=-1)
@@ -197,11 +210,6 @@ def youtube_dl_wrapper(urls, id_from_url, play, destdir):
 
     for url in urls:
         print(url)
-        if len(url) == 11:
-            allowed = set(string.ascii_lowercase + string.ascii_uppercase + string.digits + '_')
-            if set(url) <= allowed:
-                ceprint("found bare youtube id:", url)
-                url = 'https://www.youtube.com/watch?v=' + url
         if id_from_url:
             print(download_id_for_url(url))
             continue
