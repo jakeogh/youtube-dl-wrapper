@@ -179,7 +179,7 @@ def download_url(url, cache_dir, ignore_download_archive, play):
         }],
     }
     if not ignore_download_archive:
-        ydl_ops['download_archive'] = '/home/user/youtube-dl.archive'
+        ydl_opts['download_archive'] = '/home/user/youtube-dl.archive'
     print("url:", url)
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
