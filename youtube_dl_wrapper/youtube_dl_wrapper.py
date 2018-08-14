@@ -182,7 +182,7 @@ def download_url(url, cache_dir, play):
 
 def construct_youtube_url_from_id(ytid):
     if len(ytid) == 11:
-        allowed = set(string.ascii_lowercase + string.ascii_uppercase + string.digits + '_')
+        allowed = set(string.ascii_lowercase + string.ascii_uppercase + string.digits + '_' + '-')
         if set(ytid) <= allowed:
             ceprint("found bare youtube id:", ytid)
             url = 'https://www.youtube.com/watch?v=' + ytid
