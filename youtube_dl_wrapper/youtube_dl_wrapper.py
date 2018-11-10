@@ -143,7 +143,7 @@ def check_if_video_exists_by_video_id(video_id):
     raise NoMatchException
 
 
-def download_url(url, cache_dir, ignore_download_archive, play, verbose):
+def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive_file):
     assert url
     play_command = ' '.join(VIDEO_CMD) + ' {}'
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
@@ -182,7 +182,7 @@ def download_url(url, cache_dir, ignore_download_archive, play, verbose):
         ydl_opts['verbose'] = True
 
     if not ignore_download_archive:
-        ydl_opts['download_archive'] = '/home/user/youtube-dl.archive'
+        ydl_opts['download_archive'] = archive_file
     print("url:", url)
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -204,7 +204,8 @@ def construct_youtube_url_from_id(ytid):
 @click.option('--play', is_flag=True)
 @click.option('--verbose', is_flag=True)
 @click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
-def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose, destdir):
+@click.option('--archive-file', is_flag=False, required=False, default='~/.youtube_dl.cache')
+def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose, destdir, archive_file):
     if not urls:
         ceprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
@@ -222,5 +223,5 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         if id_from_url:
             print(download_id_for_url(url))
             continue
-        download_url(url=url, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose)
+        download_url(url=url, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
         print(" ")
