@@ -185,6 +185,7 @@ def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
+
 def construct_youtube_url_from_id(ytid):
     if len(ytid) == 11:
         allowed = set(string.ascii_lowercase + string.ascii_uppercase + string.digits + '_' + '-')
@@ -221,5 +222,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         if id_from_url:
             print(download_id_for_url(url))
             continue
-        download_url(url=url, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
+        download_url(url=url, cache_dir=cache_folder,
+                     ignore_download_archive=ignore_download_archive,
+                     play=play, verbose=verbose, archive_file=archive_file)
         print(" ")
