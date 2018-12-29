@@ -45,16 +45,16 @@ def extract_id_from_url(url):
     for e in extractors:
         try:
             regex = e._VALID_URL
-            id = re.match(regex, url, re.VERBOSE).groups()[-1]
+            urlid = re.match(regex, url, re.VERBOSE).groups()[-1]
             extractor = e.IE_NAME
 #            print("using extractor:", e.IE_NAME) #youtube:user
             if 'youtube' in e.IE_NAME:
                 try:
-                    if len(id) != 11:
+                    if len(urlid) != 11:
                         return False
                 except TypeError:
                     return False
-            return id, extractor
+            return urlid, extractor
         except re.error:
             pass
         except AttributeError:
@@ -153,9 +153,6 @@ def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive
     else:
         exec_cmd = queue_command
 
-
-    #'download_archive': '/home/user/youtube-dl.archive',
-
     ceprint("exec_cmd:", exec_cmd)
     ydl_opts = {
         'forcefilename': True,
@@ -165,6 +162,7 @@ def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive
         'continue': True,
         'retries': 20,
         'playlist': False,
+        'nopart',: True,
         'fragment_retries': 10,
         'writedescription': True,
         'playlistrandom': True,
