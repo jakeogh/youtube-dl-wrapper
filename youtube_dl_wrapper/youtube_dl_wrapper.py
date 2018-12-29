@@ -162,7 +162,7 @@ def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive
         'continue': True,
         'retries': 20,
         'playlist': False,
-        'nopart',: True,
+        'nopart': True,
         'fragment_retries': 10,
         'writedescription': True,
         'playlistrandom': True,
