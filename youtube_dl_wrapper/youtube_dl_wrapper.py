@@ -210,6 +210,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         ceprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
 
+    urls = list(urls)
     shuffle(urls)
     cache_folder = compat_expanduser(destdir)
     try:
