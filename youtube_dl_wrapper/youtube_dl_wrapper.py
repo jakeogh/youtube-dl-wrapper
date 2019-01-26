@@ -8,6 +8,7 @@ import glob
 import string
 import subprocess
 import youtube_dl
+from random import shuffle
 
 from youtube_dl.compat import compat_expanduser
 from youtube_dl.extractor import gen_extractors
@@ -209,6 +210,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         ceprint("no args, checking clipboard for urls")
         urls = get_clipboard_urls()
 
+    shuffle(urls)
     cache_folder = compat_expanduser(destdir)
     try:
         os.chdir(cache_folder)
