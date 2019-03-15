@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import click
+import copy
 import sh
 import os
 import re
 import glob
 import string
 import subprocess
+from cStringIO import StringIO
 from random import shuffle
 
 from youtube_dl.compat import compat_expanduser
@@ -30,6 +32,19 @@ VIDEO_CMD = ['/usr/bin/xterm',
              '--pause']
 
 FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(title)s__%(id)s.%(ext)s"
+
+
+# https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
+class Capturing(list):
+    def __enter__(self):
+        self._stdout = sys.stdout
+        sys.stdout = self._stringio = StringIO()
+        return self
+    def __exit__(self, *args):
+        self.extend(self._stringio.getvalue().splitlines())
+        del self._stringio    # free up some memory
+        sys.stdout = self._stdout
+
 
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
@@ -95,20 +110,16 @@ def download_id_for_url(url):
         except KeyError:
             return False
 
-#'getfilename': True,
 def get_filename_for_url(url, ydl_ops):
     ceprint(url)
     tydl_ops = ydl_ops
     tydl_ops['forcefilename'] = True
     tydl_ops['skip_download'] = True
     with YoutubeDL(tydl_ops) as ydl:
-        info = ydl.download([url])
-        print(info)
-        #try:
-        #    if info['id']:
-        #        return info['id']
-        #except KeyError:
-        #    return False
+        with Capturing() as output:
+            info = ydl.download([url])
+    return output
+
 
 def get_clipboard():
     clipboard_text = \
@@ -300,10 +311,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
             playlist_links = get_playlist_links(url)
             for plindex, plurl in enumerate(playlist_links):
                 ceprint('(' + str(plindex), "of", str(len(playlist_links)) + '):', url)
-                output_file = get_filename_for_url(url=plurl, ydl_ops=ydl_ops[:])
+                output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
                 ceprint("output_file:", output_file)
-                download_url(url=plurl, ydl_ops=ydl_ops[:])
+                download_url(url=plurl, ydl_ops=ydl_ops)
         else:
-            download_url(url=url, ydl_ops=ydl_ops[:])
+            download_url(url=url, ydl_ops=ydl_ops)
 
         print(" ")
