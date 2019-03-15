@@ -46,11 +46,11 @@ class NoMatchException(ValueError):
 
 
 def extract_id_from_url(url):
-    ceprint("url:", url)
-    ceprint("extractors:", extractors)
+    #ceprint("url:", url)
+    #ceprint("extractors:", extractors)
     for e in extractors:
         #try:
-        ceprint(e)
+        #ceprint(e)
         try:
             regex = e._VALID_URL
         except AttributeError:
@@ -224,7 +224,7 @@ def get_playlist_links(url):
     with YoutubeDL(ydl_opts) as ydl:
         json_info = ydl.extract_info(url, download=False)
 
-    for item in ans['entries']:
+    for item in json_info['entries']:
         links.append('https://www.youtube.com/watch?v=' + item['url'])
 
     return links
