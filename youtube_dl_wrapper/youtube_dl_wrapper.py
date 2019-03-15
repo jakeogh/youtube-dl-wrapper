@@ -212,16 +212,17 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
 
     #ceprint("exec_cmd:", exec_cmd)
     ydl_ops = {
-        'socket_timeout': 30,
+        'socket_timeout': 60,
         'ignoreerrors': True,
-        'continue': True,
-        'retries': 20,
-        'playlist': False,
-        'nopart': True,
-        'fragment_retries': 10,
-        'writedescription': True,
+        'continuedl': True,
+        'retries': 25,
+        'noplaylist': False,
         'playlistrandom': True,
+        'nopart': True,
+        'writedescription': True,
+        'writeannotations': True,
         'writeinfojson': True,
+        'writesubtitles': True,
         'allsubtitles': True,
         "source_address": "0.0.0.0",
         'progress_with_newline': False,
@@ -247,20 +248,23 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
     return ydl_ops
 
 
-def get_playlist_links(url):
+def get_playlist_links(url, ydl_ops):
     links = []
-    ydl_ops = {
-        'dumpjson': True,
-        'extract_flat': True,
-        'verbose': True,
-        'socket_timeout': 30,
-        'ignoreerrors': True,
-        'continue': True,
-        'retries': 20,
-        "source_address": "0.0.0.0",
-        'consoletitle': True,
-        'call_home': False,
-    }
+
+    ydl_ops['dumpjson'] = True
+    ydl_ops['extract_flat'] = True
+    #ydl_ops = {
+    #    'dumpjson': True,
+    #    'extract_flat': True,
+    #    'verbose': True,
+    #    'socket_timeout': 30,
+    #    'ignoreerrors': True,
+    #    'continue': True,
+    #    'retries': 20,
+    #    "source_address": "0.0.0.0",
+    #    'consoletitle': True,
+    #    'call_home': False,
+    #}
 
     tries = 0
     while not links:
@@ -333,14 +337,14 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         ceprint("str(extractor):", str(extractor))
         ceprint("type(extractor):", type(extractor))
         if extractor == 'youtube:playlist':
-            playlist_links = get_playlist_links(url)
+            playlist_links = get_playlist_links(url=url, ydl_ops=copy.copy(ydl_ops))
             for plindex, plurl in enumerate(playlist_links):
                 eprint('(' + str(plindex+1), "of", str(len(playlist_links)) + '):', url)
                 output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
                 assert output_file
                 ceprint("output_file:", output_file)
                 while not points_to_data(output_file):
-                    download_url(url=plurl, ydl_ops=ydl_ops)
+                    download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
         else:
             download_url(url=url, ydl_ops=ydl_ops)
 
