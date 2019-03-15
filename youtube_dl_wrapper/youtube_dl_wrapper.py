@@ -195,6 +195,7 @@ def get_playlist_ids(url):
     ydl_opts = {
         'dumpjson': True,
         'extract_flat': True,
+        'verbose': True,
         'socket_timeout': 30,
         'ignoreerrors': True,
         'continue': True,
