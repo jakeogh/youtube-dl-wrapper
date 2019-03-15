@@ -253,18 +253,6 @@ def get_playlist_links(url, ydl_ops):
 
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
-    #ydl_ops = {
-    #    'dumpjson': True,
-    #    'extract_flat': True,
-    #    'verbose': True,
-    #    'socket_timeout': 30,
-    #    'ignoreerrors': True,
-    #    'continue': True,
-    #    'retries': 20,
-    #    "source_address": "0.0.0.0",
-    #    'consoletitle': True,
-    #    'call_home': False,
-    #}
 
     tries = 0
     while not links:
@@ -285,9 +273,6 @@ def get_playlist_links(url, ydl_ops):
 
 def download_url(url, ydl_ops):
     assert url
-    #ceprint("url:", url)
-    #pprint.pprint(ydl_ops)
-    #ydl_ops['skip_download'] = False
     with YoutubeDL(ydl_ops) as ydl:
         ydl.download([url])
 
