@@ -116,9 +116,9 @@ def download_id_for_url(url):
 
 def get_filename_for_url(url, ydl_ops):
     ceprint(url)
-    tydl_ops = ydl_ops.copy()
-    tydl_ops['forcefilename'] = True
-    tydl_ops['skip_download'] = True
+    #tydl_ops = ydl_ops.copy()
+    ydl_ops['forcefilename'] = True
+    ydl_ops['skip_download'] = True
     with YoutubeDL(tydl_ops) as ydl:
         with Capturing() as output:
             info = ydl.download([url])
@@ -199,7 +199,6 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
 
     #ceprint("exec_cmd:", exec_cmd)
     ydl_ops = {
-        'forcefilename': True,
         'socket_timeout': 30,
         'ignoreerrors': True,
         'continue': True,
