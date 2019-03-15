@@ -124,6 +124,7 @@ def get_filename_for_url(url, ydl_ops):
     ceprint(url)
     ydl_ops['forcefilename'] = True
     ydl_ops['skip_download'] = True
+    ydl_ops['quiet'] = True
     f = io.StringIO()
 
     with redirect_stdout(f):
