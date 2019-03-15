@@ -212,7 +212,7 @@ def get_playlist_links(url):
         #print(json_info)
 
     for item in ans['entries']:
-        links.append('https://www.youtube.com/watch?v='item['url'])
+        links.append('https://www.youtube.com/watch?v=' + item['url'])
 
     return links
 
