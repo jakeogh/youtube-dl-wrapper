@@ -10,7 +10,11 @@ import glob
 import pprint
 import string
 import subprocess
-from io import StringIO
+#from io import StringIO
+import io
+from contextlib import redirect_stdout
+
+
 from random import shuffle
 
 from youtube_dl.compat import compat_expanduser
@@ -38,16 +42,17 @@ FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s_
 
 MAX_TRIES = 3
 
-# https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
-class Capturing(list):
-    def __enter__(self):
-        self._stdout = sys.stdout
-        sys.stdout = self._stringio = StringIO()
-        return self
-    def __exit__(self, *args):
-        self.extend(self._stringio.getvalue().splitlines())
-        del self._stringio    # free up some memory
-        sys.stdout = self._stdout
+
+## https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
+#class Capturing(list):
+#    def __enter__(self):
+#        self._stdout = sys.stdout
+#        sys.stdout = self._stringio = StringIO()
+#        return self
+#    def __exit__(self, *args):
+#        self.extend(self._stringio.getvalue().splitlines())
+#        del self._stringio    # free up some memory
+#        sys.stdout = self._stdout
 
 
 def is_non_zero_file(fpath):
@@ -120,11 +125,14 @@ def get_filename_for_url(url, ydl_ops):
     #tydl_ops = ydl_ops.copy()
     ydl_ops['forcefilename'] = True
     ydl_ops['skip_download'] = True
+    f = io.StringIO()
     with YoutubeDL(ydl_ops) as ydl:
-        with Capturing() as output:
+        with redirect_stdout(f):
             ydl.download([url])
-    assert output
-    return output
+        out = f.getvalue()
+
+    assert out
+    return out
 
 
 def get_clipboard():
