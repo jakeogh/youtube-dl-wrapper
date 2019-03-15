@@ -300,10 +300,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
             playlist_links = get_playlist_links(url)
             for plindex, plurl in enumerate(playlist_links):
                 ceprint('(' + str(plindex), "of", str(len(playlist_links)) + '):', url)
-                output_file = get_filename_for_url(url=plurl, ydl_ops=ydl_ops)
+                output_file = get_filename_for_url(url=plurl, ydl_ops=ydl_ops[:])
                 ceprint("output_file:", output_file)
-                download_url(url=plurl, ydl_ops=ydl_ops)
+                download_url(url=plurl, ydl_ops=ydl_ops[:])
         else:
-            download_url(url=url, ydl_ops=ydl_ops)
+            download_url(url=url, ydl_ops=ydl_ops[:])
 
         print(" ")
