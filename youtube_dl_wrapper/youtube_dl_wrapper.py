@@ -64,12 +64,13 @@ def extract_id_from_url(url):
             continue
         extractor = e.IE_NAME
         ceprint("using extractor:", e.IE_NAME) #youtube:user
-        if 'youtube' in e.IE_NAME:
+        if e.IE_NAME == 'youtube':
             try:
                 if len(urlid) != 11:
                     return False
             except TypeError:
                 return False
+
         return urlid, extractor
         #except re.error:
         #    pass
