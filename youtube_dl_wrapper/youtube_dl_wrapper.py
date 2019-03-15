@@ -153,7 +153,7 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
     else:
         exec_cmd = queue_command
 
-    ceprint("exec_cmd:", exec_cmd)
+    #ceprint("exec_cmd:", exec_cmd)
     ydl_opts = {
         'forcefilename': True,
         'socket_timeout': 30,
@@ -190,6 +190,28 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
 
     return ydl_opts
 
+
+def get_playlist_ids(url):
+    ydl_opts = {
+        'dumpjson': True,
+        'extract_flat': True,
+        'socket_timeout': 30,
+        'ignoreerrors': True,
+        'continue': True,
+        'retries': 20,
+        'playlist': False,
+        'playlistrandom': True,
+        "source_address": "0.0.0.0",
+        'progress_with_newline': False,
+        'consoletitle': True,
+        'call_home': False,
+    }
+
+    with YoutubeDL(ydl_opts) as ydl:
+        json_info = ydl.download([url])
+        #print(json_info)
+
+    return json_info
 
 def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive_file):
     assert url
