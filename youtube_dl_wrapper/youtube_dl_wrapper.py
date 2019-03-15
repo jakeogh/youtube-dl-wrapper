@@ -95,13 +95,11 @@ def download_id_for_url(url):
         except KeyError:
             return False
 
-def get_filename_for_url(url):
+#'getfilename': True,
+def get_filename_for_url(url, ydl_ops):
     ceprint(url)
-    ydl_opts = {
-        'getfilename': True,
-        'forcefilename': True,
-        'skip_download': True,
-    }
+    ydl_ops['forcefilename'] = True
+    ydl_ops['skip_download'] = True
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.download([url])
         print(info)
@@ -247,7 +245,6 @@ def get_playlist_links(url):
 def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive_file):
     assert url
     ceprint("url:", url)
-    ydl_opts = generate_download_options(cache_dir=cache_dir, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
@@ -285,6 +282,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         input('pause')
         os.chdir(cache_folder)
 
+    ydl_opts = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
     for index, url in enumerate(urls):
         ceprint('(' + str(index), "of", str(len(urls)) + '):', url)
         if id_from_url:
@@ -301,8 +299,8 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                 ceprint('(' + str(plindex), "of", str(len(playlist_links)) + '):', url)
                 output_file = get_filename_for_url(plurl)
                 ceprint("output_file:", output_file)
-                download_url(url=plurl, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
+                download_url(url=plurl, ydl_opts=ydl_opts)
         else:
-            download_url(url=url, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
+            download_url(url=url, ydl_opts=ydl_opts)
 
         print(" ")
