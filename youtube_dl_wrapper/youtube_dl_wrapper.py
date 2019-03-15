@@ -242,9 +242,11 @@ def get_playlist_links(url):
 
     return links
 
+
 def download_url(url, ydl_ops):
     assert url
     ceprint("url:", url)
+    ydl_ops['skip_download'] = False
     with YoutubeDL(ydl_ops) as ydl:
         ydl.download([url])
 
