@@ -47,24 +47,24 @@ def extract_id_from_url(url):
     ceprint("url:", url)
     ceprint("extractors:", extractors)
     for e in extractors:
-        try:
-            regex = e._VALID_URL
-            urlid = re.match(regex, url, re.VERBOSE).groups()[-1]
-            extractor = e.IE_NAME
-#           ceprint("using extractor:", e.IE_NAME) #youtube:user
-            if 'youtube' in e.IE_NAME:
-                try:
-                    if len(urlid) != 11:
-                        return False
-                except TypeError:
+        #try:
+        regex = e._VALID_URL
+        urlid = re.match(regex, url, re.VERBOSE).groups()[-1]
+        extractor = e.IE_NAME
+        ceprint("using extractor:", e.IE_NAME) #youtube:user
+        if 'youtube' in e.IE_NAME:
+            try:
+                if len(urlid) != 11:
                     return False
-            return urlid, extractor
-        except re.error:
-            pass
-        except AttributeError:
-            pass
-        except IndexError:
-            pass
+            except TypeError:
+                return False
+        return urlid, extractor
+        #except re.error:
+        #    pass
+        #except AttributeError:
+        #    pass
+        #except IndexError:
+        #    pass
     raise NoIDException
 
 
