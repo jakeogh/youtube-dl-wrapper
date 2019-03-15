@@ -7,11 +7,12 @@ import re
 import glob
 import string
 import subprocess
-import youtube_dl
+#import youtube_dl
 from random import shuffle
 
 from youtube_dl.compat import compat_expanduser
 from youtube_dl.extractor import gen_extractors
+from youtube_dl import YoutubeDL
 from kcl.printops import ceprint
 
 extractors = gen_extractors()
@@ -71,7 +72,7 @@ def download_id_for_url(url):
         'simulate': True,
         'skip_download': True
     }
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False, process=False)
         try:
             if info['id']:
@@ -143,9 +144,7 @@ def check_if_video_exists_by_video_id(video_id):
         return matches[0]
     raise NoMatchException
 
-
-def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive_file):
-    assert url
+def generate_download_options(cache_dir, ignore_download_archive, play, verbose, archive_file):
     play_command = ' '.join(VIDEO_CMD) + ' {}'
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
 
@@ -184,8 +183,15 @@ def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive
 
     if not ignore_download_archive:
         ydl_opts['download_archive'] = archive_file
+
+    return ydl_opts
+
+
+def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive_file):
+    assert url
     print("url:", url)
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    ydl_opts = generate_download_options(cache_dir=cache_dir, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
+    with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
 
