@@ -16,6 +16,7 @@ from youtube_dl.compat import compat_expanduser
 from youtube_dl.extractor import gen_extractors
 from youtube_dl import YoutubeDL
 from kcl.printops import ceprint
+from kcl.printops import eprint
 
 import sre_constants
 
@@ -110,6 +111,7 @@ def download_id_for_url(url):
                 return info['id']
         except KeyError:
             return False
+
 
 def get_filename_for_url(url, ydl_ops):
     ceprint(url)
@@ -299,7 +301,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
 
     ydl_ops = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
     for index, url in enumerate(urls):
-        ceprint('(' + str(index), "of", str(len(urls)) + '):', url)
+        eprint('(outer) (' + str(index), "of", str(len(urls)) + '):', url)
         if id_from_url:
             print(download_id_for_url(url))
             continue
@@ -311,7 +313,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         if extractor == 'youtube:playlist':
             playlist_links = get_playlist_links(url)
             for plindex, plurl in enumerate(playlist_links):
-                ceprint('(' + str(plindex), "of", str(len(playlist_links)) + '):', url)
+                eprint('(' + str(plindex), "of", str(len(playlist_links)) + '):', url)
                 output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
                 ceprint("output_file:", output_file)
                 download_url(url=plurl, ydl_ops=ydl_ops)
