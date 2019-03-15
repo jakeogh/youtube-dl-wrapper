@@ -36,6 +36,7 @@ VIDEO_CMD = ['/usr/bin/xterm',
 
 FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(title)s__%(id)s.%(ext)s"
 
+MAX_TRIES = 3
 
 # https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
 class Capturing(list):
@@ -249,11 +250,19 @@ def get_playlist_links(url):
         'call_home': False,
     }
 
-    with YoutubeDL(ydl_ops) as ydl:
-        json_info = ydl.extract_info(url, download=False)
+    tries = 0
+    while not links:
+        tries += 1
+        try:
+            with YoutubeDL(ydl_ops) as ydl:
+                json_info = ydl.extract_info(url, download=False)
 
-    for item in json_info['entries']:
-        links.append('https://www.youtube.com/watch?v=' + item['url'])
+            for item in json_info['entries']:
+                links.append('https://www.youtube.com/watch?v=' + item['url'])
+        except Exception as e:
+            print(e)
+            if tries > MAX_TRIES:
+                raise e
 
     return links
 
