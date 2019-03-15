@@ -273,6 +273,8 @@ def get_playlist_links(url, ydl_ops):
             if tries > MAX_TRIES:
                 raise e
 
+        if tries > MAX_TRIES:
+            return links
     return links
 
 
