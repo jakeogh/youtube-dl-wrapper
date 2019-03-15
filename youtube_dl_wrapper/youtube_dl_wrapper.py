@@ -242,7 +242,7 @@ def get_playlist_links(url):
 
     return links
 
-def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive_file):
+def download_url(url, ydl_ops):
     assert url
     ceprint("url:", url)
     with YoutubeDL(ydl_ops) as ydl:
