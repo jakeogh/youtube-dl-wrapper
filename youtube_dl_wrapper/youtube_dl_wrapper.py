@@ -281,8 +281,8 @@ def get_playlist_links(url):
 
 def download_url(url, ydl_ops):
     assert url
-    ceprint("url:", url)
-    pprint.pprint(ydl_ops)
+    #ceprint("url:", url)
+    #pprint.pprint(ydl_ops)
     #ydl_ops['skip_download'] = False
     with YoutubeDL(ydl_ops) as ydl:
         ydl.download([url])
@@ -323,7 +323,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
 
     ydl_ops = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
     for index, url in enumerate(urls):
-        eprint('(outer) (' + str(index), "of", str(len(urls)) + '):', url)
+        eprint('(outer) (' + str(index+1), "of", str(len(urls)) + '):', url)
         if id_from_url:
             print(download_id_for_url(url))
             continue
@@ -335,7 +335,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         if extractor == 'youtube:playlist':
             playlist_links = get_playlist_links(url)
             for plindex, plurl in enumerate(playlist_links):
-                eprint('(' + str(plindex), "of", str(len(playlist_links)) + '):', url)
+                eprint('(' + str(plindex+1), "of", str(len(playlist_links)) + '):', url)
                 output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
                 assert output_file
                 ceprint("output_file:", output_file)
