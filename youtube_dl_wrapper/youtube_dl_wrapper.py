@@ -257,24 +257,15 @@ def get_playlist_links(url, ydl_ops):
     links = []
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
+    try:
+        with YoutubeDL(ydl_ops) as ydl:
+            json_info = ydl.extract_info(url, download=False)
+        #pprint.pprint(json_info)
+        for item in json_info['entries']:
+            links.append('https://www.youtube.com/watch?v=' + item['url'])
+    except Exception as e:
+        print(e)
 
-    tries = 0
-    while not links:
-        tries += 1
-        try:
-            with YoutubeDL(ydl_ops) as ydl:
-                json_info = ydl.extract_info(url, download=False)
-            #pprint.pprint(json_info)
-            for item in json_info['entries']:
-                links.append('https://www.youtube.com/watch?v=' + item['url'])
-        except Exception as e:
-            eprint("try:", tries, "of:", MAX_TRIES)
-            print(e)
-            if tries > MAX_TRIES:
-                raise e
-
-        if tries > MAX_TRIES:
-            return links
     return links
 
 
