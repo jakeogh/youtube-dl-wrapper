@@ -206,7 +206,8 @@ def get_playlist_ids(url):
     }
 
     with YoutubeDL(ydl_opts) as ydl:
-        json_info = ydl.download([url])
+        json_info = ydl.extract_info(url, download=False)
+        #json_info = ydl.download([url])
         #print(json_info)
 
     return json_info
