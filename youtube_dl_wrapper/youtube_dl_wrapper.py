@@ -99,10 +99,11 @@ def get_filename_for_url(url):
     ceprint(url)
     ydl_opts = {
         'getfilename': True,
-        'skip_download': True
+        'forcefilename': True,
+        'skip_download': True,
     }
     with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False, process=False)
+        info = ydl.extract_info(url, download=False, process=False, forcefilename=True)
         print(info)
         #try:
         #    if info['id']:
