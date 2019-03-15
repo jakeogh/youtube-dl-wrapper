@@ -22,6 +22,7 @@ from youtube_dl.extractor import gen_extractors
 from youtube_dl import YoutubeDL
 from kcl.printops import ceprint
 from kcl.printops import eprint
+from kcl.fileops import points_to_data
 
 import sre_constants
 
@@ -336,8 +337,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
             for plindex, plurl in enumerate(playlist_links):
                 eprint('(' + str(plindex), "of", str(len(playlist_links)) + '):', url)
                 output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
+                assert output_file
                 ceprint("output_file:", output_file)
-                download_url(url=plurl, ydl_ops=ydl_ops)
+                while not points_to_data(output_file):
+                    download_url(url=plurl, ydl_ops=ydl_ops)
         else:
             download_url(url=url, ydl_ops=ydl_ops)
 
