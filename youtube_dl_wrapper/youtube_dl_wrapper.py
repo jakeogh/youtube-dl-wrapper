@@ -82,7 +82,7 @@ def extract_id_from_url(url):
 
 
 def download_id_for_url(url):
-    ceprint("download_id_for_url():", url)
+    ceprint(url)
     ydl_opts = {
         'simulate': True,
         'skip_download': True
@@ -95,6 +95,20 @@ def download_id_for_url(url):
         except KeyError:
             return False
 
+def get_filename_for_url(url):
+    ceprint(url)
+    ydl_opts = {
+        'getfilename': True,
+        'skip_download': True
+    }
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False, process=False)
+        print(info)
+        #try:
+        #    if info['id']:
+        #        return info['id']
+        #except KeyError:
+        #    return False
 
 def get_clipboard():
     clipboard_text = \
@@ -270,8 +284,8 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         input('pause')
         os.chdir(cache_folder)
 
-    for url in urls:
-        ceprint(url)
+    for index, url in enumerate(urls):
+        ceprint('(' + str(index), "of", str(len(urls)) + '):', url)
         if id_from_url:
             print(download_id_for_url(url))
             continue
@@ -281,7 +295,11 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         ceprint("str(extractor):", str(extractor))
         ceprint("type(extractor):", type(extractor))
         if extractor == 'youtube:playlist':
-            for plurl in get_playlist_links(url):
+            playlist_links = get_playlist_links(url)
+            for plindex, plurl in enumerate(playlist_links):
+                ceprint('(' + str(plindex), "of", str(len(playlist_links)) + '):', url)
+                output_file = get_filename_for_url(plurl)
+                ceprint("output_file:", output_file)
                 download_url(url=plurl, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
         else:
             download_url(url=url, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
