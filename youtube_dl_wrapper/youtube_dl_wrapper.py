@@ -49,7 +49,10 @@ def extract_id_from_url(url):
     for e in extractors:
         #try:
         regex = e._VALID_URL
-        urlid = re.match(regex, url, re.VERBOSE).groups()[-1]
+        try:
+            urlid = re.match(regex, url, re.VERBOSE).groups()[-1]
+        except AttributeError:
+            continue
         extractor = e.IE_NAME
         ceprint("using extractor:", e.IE_NAME) #youtube:user
         if 'youtube' in e.IE_NAME:
