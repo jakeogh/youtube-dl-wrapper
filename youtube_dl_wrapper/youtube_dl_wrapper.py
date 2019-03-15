@@ -280,8 +280,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         ceprint("extractor:", extractor)
         ceprint("str(extractor):", str(extractor))
         ceprint("type(extractor):", type(extractor))
+        if extractor == 'youtube:playlist':
+            for plurl in get_playlist_links(url):
+                download_url(url=plurl, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
+        else:
+            download_url(url=url, cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
 
-        download_url(url=url, cache_dir=cache_folder,
-                     ignore_download_archive=ignore_download_archive,
-                     play=play, verbose=verbose, archive_file=archive_file)
         print(" ")
