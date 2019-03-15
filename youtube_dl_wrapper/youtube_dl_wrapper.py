@@ -7,6 +7,7 @@ import sh
 import os
 import re
 import glob
+import pprint
 import string
 import subprocess
 from io import StringIO
@@ -261,6 +262,7 @@ def get_playlist_links(url):
 def download_url(url, ydl_ops):
     assert url
     ceprint("url:", url)
+    pprint.pprint(ydl_ops)
     #ydl_ops['skip_download'] = False
     with YoutubeDL(ydl_ops) as ydl:
         ydl.download([url])
