@@ -183,7 +183,7 @@ def check_lsof_for_duplicate_process(video_id):
 def get_playlist_for_channel(url):
     ydl = YoutubeDL()
     ie = YoutubeChannelIE(ydl)
-    info = ie.extract(chan)
+    info = ie.extract(url)
     return info['url']
 
 def check_if_video_exists_by_video_id(video_id):
