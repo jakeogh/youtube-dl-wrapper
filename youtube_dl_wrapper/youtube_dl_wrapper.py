@@ -44,12 +44,13 @@ class NoMatchException(ValueError):
 
 
 def extract_id_from_url(url):
+    ceprint("url:", url)
     for e in extractors:
         try:
             regex = e._VALID_URL
             urlid = re.match(regex, url, re.VERBOSE).groups()[-1]
             extractor = e.IE_NAME
-#            print("using extractor:", e.IE_NAME) #youtube:user
+#           ceprint("using extractor:", e.IE_NAME) #youtube:user
             if 'youtube' in e.IE_NAME:
                 try:
                     if len(urlid) != 11:
@@ -67,7 +68,7 @@ def extract_id_from_url(url):
 
 
 def download_id_for_url(url):
-    print("download_id_for_url():", url)
+    ceprint("download_id_for_url():", url)
     ydl_opts = {
         'simulate': True,
         'skip_download': True
@@ -85,7 +86,7 @@ def get_clipboard():
     clipboard_text = \
         subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
     clipboard_text_utf8 = clipboard_text.decode("utf-8")
-    print("clipboard_text_utf8:", clipboard_text_utf8)
+    ceprint("clipboard_text_utf8:", clipboard_text_utf8)
     return clipboard_text_utf8
 
 
@@ -118,8 +119,8 @@ def check_lsof_for_duplicate_process(video_id):
     lsof_check = sh.grep(sh.lsof(), video_id)
 
     if len(lsof_check) > 0:
-        print("lsof_check:", lsof_check)
-        print("Found", video_id, "in lsof output, skipping.")
+        ceprint("lsof_check:", lsof_check)
+        ceprint("Found", video_id, "in lsof output, skipping.")
         return True
     return False
 
@@ -137,7 +138,7 @@ def check_if_video_exists_by_video_id(video_id):
         if match.endswith('.part'):
             continue
         match_ending = match.split(video_id)[-1]
-        print("match_ending:", match_ending)
+        ceprint("match_ending:", match_ending)
         matches.append(match)
     if matches:
         ceprint("matches:", matches)
@@ -208,8 +209,6 @@ def get_playlist_links(url):
 
     with YoutubeDL(ydl_opts) as ydl:
         json_info = ydl.extract_info(url, download=False)
-        #json_info = ydl.download([url])
-        #print(json_info)
 
     for item in ans['entries']:
         links.append('https://www.youtube.com/watch?v=' + item['url'])
@@ -218,7 +217,7 @@ def get_playlist_links(url):
 
 def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive_file):
     assert url
-    print("url:", url)
+    ceprint("url:", url)
     ydl_opts = generate_download_options(cache_dir=cache_dir, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -264,9 +263,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
             continue
 
         url_id, extractor = extract_id_from_url(url)
-        print("extractor:", extractor)
-        print("str(extractor):", str(extractor))
-        print("type(extractor):", type(extractor))
+        ceprint("extractor:", extractor)
+        ceprint("str(extractor):", str(extractor))
+        ceprint("type(extractor):", type(extractor))
 
         download_url(url=url, cache_dir=cache_folder,
                      ignore_download_archive=ignore_download_archive,
