@@ -103,7 +103,7 @@ def get_filename_for_url(url):
         'skip_download': True,
     }
     with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.download(url, download=False, process=False)
+        info = ydl.download(url)
         print(info)
         #try:
         #    if info['id']:
