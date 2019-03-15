@@ -122,12 +122,11 @@ def download_id_for_url(url):
 
 def get_filename_for_url(url, ydl_ops):
     ceprint(url)
-    #tydl_ops = ydl_ops.copy()
     ydl_ops['forcefilename'] = True
     ydl_ops['skip_download'] = True
     f = io.StringIO()
-    with YoutubeDL(ydl_ops) as ydl:
-        with redirect_stdout(f):
+    with redirect_stdout(f):
+        with YoutubeDL(ydl_ops) as ydl:
             ydl.download([url])
         out = f.getvalue()
 
