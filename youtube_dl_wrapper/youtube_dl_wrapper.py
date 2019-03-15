@@ -125,6 +125,7 @@ def get_filename_for_url(url, ydl_ops):
     ydl_ops['forcefilename'] = True
     ydl_ops['skip_download'] = True
     f = io.StringIO()
+
     with redirect_stdout(f):
         with YoutubeDL(ydl_ops) as ydl:
             ydl.download([url])
