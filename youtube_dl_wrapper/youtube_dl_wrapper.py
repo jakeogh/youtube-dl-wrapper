@@ -98,9 +98,10 @@ def download_id_for_url(url):
 #'getfilename': True,
 def get_filename_for_url(url, ydl_ops):
     ceprint(url)
-    ydl_ops['forcefilename'] = True
-    ydl_ops['skip_download'] = True
-    with YoutubeDL(ydl_ops) as ydl:
+    tydl_ops = ydl_ops
+    tydl_ops['forcefilename'] = True
+    tydl_ops['skip_download'] = True
+    with YoutubeDL(tydl_ops) as ydl:
         info = ydl.download([url])
         print(info)
         #try:
@@ -246,7 +247,7 @@ def get_playlist_links(url):
 def download_url(url, ydl_ops):
     assert url
     ceprint("url:", url)
-    ydl_ops['skip_download'] = False
+    #ydl_ops['skip_download'] = False
     with YoutubeDL(ydl_ops) as ydl:
         ydl.download([url])
 
