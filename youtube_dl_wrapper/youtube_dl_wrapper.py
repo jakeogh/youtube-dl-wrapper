@@ -7,7 +7,6 @@ import re
 import glob
 import string
 import subprocess
-#import youtube_dl
 from random import shuffle
 
 from youtube_dl.compat import compat_expanduser
