@@ -51,7 +51,11 @@ def extract_id_from_url(url):
     for e in extractors:
         #try:
         ceprint(e)
-        regex = e._VALID_URL
+        try:
+            regex = e._VALID_URL
+        except AttributeError:
+            continue
+
         try:
             urlid = re.match(regex, url, re.VERBOSE).groups()[-1]
         except AttributeError:
