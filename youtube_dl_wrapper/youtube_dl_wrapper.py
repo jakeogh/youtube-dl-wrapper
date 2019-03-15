@@ -45,6 +45,7 @@ class NoMatchException(ValueError):
 
 def extract_id_from_url(url):
     ceprint("url:", url)
+    ceprint("extractors:", extractors)
     for e in extractors:
         try:
             regex = e._VALID_URL
@@ -257,7 +258,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         os.chdir(cache_folder)
 
     for url in urls:
-        print(url)
+        ceprint(url)
         if id_from_url:
             print(download_id_for_url(url))
             continue
