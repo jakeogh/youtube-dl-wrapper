@@ -8,7 +8,7 @@ import re
 import glob
 import string
 import subprocess
-from cStringIO import StringIO
+from io import StringIO
 from random import shuffle
 
 from youtube_dl.compat import compat_expanduser
