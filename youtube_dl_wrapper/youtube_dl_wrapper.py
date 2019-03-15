@@ -122,7 +122,8 @@ def get_filename_for_url(url, ydl_ops):
     ydl_ops['skip_download'] = True
     with YoutubeDL(ydl_ops) as ydl:
         with Capturing() as output:
-            info = ydl.download([url])
+            ydl.download([url])
+    assert output
     return output
 
 
