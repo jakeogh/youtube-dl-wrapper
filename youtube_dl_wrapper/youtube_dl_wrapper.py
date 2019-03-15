@@ -83,11 +83,11 @@ def extract_id_from_url(url):
 
 def download_id_for_url(url):
     ceprint(url)
-    ydl_opts = {
+    ydl_ops = {
         'simulate': True,
         'skip_download': True
     }
-    with YoutubeDL(ydl_opts) as ydl:
+    with YoutubeDL(ydl_ops) as ydl:
         info = ydl.extract_info(url, download=False, process=False)
         try:
             if info['id']:
@@ -100,7 +100,7 @@ def get_filename_for_url(url, ydl_ops):
     ceprint(url)
     ydl_ops['forcefilename'] = True
     ydl_ops['skip_download'] = True
-    with YoutubeDL(ydl_opts) as ydl:
+    with YoutubeDL(ydl_ops) as ydl:
         info = ydl.download([url])
         print(info)
         #try:
@@ -182,7 +182,7 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
         exec_cmd = queue_command
 
     #ceprint("exec_cmd:", exec_cmd)
-    ydl_opts = {
+    ydl_ops = {
         'forcefilename': True,
         'socket_timeout': 30,
         'ignoreerrors': True,
@@ -206,22 +206,22 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
     }
 
     if cache_dir:
-        ydl_opts['outtmpl'] = cache_dir + '/sources/' + FILE_TEMPLATE
+        ydl_ops['outtmpl'] = cache_dir + '/sources/' + FILE_TEMPLATE
     else:
-        ydl_opts['outtmpl'] = FILE_TEMPLATE
+        ydl_ops['outtmpl'] = FILE_TEMPLATE
 
     if verbose:
-        ydl_opts['verbose'] = True
+        ydl_ops['verbose'] = True
 
     if not ignore_download_archive:
-        ydl_opts['download_archive'] = archive_file
+        ydl_ops['download_archive'] = archive_file
 
-    return ydl_opts
+    return ydl_ops
 
 
 def get_playlist_links(url):
     links = []
-    ydl_opts = {
+    ydl_ops = {
         'dumpjson': True,
         'extract_flat': True,
         'verbose': True,
@@ -234,7 +234,7 @@ def get_playlist_links(url):
         'call_home': False,
     }
 
-    with YoutubeDL(ydl_opts) as ydl:
+    with YoutubeDL(ydl_ops) as ydl:
         json_info = ydl.extract_info(url, download=False)
 
     for item in json_info['entries']:
@@ -245,7 +245,7 @@ def get_playlist_links(url):
 def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive_file):
     assert url
     ceprint("url:", url)
-    with YoutubeDL(ydl_opts) as ydl:
+    with YoutubeDL(ydl_ops) as ydl:
         ydl.download([url])
 
 
@@ -282,7 +282,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         input('pause')
         os.chdir(cache_folder)
 
-    ydl_opts = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
+    ydl_ops = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
     for index, url in enumerate(urls):
         ceprint('(' + str(index), "of", str(len(urls)) + '):', url)
         if id_from_url:
@@ -299,8 +299,8 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                 ceprint('(' + str(plindex), "of", str(len(playlist_links)) + '):', url)
                 output_file = get_filename_for_url(plurl)
                 ceprint("output_file:", output_file)
-                download_url(url=plurl, ydl_opts=ydl_opts)
+                download_url(url=plurl, ydl_ops=ydl_ops)
         else:
-            download_url(url=url, ydl_opts=ydl_opts)
+            download_url(url=url, ydl_ops=ydl_ops)
 
         print(" ")
