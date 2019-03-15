@@ -265,7 +265,7 @@ def get_playlist_links(url, ydl_ops):
         try:
             with YoutubeDL(ydl_ops) as ydl:
                 json_info = ydl.extract_info(url, download=False)
-            pprint.pprint(json_info)
+            #pprint.pprint(json_info)
             for item in json_info['entries']:
                 links.append('https://www.youtube.com/watch?v=' + item['url'])
         except Exception as e:
