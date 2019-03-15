@@ -328,6 +328,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         ceprint("type(extractor):", type(extractor))
         if extractor in ['youtube:channel']:
             url = get_playlist_for_channel(url)
+            url_id, extractor = extract_id_from_url(url)  # re-get now that user is converted to channel playlist
 
         if extractor in ['youtube:playlist']:
             playlist_links = get_playlist_links(url=url, ydl_ops=copy.copy(ydl_ops))
