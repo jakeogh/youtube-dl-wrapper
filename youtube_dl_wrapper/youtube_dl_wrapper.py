@@ -27,6 +27,7 @@ VIDEO_CMD = ['/usr/bin/xterm',
              '--cache-default=275000',
              '--pause']
 
+FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(title)s__%(id)s.%(ext)s"
 
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
@@ -143,7 +144,7 @@ def check_if_video_exists_by_video_id(video_id):
         return matches[0]
     raise NoMatchException
 
-def generate_download_options(cache_dir, ignore_download_archive, play, verbose, archive_file):
+def generate_download_options(cache_dir=False, ignore_download_archive=True, play=False, verbose=False, archive_file=False):
     play_command = ' '.join(VIDEO_CMD) + ' {}'
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
 
@@ -156,7 +157,6 @@ def generate_download_options(cache_dir, ignore_download_archive, play, verbose,
     ydl_opts = {
         'forcefilename': True,
         'socket_timeout': 30,
-        'outtmpl': cache_dir + '/sources/' + '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(title)s__%(id)s.%(ext)s",
         'ignoreerrors': True,
         'continue': True,
         'retries': 20,
@@ -176,6 +176,11 @@ def generate_download_options(cache_dir, ignore_download_archive, play, verbose,
             'exec_cmd': exec_cmd,
         }],
     }
+
+    if cache_dir:
+        ydl_opts['outtmpl'] = cache_dir + '/sources/' + FILE_TEMPLATE
+    else:
+        ydl_opts['outtmpl'] = FILE_TEMPLATE
 
     if verbose:
         ydl_opts['verbose'] = True
