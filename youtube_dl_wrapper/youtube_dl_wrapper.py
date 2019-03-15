@@ -48,6 +48,7 @@ def extract_id_from_url(url):
     ceprint("extractors:", extractors)
     for e in extractors:
         #try:
+        ceprint(e)
         regex = e._VALID_URL
         try:
             urlid = re.match(regex, url, re.VERBOSE).groups()[-1]
