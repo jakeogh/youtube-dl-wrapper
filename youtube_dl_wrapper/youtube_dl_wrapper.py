@@ -14,6 +14,8 @@ from youtube_dl.extractor import gen_extractors
 from youtube_dl import YoutubeDL
 from kcl.printops import ceprint
 
+import sre_constants
+
 extractors = gen_extractors()
 QUEUE_CMD = ['/home/cfg/redis/rpush', 'mpv']
 downloaded_video_list = []
@@ -53,6 +55,8 @@ def extract_id_from_url(url):
         try:
             urlid = re.match(regex, url, re.VERBOSE).groups()[-1]
         except AttributeError:
+            continue
+        except sre_constants.error:
             continue
         extractor = e.IE_NAME
         ceprint("using extractor:", e.IE_NAME) #youtube:user
