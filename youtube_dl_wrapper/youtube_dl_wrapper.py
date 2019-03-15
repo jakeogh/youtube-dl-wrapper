@@ -199,10 +199,7 @@ def get_playlist_ids(url):
         'ignoreerrors': True,
         'continue': True,
         'retries': 20,
-        'playlist': False,
-        'playlistrandom': True,
         "source_address": "0.0.0.0",
-        'progress_with_newline': False,
         'consoletitle': True,
         'call_home': False,
     }
