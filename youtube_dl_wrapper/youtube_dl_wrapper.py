@@ -171,6 +171,8 @@ def download_url(url, cache_dir, ignore_download_archive, play, verbose, archive
         'allsubtitles': True,
         "source_address": "0.0.0.0",
         'progress_with_newline': False,
+        'consoletitle': True,
+        'call_home': False,
         'postprocessors': [{
             'key': 'ExecAfterDownload',
             'exec_cmd': exec_cmd,
