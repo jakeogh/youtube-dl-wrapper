@@ -132,6 +132,7 @@ def get_filename_for_url(url, ydl_ops):
         out = f.getvalue()
 
     assert out
+    ceprint("out:", out)
     return out
 
 
