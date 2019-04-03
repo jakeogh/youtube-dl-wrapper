@@ -110,6 +110,7 @@ def extract_id_from_url(url):
     if 'hooktube.com' in url:
         hooktube_id = url.split('/')[-1]
         url = 'https://youtube.com/watch?v=' + hooktube_id
+        ceprint("url:", url)
         extract_id_from_url(url)
 
     raise NoIDException
