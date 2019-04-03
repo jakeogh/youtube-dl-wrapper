@@ -87,6 +87,8 @@ def extract_id_from_url(url):
             continue
         except sre_constants.error:
             continue
+        except IndexError:
+            continue
         extractor = e.IE_NAME
         ceprint("using extractor:", e.IE_NAME) #youtube:user
         if e.IE_NAME == 'youtube':
