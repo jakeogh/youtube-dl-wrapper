@@ -322,13 +322,15 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
             url_id, extractor = extract_id_from_url(url)
 
         except NoIDException:
-            ceprint("url:", url)
+            #ceprint("url:", url)
             if 'hooktube.com' in url:
                 hooktube_id = url.split('/')[-1]
                 url = 'https://youtube.com/watch?v=' + hooktube_id
                 ceprint("url:", url)
                 urlid, extractor = extract_id_from_url(url)
 
+        tries = 0
+        max_tries = 10
         ceprint("extractor:", extractor)
         ceprint("str(extractor):", str(extractor))
         ceprint("type(extractor):", type(extractor))
@@ -344,9 +346,14 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                 assert output_file
                 #ceprint("output_file:", output_file)
                 while not points_to_data(output_file):
+                    tries += 1
+                    if tries > max_tries:
+                        ceprint("tried", max_tries, "times, skipping")
+                        break
                     ceprint("output_file:", output_file)
                     download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
         else:
+            ceprint("skipped looking for output file")
             download_url(url=url, ydl_ops=ydl_ops)
 
         print(" ")
