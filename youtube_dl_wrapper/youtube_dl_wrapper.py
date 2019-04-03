@@ -106,14 +106,6 @@ def extract_id_from_url(url):
         #except IndexError:
         #    pass
 
-    ceprint("url:", url)
-    if 'hooktube.com' in url:
-        hooktube_id = url.split('/')[-1]
-        url = 'https://youtube.com/watch?v=' + hooktube_id
-        ceprint("url:", url)
-        urlid, extractor = extract_id_from_url(url)
-        return urlid, extractor
-
     raise NoIDException
 
 
@@ -326,7 +318,17 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
             print(download_id_for_url(url))
             continue
 
-        url_id, extractor = extract_id_from_url(url)
+        try:
+            url_id, extractor = extract_id_from_url(url)
+
+        except NoIDException:
+            ceprint("url:", url)
+            if 'hooktube.com' in url:
+                hooktube_id = url.split('/')[-1]
+                url = 'https://youtube.com/watch?v=' + hooktube_id
+                ceprint("url:", url)
+                urlid, extractor = extract_id_from_url(url)
+
         ceprint("extractor:", extractor)
         ceprint("str(extractor):", str(extractor))
         ceprint("type(extractor):", type(extractor))
