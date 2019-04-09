@@ -351,8 +351,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                     if tries > max_tries:
                         ceprint("tried", max_tries, "times, skipping")
                         break
-                    ceprint("output_file:", output_file)
-                    download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
+                    else:
+                        ceprint("output_file:", output_file)
+                        download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
         else:
             ceprint("skipped looking for output file")
             download_url(url=url, ydl_ops=ydl_ops)
