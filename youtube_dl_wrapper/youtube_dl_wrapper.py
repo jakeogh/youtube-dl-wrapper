@@ -328,6 +328,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                 url = 'https://youtube.com/watch?v=' + hooktube_id
                 ceprint("url:", url)
                 urlid, extractor = extract_id_from_url(url)
+            else:
+                urlid = None
+                extractor = None
 
         tries = 0
         max_tries = 10
