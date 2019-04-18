@@ -360,7 +360,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
 
                 #ceprint("output_file:", output_file)
                 #while not points_to_data(output_file):
-                while not look_for_output_file_variations()(output_file):
+                while not look_for_output_file_variations(output_file):
                     tries += 1
                     if tries > max_tries:
                         ceprint("tried", max_tries, "times, skipping")
