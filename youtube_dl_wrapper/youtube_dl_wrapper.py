@@ -287,6 +287,15 @@ def construct_youtube_url_from_id(ytid):
             return url
     return False
 
+def look_for_output_file_variations(output_file):
+    output_file_no_ext = ".".join(output_file.split('.')[:-1])
+    extensions = ['webm', 'mp4', 'mkv']
+    for ext in extensions:
+        file_to_look_for = output_file_no_ext + '.' + ext
+        if points_to_data(file_to_look_for):
+            return True
+    return False
+
 
 @click.command()
 @click.argument('urls', nargs=-1)
@@ -348,13 +357,16 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                 eprint('(' + str(plindex+1), "of", str(len(playlist_links)) + '):', url)
                 output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
                 assert output_file
+
                 #ceprint("output_file:", output_file)
-                while not points_to_data(output_file):
+                #while not points_to_data(output_file):
+                while not look_for_output_file_variations()(output_file):
                     tries += 1
                     if tries > max_tries:
                         ceprint("tried", max_tries, "times, skipping")
                         break
                     else:
+                        ceprint("tries:", tries)
                         ceprint("output_file:", output_file)
                         download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
         else:
