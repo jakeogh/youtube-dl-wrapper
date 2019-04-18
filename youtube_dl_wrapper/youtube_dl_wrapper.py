@@ -292,6 +292,7 @@ def look_for_output_file_variations(output_file):
     extensions = ['webm', 'mp4', 'mkv']
     for ext in extensions:
         file_to_look_for = output_file_no_ext + '.' + ext
+        ceprint("looking for:", file_to_look_for)
         if points_to_data(file_to_look_for):
             return True
     return False
