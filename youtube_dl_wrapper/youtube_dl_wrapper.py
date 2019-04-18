@@ -27,7 +27,7 @@ from kcl.fileops import points_to_data
 import sre_constants
 
 extractors = gen_extractors()
-QUEUE_CMD = ['/home/cfg/redis/rpush', 'mpv']
+QUEUE_CMD = ['/home/cfg/redis/types/list/rpush', 'mpv']
 downloaded_video_list = []
 
 VIDEO_CMD = ['/usr/bin/xterm',
