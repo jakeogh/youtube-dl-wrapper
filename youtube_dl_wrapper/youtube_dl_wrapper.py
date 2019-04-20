@@ -342,7 +342,6 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                 urlid = None
                 extractor = None
 
-        tries = 0
         max_tries = 10
         ceprint("extractor:", extractor)
         ceprint("str(extractor):", str(extractor))
@@ -354,6 +353,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         #if extractor in ['youtube:playlist', 'youtube:user']:
         if extractor in ['youtube:playlist']:
             playlist_links = get_playlist_links(url=url, ydl_ops=copy.copy(ydl_ops))
+            tries = 0
             for plindex, plurl in enumerate(playlist_links):
                 eprint('(' + str(plindex+1), "of", str(len(playlist_links)) + '):', url)
                 output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
