@@ -2,12 +2,12 @@
 
 import click
 import copy
-import sys
+#import sys
 import sh
 import os
 import re
 import glob
-import pprint
+#import pprint
 import string
 import subprocess
 #from io import StringIO
@@ -27,7 +27,7 @@ from kcl.fileops import points_to_data
 import sre_constants
 
 extractors = gen_extractors()
-QUEUE_CMD = ['/home/cfg/redis/types/list/rpush', 'mpv']
+QUEUE_CMD = ['/home/cfg/redis/types/list/rpush', 'mpv:queue#']
 downloaded_video_list = []
 
 VIDEO_CMD = ['/usr/bin/xterm',
@@ -44,7 +44,7 @@ FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s_
 MAX_TRIES = 3
 
 
-## https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
+# https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
 #class Capturing(list):
 #    def __enter__(self):
 #        self._stdout = sys.stdout
