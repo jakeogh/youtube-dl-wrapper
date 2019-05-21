@@ -289,7 +289,7 @@ def construct_youtube_url_from_id(ytid):
 
 def look_for_output_file_variations(output_file):
     output_file_no_ext = ".".join(output_file.split('.')[:-1])
-    extensions = ['webm', 'mp4', 'mkv']
+    extensions = ['webm', 'mp4', 'mkv', 'mxf']
     for ext in extensions:
         file_to_look_for = output_file_no_ext + '.' + ext
         ceprint("looking for:", file_to_look_for)
