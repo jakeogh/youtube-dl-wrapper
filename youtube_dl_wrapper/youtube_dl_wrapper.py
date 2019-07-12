@@ -38,8 +38,8 @@ VIDEO_CMD = ['/usr/bin/xterm',
              '--cache-default=275000',
              '--pause']
 
-#FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(title)s__%(id)s.%(ext)s"
-FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(id)s.%(ext)s"
+FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(title)s__%(id)s.%(ext)s"
+FILE_TEMPLATE_TW = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(id)s.%(ext)s"
 
 MAX_TRIES = 3
 
@@ -209,7 +209,7 @@ def check_if_video_exists_by_video_id(video_id):
         return matches[0]
     raise NoMatchException
 
-def generate_download_options(cache_dir=False, ignore_download_archive=True, play=False, verbose=False, archive_file=False):
+def generate_download_options(cache_dir=False, ignore_download_archive=True, play=False, verbose=False, archive_file=False, notitle=False):
     play_command = ' '.join(VIDEO_CMD) + ' {}'
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
 
@@ -243,9 +243,15 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
     }
 
     if cache_dir:
-        ydl_ops['outtmpl'] = cache_dir + '/sources/' + FILE_TEMPLATE
+        if notitle:
+            ydl_ops['outtmpl'] = cache_dir + '/sources/' + FILE_TEMPLATE_TW
+        else:
+            ydl_ops['outtmpl'] = cache_dir + '/sources/' + FILE_TEMPLATE
     else:
-        ydl_ops['outtmpl'] = FILE_TEMPLATE
+        if notitle:
+            ydl_ops['outtmpl'] = FILE_TEMPLATE_TW
+        else:
+            ydl_ops['outtmpl'] = FILE_TEMPLATE
 
     if verbose:
         ydl_ops['verbose'] = True
@@ -370,6 +376,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                         ceprint("tries:", tries)
                         ceprint("output_file:", output_file)
                         download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
+        elif extractor in ['twitter']:
+            ydl_ops = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file, notitle=True)
+            download_url(url=url, ydl_ops=ydl_ops)
+
         else:
             ceprint("skipped looking for output file")
             download_url(url=url, ydl_ops=ydl_ops)
