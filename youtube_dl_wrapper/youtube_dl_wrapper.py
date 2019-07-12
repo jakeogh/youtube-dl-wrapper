@@ -10,7 +10,6 @@ import glob
 #import pprint
 import string
 import subprocess
-#from io import StringIO
 import io
 from contextlib import redirect_stdout
 
