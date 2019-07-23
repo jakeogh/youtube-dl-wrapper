@@ -223,7 +223,7 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
         'socket_timeout': 60,
         'ignoreerrors': True,
         'continuedl': True,
-        'retries': 25,
+        'retries': 125,
         'noplaylist': False,
         'playlistrandom': True,
         'nopart': True,
@@ -348,7 +348,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                 urlid = None
                 extractor = None
 
-        max_tries = 10
+        max_tries = 11
         ceprint("extractor:", extractor)
         ceprint("str(extractor):", str(extractor))
         ceprint("type(extractor):", type(extractor))
