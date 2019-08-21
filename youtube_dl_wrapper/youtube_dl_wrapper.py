@@ -173,15 +173,15 @@ def extract_urls_from_text(intext):
     return list(url_set)
 
 
-def check_lsof_for_duplicate_process(video_id):
-    lsof_check = ""
-    lsof_check = sh.grep(sh.lsof(), video_id)
-
-    if len(lsof_check) > 0:
-        ceprint("lsof_check:", lsof_check)
-        ceprint("Found", video_id, "in lsof output, skipping.")
-        return True
-    return False
+#def check_lsof_for_duplicate_process(video_id):
+#    lsof_check = ""
+#    lsof_check = sh.grep(sh.lsof(), video_id)
+#
+#    if len(lsof_check) > 0:
+#        ceprint("lsof_check:", lsof_check)
+#        ceprint("Found", video_id, "in lsof output, skipping.")
+#        return True
+#    return False
 
 def get_playlist_for_channel(url):
     ydl = YoutubeDL()
@@ -376,7 +376,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                         ceprint("tries:", tries)
                         ceprint("output_file:", output_file)
                         download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
-        elif extractor in ['twitter']:
+        elif extractor in ['twitter'] or url.startswith('https://t.co/'):
             ydl_ops = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file, notitle=True)
             download_url(url=url, ydl_ops=ydl_ops)
 
