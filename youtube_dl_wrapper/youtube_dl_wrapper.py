@@ -27,6 +27,7 @@ import sre_constants
 
 extractors = gen_extractors()
 QUEUE_CMD = ['/home/cfg/redis/types/list/rpush', 'mpv:queue#']
+FSINDEX_CMD = ['/usr/bin/fsindex', 'create', 'record']
 downloaded_video_list = []
 
 VIDEO_CMD = ['/usr/bin/xterm',
@@ -212,11 +213,12 @@ def check_if_video_exists_by_video_id(video_id):
 def generate_download_options(cache_dir=False, ignore_download_archive=True, play=False, verbose=False, archive_file=False, notitle=False):
     play_command = ' '.join(VIDEO_CMD) + ' {}'
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
+    fsindex_command = ' '.join(FSINDEX_CMD) + ' {}'
 
     if play:
-        exec_cmd = queue_command + ' ; ' + play_command + ' & '
+        exec_cmd = fsindex_command + ' ; ' + queue_command + ' ; ' + play_command + ' & '
     else:
-        exec_cmd = queue_command
+        exec_cmd = fsindex_command + ' ; ' + queue_command
 
     #ceprint("exec_cmd:", exec_cmd)
     ydl_ops = {
