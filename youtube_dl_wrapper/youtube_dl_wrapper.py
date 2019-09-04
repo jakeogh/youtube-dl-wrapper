@@ -99,20 +99,6 @@ def extract_id_from_url(url):
     raise NoIDException
 
 
-def download_id_for_url(url):
-    ceprint(url)
-    ydl_ops = {
-        'simulate': True,
-        'skip_download': True
-    }
-    with YoutubeDL(ydl_ops) as ydl:
-        info = ydl.extract_info(url, download=False, process=False)
-        try:
-            if info['id']:
-                return info['id']
-        except KeyError:
-            return False
-
 
 def get_filename_for_url(url, ydl_ops):
     ic(url)
@@ -171,6 +157,7 @@ def get_playlist_for_channel(url):
     info = ie.extract(url)
     return info['url']
 
+
 def check_if_video_exists_by_video_id(video_id):
     pre_matches = glob.glob('./*' + video_id + '*')
     matches = []
@@ -190,6 +177,7 @@ def check_if_video_exists_by_video_id(video_id):
         ceprint("matches:", matches)
         return matches[0]
     raise NoMatchException
+
 
 def generate_download_options(cache_dir=False, ignore_download_archive=True, play=False, verbose=False, archive_file=False, notitle=False):
     play_command = ' '.join(VIDEO_CMD) + ' {}'
@@ -276,6 +264,7 @@ def construct_youtube_url_from_id(ytid):
             return url
     return False
 
+
 def look_for_output_file_variations(output_file):
     output_file_no_ext = ".".join(output_file.split('.')[:-1])
     extensions = ['webm', 'mp4', 'mkv', 'mxf']
@@ -313,9 +302,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
     ydl_ops = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
     for index, url in enumerate(urls):
         eprint('(outer) (' + str(index+1), "of", str(len(urls)) + '):', url)
-        if id_from_url:
-            print(download_id_for_url(url))
-            continue
+        #if id_from_url:
+        #    print(download_id_for_url(url))
+        #    continue
 
         try:
             url_id, extractor = extract_id_from_url(url)
@@ -392,4 +381,16 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
 #        del self._stringio    # free up some memory
 #        sys.stdout = self._stdout
 
-
+#def download_id_for_url(url):
+#    ic(url)
+#    ydl_ops = {
+#        'simulate': True,
+#        'skip_download': True
+#    }
+#    with YoutubeDL(ydl_ops) as ydl:
+#        info = ydl.extract_info(url, download=False, process=False)
+#        #try:
+#        if info['id']:
+#            return info['id']
+#        #except KeyError:
+#        #    return False
