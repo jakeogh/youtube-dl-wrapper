@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 
-import click
+
+
 import copy
 #import sys
-import sh
+#import sh
+#import pprint
 import os
 import re
 import glob
-#import pprint
 import string
 import subprocess
 import io
+import sre_constants
 from contextlib import redirect_stdout
-
-
 from random import shuffle
+from icecream import ic
+import click
 from youtube_dl.extractor import YoutubeChannelIE
 from youtube_dl.compat import compat_expanduser
 from youtube_dl.extractor import gen_extractors
@@ -23,7 +25,6 @@ from kcl.printops import ceprint
 from kcl.printops import eprint
 from kcl.fileops import points_to_data
 
-import sre_constants
 
 extractors = gen_extractors()
 QUEUE_CMD = ['/home/cfg/redis/types/list/rpush', 'mpv:queue#']
@@ -43,18 +44,6 @@ FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s_
 FILE_TEMPLATE_TW = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(id)s.%(ext)s"
 
 MAX_TRIES = 3
-
-
-# https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
-#class Capturing(list):
-#    def __enter__(self):
-#        self._stdout = sys.stdout
-#        sys.stdout = self._stringio = StringIO()
-#        return self
-#    def __exit__(self, *args):
-#        self.extend(self._stringio.getvalue().splitlines())
-#        del self._stringio    # free up some memory
-#        sys.stdout = self._stdout
 
 
 def is_non_zero_file(fpath):
@@ -126,7 +115,7 @@ def download_id_for_url(url):
 
 
 def get_filename_for_url(url, ydl_ops):
-    ceprint(url)
+    ic(url)
     ydl_ops['forcefilename'] = True
     ydl_ops['skip_download'] = True
     ydl_ops['quiet'] = True
@@ -137,9 +126,11 @@ def get_filename_for_url(url, ydl_ops):
             ydl.download([url])
         out = f.getvalue()
 
-    assert out
-    ceprint("out:", out)
-    return out
+    if out:
+        ic(out)
+        return out
+
+    raise ValueError
 
 
 def get_clipboard():
@@ -173,16 +164,6 @@ def extract_urls_from_text(intext):
     url_set = set(extracted_url_list)
     return list(url_set)
 
-
-#def check_lsof_for_duplicate_process(video_id):
-#    lsof_check = ""
-#    lsof_check = sh.grep(sh.lsof(), video_id)
-#
-#    if len(lsof_check) > 0:
-#        ceprint("lsof_check:", lsof_check)
-#        ceprint("Found", video_id, "in lsof output, skipping.")
-#        return True
-#    return False
 
 def get_playlist_for_channel(url):
     ydl = YoutubeDL()
@@ -387,3 +368,28 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
             download_url(url=url, ydl_ops=ydl_ops)
 
         print(" ")
+
+
+
+#def check_lsof_for_duplicate_process(video_id):
+#    lsof_check = ""
+#    lsof_check = sh.grep(sh.lsof(), video_id)
+#
+#    if len(lsof_check) > 0:
+#        ceprint("lsof_check:", lsof_check)
+#        ceprint("Found", video_id, "in lsof output, skipping.")
+#        return True
+#    return False
+
+# https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
+#class Capturing(list):
+#    def __enter__(self):
+#        self._stdout = sys.stdout
+#        sys.stdout = self._stringio = StringIO()
+#        return self
+#    def __exit__(self, *args):
+#        self.extend(self._stringio.getvalue().splitlines())
+#        del self._stringio    # free up some memory
+#        sys.stdout = self._stdout
+
+
