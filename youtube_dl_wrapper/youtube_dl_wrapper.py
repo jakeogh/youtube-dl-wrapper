@@ -322,9 +322,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                 extractor = None
 
         max_tries = 11
-        ceprint("extractor:", extractor)
-        ceprint("str(extractor):", str(extractor))
-        ceprint("type(extractor):", type(extractor))
+        #ceprint("extractor:", extractor)
+        #ceprint("str(extractor):", str(extractor))
+        #ceprint("type(extractor):", type(extractor))
         if extractor in ['youtube:channel']:
             url = get_playlist_for_channel(url)
             url_id, extractor = extract_id_from_url(url)  # re-get now that user is converted to channel playlist
