@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 
 
-
 import copy
-#import sys
-#import sh
-#import pprint
 import os
 import re
 import glob
 import string
-import subprocess
 import io
 import sre_constants
 from contextlib import redirect_stdout
@@ -24,6 +19,7 @@ from youtube_dl import YoutubeDL
 from kcl.printops import ceprint
 from kcl.printops import eprint
 from kcl.fileops import points_to_data
+from kcl.clipboardops import get_clipboard_iris
 
 
 extractors = gen_extractors()
@@ -117,38 +113,6 @@ def get_filename_for_url(url, ydl_ops):
         return out
 
     raise ValueError
-
-
-def get_clipboard():
-    clipboard_text = \
-        subprocess.Popen(["xclip", "-o"], stdout=subprocess.PIPE).stdout.read()
-    clipboard_text_utf8 = clipboard_text.decode("utf-8")
-    ceprint("clipboard_text_utf8:", clipboard_text_utf8)
-    return clipboard_text_utf8
-
-
-def get_clipboard_urls():
-    clipboard_text = get_clipboard()
-    urls = extract_urls_from_text(clipboard_text)
-    return urls
-
-
-def extract_urls_from_text(intext):
-    text = intext.split("\n")
-    clean_text = filter(None, text)
-    extracted_url_list = []
-    for line in clean_text:
-        for word in line.split(' '):
-            urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', word)
-            if len(urls) == 0:
-                constructed_url = construct_youtube_url_from_id(ytid=word)
-                if constructed_url:
-                    urls.append(constructed_url)
-            for url in urls:
-                extracted_url_list.append(url)
-
-    url_set = set(extracted_url_list)
-    return list(url_set)
 
 
 def get_playlist_for_channel(url):
@@ -254,7 +218,7 @@ def download_url(url, ydl_ops):
     assert url
     with YoutubeDL(ydl_ops) as ydl:
         ydl.download([url])
-
+        ic(dir(ytl))
 
 def construct_youtube_url_from_id(ytid):
     if len(ytid) == 11:
@@ -288,7 +252,7 @@ def look_for_output_file_variations(output_file):
 def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose, destdir, archive_file):
     if not urls:
         ceprint("no args, checking clipboard for urls")
-        urls = get_clipboard_urls()
+        urls = get_clipboard_iris()
 
     urls = list(urls)
     shuffle(urls)
@@ -300,7 +264,11 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
         input('pause')
         os.chdir(cache_folder)
 
-    ydl_ops = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file)
+    ydl_ops = generate_download_options(cache_dir=cache_folder,
+                                        ignore_download_archive=ignore_download_archive,
+                                        play=play,
+                                        verbose=verbose,
+                                        archive_file=archive_file)
     for index, url in enumerate(urls):
         eprint('(outer) (' + str(index+1), "of", str(len(urls)) + '):', url)
         #if id_from_url:
@@ -336,21 +304,24 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                 tries = 0
                 eprint('(' + str(plindex+1), "of", str(len(playlist_links)) + '):', url)
                 output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
-                assert output_file
+                ic(output_file)
 
-                #ceprint("output_file:", output_file)
-                #while not points_to_data(output_file):
                 while not look_for_output_file_variations(output_file):
                     tries += 1
                     if tries > max_tries:
                         ceprint("tried", max_tries, "times, skipping")
                         break
                     else:
-                        ceprint("tries:", tries)
-                        ceprint("output_file:", output_file)
+                        ic(tries)
+                        ic(output_file)
                         download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
         elif extractor in ['twitter'] or url.startswith('https://t.co/'):
-            ydl_ops = generate_download_options(cache_dir=cache_folder, ignore_download_archive=ignore_download_archive, play=play, verbose=verbose, archive_file=archive_file, notitle=True)
+            ydl_ops = generate_download_options(cache_dir=cache_folder,
+                                                ignore_download_archive=ignore_download_archive,
+                                                play=play,
+                                                verbose=verbose,
+                                                archive_file=archive_file,
+                                                notitle=True)
             download_url(url=url, ydl_ops=ydl_ops)
 
         else:
@@ -359,39 +330,3 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
 
         print(" ")
 
-
-
-#def check_lsof_for_duplicate_process(video_id):
-#    lsof_check = ""
-#    lsof_check = sh.grep(sh.lsof(), video_id)
-#
-#    if len(lsof_check) > 0:
-#        ceprint("lsof_check:", lsof_check)
-#        ceprint("Found", video_id, "in lsof output, skipping.")
-#        return True
-#    return False
-
-# https://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
-#class Capturing(list):
-#    def __enter__(self):
-#        self._stdout = sys.stdout
-#        sys.stdout = self._stringio = StringIO()
-#        return self
-#    def __exit__(self, *args):
-#        self.extend(self._stringio.getvalue().splitlines())
-#        del self._stringio    # free up some memory
-#        sys.stdout = self._stdout
-
-#def download_id_for_url(url):
-#    ic(url)
-#    ydl_ops = {
-#        'simulate': True,
-#        'skip_download': True
-#    }
-#    with YoutubeDL(ydl_ops) as ydl:
-#        info = ydl.extract_info(url, download=False, process=False)
-#        #try:
-#        if info['id']:
-#            return info['id']
-#        #except KeyError:
-#        #    return False
