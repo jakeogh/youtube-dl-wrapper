@@ -217,9 +217,10 @@ def get_playlist_links(url, ydl_ops):
 def download_url(url, ydl_ops):
     assert url
     with YoutubeDL(ydl_ops) as ydl:
-        ydl.download([url])
+        thing = ydl.download([url])
         ic(dir(ydl))
-        ic(ydl.in_download_archive())
+        #ic(ydl.in_download_archive())
+        ic(thing)
 
 def construct_youtube_url_from_id(ytid):
     if len(ytid) == 11:
