@@ -219,6 +219,7 @@ def download_url(url, ydl_ops):
     with YoutubeDL(ydl_ops) as ydl:
         ydl.download([url])
         ic(dir(ydl))
+        ic(ydl.in_download_archive)
 
 def construct_youtube_url_from_id(ytid):
     if len(ytid) == 11:
