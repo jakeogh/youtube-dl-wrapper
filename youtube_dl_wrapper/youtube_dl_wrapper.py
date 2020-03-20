@@ -254,7 +254,7 @@ def look_for_output_file_variations(output_file):
 def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose, destdir, archive_file):
     if not urls:
         ceprint("no args, checking clipboard for urls")
-        urls = get_clipboard_iris()
+        urls = get_clipboard_iris(verbose=True)
 
     urls = list(urls)
     shuffle(urls)
