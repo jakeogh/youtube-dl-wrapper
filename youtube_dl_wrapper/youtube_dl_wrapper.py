@@ -275,7 +275,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                                         verbose=verbose,
                                         archive_file=archive_file)
     for index, url in enumerate(urls):
-        eprint('(outer) (' + str(index+1), "of", str(len(urls)) + '):', url)
+        eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
         #if id_from_url:
         #    print(download_id_for_url(url))
         #    continue
