@@ -252,6 +252,7 @@ def look_for_output_file_variations(output_file):
 @click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
 @click.option('--archive-file', is_flag=False, required=False, default='~/.youtube_dl.cache')
 def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose, destdir, archive_file):
+    ic(verbose)
     if not urls:
         ceprint("no args, checking clipboard for urls")
         urls = get_clipboard_iris(verbose=verbose)
