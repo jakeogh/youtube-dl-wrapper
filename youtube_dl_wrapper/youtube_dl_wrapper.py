@@ -208,8 +208,9 @@ def get_playlist_links(*, url, ydl_ops, verbose):
         json_info = ydl.extract_info(url, download=False)
     if verbose:
         ic(json_info)
-    for item in json_info['entries']:
-        links.append((json_info['extractor'], item['url']))
+    if 'entries' in json_info.keys():
+        for item in json_info['entries']:
+            links.append((json_info['extractor'], item['url']))
     #except Exception as e:
     #    ic(e)
     #if not links:
