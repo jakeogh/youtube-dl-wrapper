@@ -247,7 +247,7 @@ def get_playlist_links(*, url, ydl_ops, verbose):
 def download_url(*, url, ydl_ops):
     assert url
     response = None
-    while not response:
+    while response == None:
         try:
             response = requests.head(url)
             ic(response.headers)
