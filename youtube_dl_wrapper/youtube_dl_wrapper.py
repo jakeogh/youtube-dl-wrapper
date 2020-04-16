@@ -198,18 +198,19 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
     return ydl_ops
 
 
-def get_playlist_links(url, ydl_ops):
+def get_playlist_links(url, ydl_ops, verbose):
     links = []
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
     try:
         with YoutubeDL(ydl_ops) as ydl:
             json_info = ydl.extract_info(url, download=False)
-        #pprint.pprint(json_info)
+        if verbose:
+            ic(json_info)
         for item in json_info['entries']:
             links.append('https://www.youtube.com/watch?v=' + item['url'])
     except Exception as e:
-        print(e)
+        ic(e)
 
     ic(links)
     return links
@@ -222,6 +223,7 @@ def download_url(url, ydl_ops):
         #ic(dir(ydl))
         #ic(ydl.in_download_archive(ydl_ops))
         ic(thing)
+
 
 def construct_youtube_url_from_id(ytid):
     if len(ytid) == 11:
@@ -280,7 +282,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
     for index, url in enumerate(urls):
         eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
         if extract_urls:
-            for link in get_playlist_links(url, ydl_ops):
+            for link in get_playlist_links(url, ydl_ops, verbose=verbose):
                 print(link)
             continue
 
