@@ -202,20 +202,20 @@ def get_playlist_links(url, ydl_ops, verbose):
     links = []
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
-    try:
-        with YoutubeDL(ydl_ops) as ydl:
-            json_info = ydl.extract_info(url, download=False)
-        if verbose:
-            ic(json_info)
-        for item in json_info['entries']:
-            #links.append((json_info['extractor'], 'https://www.youtube.com/watch?v=' + item['url']))
-            links.append((json_info['extractor'], item['url']))
-    except Exception as e:
-        ic(e)
-    if not links:
-        links.append((json_info['extractor'], json_info['id']))
+    #try:
+    with YoutubeDL(ydl_ops) as ydl:
+        json_info = ydl.extract_info(url, download=False)
+    if verbose:
+        ic(json_info)
+    for item in json_info['entries']:
+        links.append((json_info['extractor'], item['url']))
+    #except Exception as e:
+    #    ic(e)
+    #if not links:
+    #    links.append((json_info['extractor'], json_info['id']))
 
-    ic(links)
+    if verbose:
+        ic(links)
     return links
 
 
@@ -229,7 +229,11 @@ def download_url(url, ydl_ops):
 
 
 def construct_url_from_id(vid_id, extractor):
-    pass
+    if extractor == "youtube:playlist":
+        return "https://www.youtube.com/watch?v={}".format(vid_id)
+    if extractor == "BitChute":
+        return "https://www.bitchute.com/video/{}".format(vid_id)
+    raise NotImplementedError("Unknkown extractor: {}".format(extractor))
 
 
 def construct_youtube_url_from_id(ytid):
@@ -286,30 +290,47 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
                                         play=play,
                                         verbose=verbose,
                                         archive_file=archive_file)
+
+    url_set = set([])
     for index, url in enumerate(urls):
         eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
-        if extract_urls:
-            for link in get_playlist_links(url, ydl_ops, verbose=verbose):
-                print(link)
-            continue
 
-        #if id_from_url:
-        #    print(download_id_for_url(url))
-        #    continue
 
-        try:
-            url_id, extractor = extract_id_from_url(url)
+        # step 1, expand playlists
+        for vid_id, extractor in get_playlist_links(url, ydl_ops, verbose=verbose):
+            try:
+                constructed_url = construct_url_from_id(vid_id, extractor)
+                url_set.add(constructed_url)
+            except NotImplementedError as e:
+                ic(e)
+                url_set.add(url)
 
-        except NoIDException:
-            #ceprint("url:", url)
-            if 'hooktube.com' in url:
-                hooktube_id = url.split('/')[-1]
-                url = 'https://youtube.com/watch?v=' + hooktube_id
-                ceprint("url:", url)
-                urlid, extractor = extract_id_from_url(url)
-            else:
-                urlid = None
-                extractor = None
+        else:
+            eprint("get_playlist_links() returned nothing, adding url to set directly")
+            url_set.add(url)
+
+
+
+    for index, url in enumerate(url_set):
+        ic(index, url)
+        continue
+
+
+
+        # disabled, hooktube is handeled automatically now
+        #try:
+        #    url_id, extractor = extract_id_from_url(url)
+
+        #except NoIDException:
+        #    #ceprint("url:", url)
+        #    if 'hooktube.com' in url:
+        #        hooktube_id = url.split('/')[-1]
+        #        url = 'https://youtube.com/watch?v=' + hooktube_id
+        #        ceprint("url:", url)
+        #        urlid, extractor = extract_id_from_url(url)
+        #    else:
+        #        urlid = None
+        #        extractor = None
 
         max_tries = 11
         #ceprint("extractor:", extractor)
