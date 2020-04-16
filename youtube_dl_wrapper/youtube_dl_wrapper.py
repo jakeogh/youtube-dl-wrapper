@@ -248,11 +248,12 @@ def look_for_output_file_variations(output_file):
 @click.option('--id-from-url', is_flag=True)
 @click.option('--ignore-download-archive', is_flag=True)
 @click.option('--play', is_flag=True)
+@click.option('--extract-urls', is_flag=True)
 @click.option('--verbose', is_flag=True)
 @click.option('--debug', is_flag=True)
 @click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
 @click.option('--archive-file', is_flag=False, required=False, default='~/.youtube_dl.cache')
-def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose, debug, destdir, archive_file):
+def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract_urls, verbose, debug, destdir, archive_file):
     ic(verbose)
     if not urls:
         ceprint("no args, checking clipboard for urls")
@@ -277,6 +278,11 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, verbose
                                         archive_file=archive_file)
     for index, url in enumerate(urls):
         eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
+        if extract_urls:
+            for link in get_playlist_links(url, ydl_ops):
+                print(link)
+            continue
+
         #if id_from_url:
         #    print(download_id_for_url(url))
         #    continue
