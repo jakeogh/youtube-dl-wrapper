@@ -11,6 +11,7 @@ import sre_constants
 from contextlib import redirect_stdout
 from random import shuffle
 from icecream import ic
+import requests
 import click
 from youtube_dl.extractor import YoutubeChannelIE
 from youtube_dl.compat import compat_expanduser
@@ -245,6 +246,9 @@ def get_playlist_links(*, url, ydl_ops, verbose):
 
 def download_url(*, url, ydl_ops):
     assert url
+    response = requests.head(url)
+    ic(response.headers)
+
     with YoutubeDL(ydl_ops) as ydl:
         thing = ydl.download([url])
         #ic(dir(ydl))
