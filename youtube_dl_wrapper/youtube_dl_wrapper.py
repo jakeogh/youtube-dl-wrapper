@@ -290,11 +290,17 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         input('pause')
         os.chdir(cache_folder)
 
-    ydl_ops = generate_download_options(cache_dir=cache_folder,
-                                        ignore_download_archive=ignore_download_archive,
-                                        play=play,
-                                        verbose=verbose,
-                                        archive_file=archive_file)
+    ydl_ops_standard = generate_download_options(cache_dir=cache_folder,
+                                                 ignore_download_archive=ignore_download_archive,
+                                                 play=play,
+                                                 verbose=verbose,
+                                                 archive_file=archive_file)
+    ydl_ops_notitle = generate_download_options(cache_dir=cache_folder,
+                                                ignore_download_archive=ignore_download_archive,
+                                                play=play,
+                                                verbose=verbose,
+                                                archive_file=archive_file,
+                                                notitle=True)
 
     url_set = set([])
     for index, url in enumerate(urls):
@@ -303,7 +309,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
         # step 1, expand playlists
         try:
-            for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops, verbose=verbose):
+            for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops_standard, verbose=verbose):
                 try:
                     constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor)
                     url_set.add(constructed_url)
@@ -316,11 +322,20 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
             url_set.add(url)
 
 
-
+    url_set_len = len(url_set)
     for index, url in enumerate(url_set):
-        ic(index, url)
-        continue
+        ic("{} of {}".format(index, url_set_len), url)
 
+        url_id, extractor = extract_id_from_url(url)
+
+        if extractor in ['twitter'] or url.startswith('https://t.co/'):
+            download_url(url=url, ydl_ops=ydl_ops_notitle)
+
+        else:
+            download_url(url=url, ydl_ops=ydl_ops_standard)
+
+        print()
+        continue
 
 
         # disabled, hooktube is handeled automatically now
@@ -338,44 +353,44 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         #        urlid = None
         #        extractor = None
 
-        max_tries = 11
-        #ceprint("extractor:", extractor)
-        #ceprint("str(extractor):", str(extractor))
-        #ceprint("type(extractor):", type(extractor))
-        if extractor in ['youtube:channel']:
-            url = get_playlist_for_channel(url)
-            url_id, extractor = extract_id_from_url(url)  # re-get now that user is converted to channel playlist
+        #max_tries = 11
+        ##ceprint("extractor:", extractor)
+        ##ceprint("str(extractor):", str(extractor))
+        ##ceprint("type(extractor):", type(extractor))
+        #if extractor in ['youtube:channel']:
+        #    url = get_playlist_for_channel(url)
+        #    url_id, extractor = extract_id_from_url(url)  # re-get now that user is converted to channel playlist
 
-        #if extractor in ['youtube:playlist', 'youtube:user']:
-        if extractor in ['youtube:playlist']:
-            playlist_links = get_playlist_links(url=url, ydl_ops=copy.copy(ydl_ops))
-            for plindex, plurl in enumerate(playlist_links):
-                tries = 0
-                eprint('(' + str(plindex+1), "of", str(len(playlist_links)) + '):', url)
-                output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
-                ic(output_file)
+        ##if extractor in ['youtube:playlist', 'youtube:user']:
+        #if extractor in ['youtube:playlist']:
+        #    playlist_links = get_playlist_links(url=url, ydl_ops=copy.copy(ydl_ops))
+        #    for plindex, plurl in enumerate(playlist_links):
+        #        tries = 0
+        #        eprint('(' + str(plindex+1), "of", str(len(playlist_links)) + '):', url)
+        #        output_file = get_filename_for_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
+        #        ic(output_file)
 
-                while not look_for_output_file_variations(output_file):
-                    tries += 1
-                    if tries > max_tries:
-                        ceprint("tried", max_tries, "times, skipping")
-                        break
-                    else:
-                        ic(tries)
-                        ic(output_file)
-                        download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
-        elif extractor in ['twitter'] or url.startswith('https://t.co/'):
-            ydl_ops = generate_download_options(cache_dir=cache_folder,
-                                                ignore_download_archive=ignore_download_archive,
-                                                play=play,
-                                                verbose=verbose,
-                                                archive_file=archive_file,
-                                                notitle=True)
-            download_url(url=url, ydl_ops=ydl_ops)
+        #        while not look_for_output_file_variations(output_file):
+        #            tries += 1
+        #            if tries > max_tries:
+        #                ceprint("tried", max_tries, "times, skipping")
+        #                break
+        #            else:
+        #                ic(tries)
+        #                ic(output_file)
+        #                download_url(url=plurl, ydl_ops=copy.copy(ydl_ops))
+        #elif extractor in ['twitter'] or url.startswith('https://t.co/'):
+        #    ydl_ops = generate_download_options(cache_dir=cache_folder,
+        #                                        ignore_download_archive=ignore_download_archive,
+        #                                        play=play,
+        #                                        verbose=verbose,
+        #                                        archive_file=archive_file,
+        #                                        notitle=True)
+        #    download_url(url=url, ydl_ops=ydl_ops)
 
-        else:
-            ceprint("skipped looking for output file")
-            download_url(url=url, ydl_ops=ydl_ops)
+        #else:
+        #    ceprint("skipped looking for output file")
+        #    download_url(url=url, ydl_ops=ydl_ops)
 
-        print(" ")
+        #print(" ")
 
