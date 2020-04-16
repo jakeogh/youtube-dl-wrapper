@@ -212,6 +212,8 @@ def get_playlist_links(url, ydl_ops, verbose):
             links.append((json_info['extractor'], item['url']))
     except Exception as e:
         ic(e)
+    if not links:
+        links.append((json_info['extractor'], json_info['id']))
 
     ic(links)
     return links
