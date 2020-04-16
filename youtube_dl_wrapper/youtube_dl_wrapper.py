@@ -296,7 +296,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
 
         # step 1, expand playlists
-        for extractor, vid_id in get_playlist_links(url, ydl_ops, verbose=verbose):
+        for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops, verbose=verbose):
             try:
                 constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor)
                 url_set.add(constructed_url)
