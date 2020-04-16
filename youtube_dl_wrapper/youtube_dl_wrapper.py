@@ -199,7 +199,25 @@ def generate_download_options(*, cache_dir=False, ignore_download_archive=True, 
     return ydl_ops
 
 
+def convert_url_to_playlist(url, ydl_ops, verbose):
+    ydl_ops['dumpjson'] = True
+    ydl_ops['extract_flat'] = True
+    #try:
+    with YoutubeDL(ydl_ops) as ydl:
+        json_info = ydl.extract_info(url, download=False)
+    if verbose:
+        ic(json_info)
+
+    if json_info['extractor'] == 'youtube:user':
+        if verbose:
+            ic(json_info['extractor'])
+        return json_info['url']
+    else:
+        return url
+
+
 def get_playlist_links(*, url, ydl_ops, verbose):
+    url = convert_url_to_playlist(url, ydl_ops, verbose)
     links = []
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
@@ -208,6 +226,7 @@ def get_playlist_links(*, url, ydl_ops, verbose):
         json_info = ydl.extract_info(url, download=False)
     if verbose:
         ic(json_info)
+
     if 'entries' in json_info.keys():
         for item in json_info['entries']:
             links.append((json_info['extractor'], item['url']))
@@ -324,7 +343,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
     url_set_len = len(url_set)
     for index, url in enumerate(url_set):
-        ic("{} of {}".format(index, url_set_len), url)
+        eprint("{} of {}".format(index, url_set_len), url)
 
         url_id, extractor = extract_id_from_url(url)
 
