@@ -245,7 +245,7 @@ def get_playlist_links(*, url, ydl_ops, verbose):
     return links
 
 
-def download_url(*, url, ydl_ops, verbose):
+def download_url(*, url, ydl_ops, retries, verbose, current_try=1):
     assert url
     response = None
     delay = 10
@@ -266,8 +266,9 @@ def download_url(*, url, ydl_ops, verbose):
         #ic(ydl.in_download_archive(ydl_ops))
         ic(thing)
     if int(thing) == 1:
-        download_url(url=url, ydl_ops=ydl_ops, verbose=verbose)
-
+        ic(current_try)
+        if current_try <= retries:
+            download_url(url=url, ydl_ops=ydl_ops, retries=retries, verbose=verbose, current_try=current_try+1)
 
 
 def construct_url_from_id(*, vid_id, extractor):
@@ -344,7 +345,6 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
     for index, url in enumerate(urls):
         eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
 
-
         # step 1, expand playlists
         try:
             for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops_standard, verbose=verbose):
@@ -360,6 +360,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
             url_set.add(url)
 
 
+    retries = 5
     url_set_len = len(url_set)
     for index, url in enumerate(url_set):
         eprint("{} of {}".format(index+1, url_set_len), url)
@@ -367,10 +368,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         url_id, extractor = extract_id_from_url(url)
 
         if extractor in ['twitter'] or url.startswith('https://t.co/'):
-            download_url(url=url, ydl_ops=ydl_ops_notitle, verbose=verbose)
+            download_url(url=url, ydl_ops=ydl_ops_notitle, retries=retries, verbose=verbose)
 
         else:
-            download_url(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+            download_url(url=url, ydl_ops=ydl_ops_standard, retries=retries, verbose=verbose)
 
         print()
         continue
