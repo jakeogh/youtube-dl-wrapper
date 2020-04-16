@@ -362,10 +362,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         url_id, extractor = extract_id_from_url(url)
 
         if extractor in ['twitter'] or url.startswith('https://t.co/'):
-            download_url(url=url, ydl_ops=ydl_ops_notitle)
+            download_url(url=url, ydl_ops=ydl_ops_notitle, verbose=verbose)
 
         else:
-            download_url(url=url, ydl_ops=ydl_ops_standard)
+            download_url(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
 
         print()
         continue
