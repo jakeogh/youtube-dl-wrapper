@@ -248,7 +248,7 @@ def get_playlist_links(*, url, ydl_ops, verbose):
 def download_url(*, url, ydl_ops, verbose):
     assert url
     response = None
-    delay = 1
+    delay = 10
     while response == None:
         try:
             response = requests.head(url)
@@ -258,13 +258,16 @@ def download_url(*, url, ydl_ops, verbose):
             ic(delay, url, e)
             response = None
             time.sleep(delay)
-            delay = delay * 2
+            delay = delay * 3
 
     with YoutubeDL(ydl_ops) as ydl:
         thing = ydl.download([url])
         #ic(dir(ydl))
         #ic(ydl.in_download_archive(ydl_ops))
         ic(thing)
+    if int(thing) == 1:
+        download_url(url=url, ydl_ops=ydl_ops, verbose=verbose)
+
 
 
 def construct_url_from_id(*, vid_id, extractor):
