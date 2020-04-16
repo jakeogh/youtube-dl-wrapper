@@ -310,6 +310,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
     urls = list(urls)
     shuffle(urls)
+    ic(urls)
     cache_folder = compat_expanduser(destdir)
     try:
         os.chdir(cache_folder)
