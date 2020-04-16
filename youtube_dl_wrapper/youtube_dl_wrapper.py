@@ -95,8 +95,7 @@ def extract_id_from_url(url):
     raise NoIDException
 
 
-
-def get_filename_for_url(url, ydl_ops):
+def get_filename_for_url(*, url, ydl_ops):
     ic(url)
     ydl_ops['forcefilename'] = True
     ydl_ops['skip_download'] = True
@@ -143,7 +142,7 @@ def check_if_video_exists_by_video_id(video_id):
     raise NoMatchException
 
 
-def generate_download_options(cache_dir=False, ignore_download_archive=True, play=False, verbose=False, archive_file=False, notitle=False):
+def generate_download_options(*, cache_dir=False, ignore_download_archive=True, play=False, verbose=False, archive_file=False, notitle=False):
     play_command = ' '.join(VIDEO_CMD) + ' {}'
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
     #fsindex_command = ' '.join(FSINDEX_CMD) + ' {}'
@@ -198,7 +197,7 @@ def generate_download_options(cache_dir=False, ignore_download_archive=True, pla
     return ydl_ops
 
 
-def get_playlist_links(url, ydl_ops, verbose):
+def get_playlist_links(*, url, ydl_ops, verbose):
     links = []
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
@@ -219,7 +218,7 @@ def get_playlist_links(url, ydl_ops, verbose):
     return links
 
 
-def download_url(url, ydl_ops):
+def download_url(*, url, ydl_ops):
     assert url
     with YoutubeDL(ydl_ops) as ydl:
         thing = ydl.download([url])
@@ -228,7 +227,7 @@ def download_url(url, ydl_ops):
         ic(thing)
 
 
-def construct_url_from_id(vid_id, extractor):
+def construct_url_from_id(*, vid_id, extractor):
     if extractor == "youtube:playlist":
         return "https://www.youtube.com/watch?v={}".format(vid_id)
     if extractor == "BitChute":
@@ -297,9 +296,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
 
         # step 1, expand playlists
-        for vid_id, extractor in get_playlist_links(url, ydl_ops, verbose=verbose):
+        for extractor, vid_id in get_playlist_links(url, ydl_ops, verbose=verbose):
             try:
-                constructed_url = construct_url_from_id(vid_id, extractor)
+                constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor)
                 url_set.add(constructed_url)
             except NotImplementedError as e:
                 ic(e)
