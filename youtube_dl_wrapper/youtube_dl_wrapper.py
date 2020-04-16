@@ -210,7 +210,7 @@ def convert_url_to_playlist(url, ydl_ops, verbose):
     if verbose:
         ic(json_info)
 
-    if json_info['extractor'] == 'youtube:user':
+    if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
         if verbose:
             ic(json_info['extractor'])
         return json_info['url']
@@ -245,13 +245,14 @@ def get_playlist_links(*, url, ydl_ops, verbose):
     return links
 
 
-def download_url(*, url, ydl_ops):
+def download_url(*, url, ydl_ops, verbose):
     assert url
     response = None
     while response == None:
         try:
             response = requests.head(url)
-            ic(response.headers)
+            if verbose:
+                ic(response.headers)
         except Exception as e:
             ic(url, e)
             response = None
