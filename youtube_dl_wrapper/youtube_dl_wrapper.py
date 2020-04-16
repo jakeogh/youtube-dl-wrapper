@@ -253,7 +253,7 @@ def download_url(*, url, ydl_ops):
             response = requests.head(url)
             ic(response.headers)
         except Exception as e:
-            ic(e)
+            ic(url, e)
             response = None
             time.sleep(1)
 
