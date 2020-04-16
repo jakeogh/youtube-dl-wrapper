@@ -55,6 +55,8 @@ class NoIDException(ValueError):
 class NoMatchException(ValueError):
     pass
 
+class NotPlaylistException(ValueError):
+    pass
 
 def extract_id_from_url(url):
     #ceprint("url:", url)
@@ -215,6 +217,9 @@ def get_playlist_links(*, url, ydl_ops, verbose):
 
     if verbose:
         ic(links)
+    if not links:
+        raise NotPlaylistException
+
     return links
 
 
@@ -296,16 +301,17 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
 
         # step 1, expand playlists
-        for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops, verbose=verbose):
-            try:
-                constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor)
-                url_set.add(constructed_url)
-            except NotImplementedError as e:
-                ic(e)
-                url_set.add(url)
+        try:
+            for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops, verbose=verbose):
+                try:
+                    constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor)
+                    url_set.add(constructed_url)
+                except NotImplementedError as e:
+                    ic(e)
+                    url_set.add(url)
 
-        else:
-            eprint("get_playlist_links() returned nothing, adding url to set directly")
+        except NotPlaylistException:
+            eprint("Not a playlist, adding url to set directly")
             url_set.add(url)
 
 
