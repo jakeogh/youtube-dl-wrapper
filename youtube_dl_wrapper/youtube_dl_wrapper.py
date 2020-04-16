@@ -246,8 +246,13 @@ def get_playlist_links(*, url, ydl_ops, verbose):
 
 def download_url(*, url, ydl_ops):
     assert url
-    response = requests.head(url)
-    ic(response.headers)
+    response = None
+    while not response:
+        try:
+            response = requests.head(url)
+            ic(response.headers)
+        except Exception as e:
+            ic(e)
 
     with YoutubeDL(ydl_ops) as ydl:
         thing = ydl.download([url])
