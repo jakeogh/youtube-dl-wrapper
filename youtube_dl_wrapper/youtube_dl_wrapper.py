@@ -3,6 +3,7 @@
 
 import copy
 import os
+import time
 import re
 import glob
 import string
@@ -253,6 +254,8 @@ def download_url(*, url, ydl_ops):
             ic(response.headers)
         except Exception as e:
             ic(e)
+            response = None
+            time.sleep(1)
 
     with YoutubeDL(ydl_ops) as ydl:
         thing = ydl.download([url])
