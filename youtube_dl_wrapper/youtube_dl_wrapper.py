@@ -248,15 +248,17 @@ def get_playlist_links(*, url, ydl_ops, verbose):
 def download_url(*, url, ydl_ops, verbose):
     assert url
     response = None
+    delay = 1
     while response == None:
         try:
             response = requests.head(url)
             if verbose:
                 ic(response.headers)
         except Exception as e:
-            ic(url, e)
+            ic(delay, url, e)
             response = None
-            time.sleep(1)
+            time.sleep(delay)
+            delay = delay * 2
 
     with YoutubeDL(ydl_ops) as ydl:
         thing = ydl.download([url])
@@ -357,7 +359,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
     url_set_len = len(url_set)
     for index, url in enumerate(url_set):
-        eprint("{} of {}".format(index, url_set_len), url)
+        eprint("{} of {}".format(index+1, url_set_len), url)
 
         url_id, extractor = extract_id_from_url(url)
 
