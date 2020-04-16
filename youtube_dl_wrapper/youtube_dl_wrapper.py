@@ -211,6 +211,7 @@ def get_playlist_links(url, ydl_ops):
     except Exception as e:
         print(e)
 
+    ic(links)
     return links
 
 
