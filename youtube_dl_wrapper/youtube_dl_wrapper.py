@@ -208,7 +208,8 @@ def get_playlist_links(url, ydl_ops, verbose):
         if verbose:
             ic(json_info)
         for item in json_info['entries']:
-            links.append('https://www.youtube.com/watch?v=' + item['url'])
+            #links.append((json_info['extractor'], 'https://www.youtube.com/watch?v=' + item['url']))
+            links.append((json_info['extractor'], item['url']))
     except Exception as e:
         ic(e)
 
@@ -223,6 +224,10 @@ def download_url(url, ydl_ops):
         #ic(dir(ydl))
         #ic(ydl.in_download_archive(ydl_ops))
         ic(thing)
+
+
+def construct_url_from_id(vid_id, extractor):
+    pass
 
 
 def construct_youtube_url_from_id(ytid):
