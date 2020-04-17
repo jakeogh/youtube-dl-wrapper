@@ -256,7 +256,10 @@ def download_url(*, url, ydl_ops, retries, verbose, current_try=1):
             if verbose:
                 ic(response.headers)
         except Exception as e:
-            ic(delay, url, e)
+            if current_try == 1:
+                ic(delay, url, e)
+            else:
+                ic(delay)
             response = None
             time.sleep(delay)
             delay = delay + (delay * 0.3)
