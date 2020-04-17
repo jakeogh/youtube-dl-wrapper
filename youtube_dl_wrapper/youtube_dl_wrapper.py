@@ -258,7 +258,7 @@ def download_url(*, url, ydl_ops, retries, verbose, current_try=1):
             ic(delay, url, e)
             response = None
             time.sleep(delay)
-            delay = delay * 3
+            delay = delay + (delay * 0.3)
 
     with YoutubeDL(ydl_ops) as ydl:
         thing = ydl.download([url])
