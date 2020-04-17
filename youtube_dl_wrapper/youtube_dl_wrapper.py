@@ -203,6 +203,7 @@ def generate_download_options(*, cache_dir=False, ignore_download_archive=True, 
 
 
 def convert_url_to_playlist(url, ydl_ops, verbose):
+    ic()
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
     #try:
@@ -220,6 +221,7 @@ def convert_url_to_playlist(url, ydl_ops, verbose):
 
 
 def get_playlist_links(*, url, ydl_ops, verbose):
+    ic()
     url = convert_url_to_playlist(url, ydl_ops, verbose)
     links = []
     ydl_ops['dumpjson'] = True
@@ -362,7 +364,6 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         except NotPlaylistException:
             eprint("Not a playlist, adding url to set directly")
             url_set.add(url)
-
 
     retries = 5
     url_set_len = len(url_set)
