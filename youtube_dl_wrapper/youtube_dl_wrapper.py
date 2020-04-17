@@ -173,6 +173,7 @@ def generate_download_options(*, cache_dir=False, ignore_download_archive=True, 
         'allsubtitles': True,
         "source_address": "0.0.0.0",
         'progress_with_newline': False,
+        'user_agent': "Mozilla/5.0 (X11; Linux x86_64; rv:72.0) Gecko/20100101 Firefox/72.0",
         'consoletitle': True,
         'call_home': False,
         'postprocessors': [{
