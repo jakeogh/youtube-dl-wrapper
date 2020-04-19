@@ -379,7 +379,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
     for index, url in enumerate(url_set):
         eprint("{} of {}".format(index+1, url_set_len), url)
 
-        url_id, extractor = extract_id_from_url(url)
+        try:
+            url_id, extractor = extract_id_from_url(url)
+        except NoIDException:
+            extractor = None
 
         if extractor in ['twitter'] or url.startswith('https://t.co/'):
             download_url(url=url, ydl_ops=ydl_ops_notitle, retries=retries, verbose=verbose)
