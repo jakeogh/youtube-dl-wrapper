@@ -403,7 +403,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
             url_set.add(url)
 
         # step 2, expand redirects
-        url_redirect = convert_url_to_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+        url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
         if verbose:
             ic(url_redirect)
         url_set.add(url_redirect)
