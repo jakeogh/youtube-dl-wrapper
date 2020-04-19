@@ -13,6 +13,7 @@ from contextlib import redirect_stdout
 from random import shuffle
 from icecream import ic
 import requests
+import random
 import click
 from youtube_dl.extractor import YoutubeChannelIE
 from youtube_dl.compat import compat_expanduser
@@ -23,6 +24,9 @@ from kcl.printops import eprint
 from kcl.fileops import points_to_data
 from kcl.clipboardops import get_clipboard_iris
 
+
+global DELAY_MULTIPLIER
+DELAY_MULTIPLIER = random.random() / 2
 
 extractors = gen_extractors()
 QUEUE_CMD = ['/home/cfg/redis/types/list/rpush', 'mpv:queue#']
@@ -249,6 +253,7 @@ def get_playlist_links(*, url, ydl_ops, verbose):
 
 
 def download_url(*, url, ydl_ops, retries, verbose, current_try=1):
+    global DELAY_MULTIPLIER
     assert url
     response = None
     delay = 10
@@ -264,12 +269,10 @@ def download_url(*, url, ydl_ops, retries, verbose, current_try=1):
                 ic(delay)
             response = None
             time.sleep(delay)
-            delay = delay + (delay * 0.3)
+            delay = delay + (delay * DELAY_MULTIPLIER)
 
     with YoutubeDL(ydl_ops) as ydl:
         thing = ydl.download([url])
-        #ic(dir(ydl))
-        #ic(ydl.in_download_archive(ydl_ops))
         ic(thing)
     if int(thing) == 1:
         ic(current_try)
