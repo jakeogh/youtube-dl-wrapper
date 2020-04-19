@@ -221,7 +221,9 @@ def convert_url_to_playlist(url, ydl_ops, verbose):
             if verbose:
                 ic(json_info['extractor'])
             return json_info['url']
-    except TypeError:  # 'NoneType' object is not subscriptable
+    except TypeError as e:  # 'NoneType' object is not subscriptable
+        if verbose:
+            ic(e)
         return url
     else:
         return url
@@ -230,6 +232,8 @@ def convert_url_to_playlist(url, ydl_ops, verbose):
 def get_playlist_links(*, url, ydl_ops, verbose):
     ic()
     url = convert_url_to_playlist(url, ydl_ops, verbose)
+    if verbose:
+        ic(url)
     links = []
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
