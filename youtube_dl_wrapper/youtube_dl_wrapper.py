@@ -206,7 +206,8 @@ def generate_download_options(*, cache_dir=False, ignore_download_archive=True, 
     return ydl_ops
 
 
-def convert_url_to_playlist(url, ydl_ops, verbose):
+
+def convert_url_to_redirect(url, ydl_ops, verbose):
     ic()
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
@@ -217,7 +218,30 @@ def convert_url_to_playlist(url, ydl_ops, verbose):
         ic(json_info)
 
     try:
-        if json_info['extractor'] in ['youtube:user', 'youtube:channel', 'generic']:
+        if json_info['extractor'] in ['generic']:
+            if verbose:
+                ic(json_info['extractor'])
+            return json_info['url']
+    except TypeError as e:  # 'NoneType' object is not subscriptable
+        if verbose:
+            ic(e)
+        return url
+    else:
+        return url
+
+
+def convert_url_to_playlist(*, url, ydl_ops, verbose):
+    ic()
+    ydl_ops['dumpjson'] = True
+    ydl_ops['extract_flat'] = True
+    #try:
+    with YoutubeDL(ydl_ops) as ydl:
+        json_info = ydl.extract_info(url, download=False)
+    if verbose:
+        ic(json_info)
+
+    try:
+        if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
             if verbose:
                 ic(json_info['extractor'])
             return json_info['url']
@@ -231,7 +255,7 @@ def convert_url_to_playlist(url, ydl_ops, verbose):
 
 def get_playlist_links(*, url, ydl_ops, verbose):
     ic()
-    url = convert_url_to_playlist(url, ydl_ops, verbose)
+    url = convert_url_to_playlist(url=url, ydl_ops=ydl_ops, verbose=verbose)
     if verbose:
         ic(url)
     links = []
@@ -377,6 +401,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         except NotPlaylistException:
             eprint("Not a playlist, adding url to set directly")
             url_set.add(url)
+
+        # step 2, expand redirects
+        url_redirect = convert_url_to_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+        url_set.add(url_redirect)
 
     retries = 5
     url_set_len = len(url_set)
