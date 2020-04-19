@@ -216,10 +216,13 @@ def convert_url_to_playlist(url, ydl_ops, verbose):
     if verbose:
         ic(json_info)
 
-    if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
-        if verbose:
-            ic(json_info['extractor'])
-        return json_info['url']
+    try:
+        if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
+            if verbose:
+                ic(json_info['extractor'])
+            return json_info['url']
+    except TypeError:  # 'NoneType' object is not subscriptable
+        return url
     else:
         return url
 
