@@ -217,7 +217,7 @@ def convert_url_to_playlist(url, ydl_ops, verbose):
         ic(json_info)
 
     try:
-        if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
+        if json_info['extractor'] in ['youtube:user', 'youtube:channel', 'generic']:
             if verbose:
                 ic(json_info['extractor'])
             return json_info['url']
