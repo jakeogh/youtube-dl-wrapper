@@ -221,7 +221,10 @@ def convert_url_to_redirect(url, ydl_ops, verbose):
         if json_info['extractor'] in ['generic']:
             if verbose:
                 ic(json_info['extractor'])
-            return json_info['url']
+            try:
+                return json_info['url']
+            except KeyError:
+                return url
     except TypeError as e:  # 'NoneType' object is not subscriptable
         if verbose:
             ic(e)
