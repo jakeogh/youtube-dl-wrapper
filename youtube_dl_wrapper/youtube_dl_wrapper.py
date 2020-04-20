@@ -233,7 +233,20 @@ def convert_url_to_redirect(url, ydl_ops, verbose):
         return url
 
 
-def convert_url_to_playlist(*, url, ydl_ops, verbose):
+def convert_url_to_webpage_url(*, url, ydl_ops, verbose):
+    ic()
+    ydl_ops['dumpjson'] = True
+    ydl_ops['extract_flat'] = True
+    #try:
+    with YoutubeDL(ydl_ops) as ydl:
+        json_info = ydl.extract_info(url, download=False)
+    if verbose:
+        ic(json_info)
+
+    return json_info['webpage_url']
+
+
+def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose):
     ic()
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
@@ -258,7 +271,7 @@ def convert_url_to_playlist(*, url, ydl_ops, verbose):
 
 def get_playlist_links(*, url, ydl_ops, verbose):
     ic()
-    url = convert_url_to_playlist(url=url, ydl_ops=ydl_ops, verbose=verbose)
+    url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops, verbose=verbose)
     if verbose:
         ic(url)
     links = []
@@ -390,6 +403,11 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
     url_set = set([])
     for index, url in enumerate(urls):
         eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
+
+        # step 0, convert non-url to url
+        if not url.startswith('https://'):
+            if not url.startswith('https://'):
+                url = convert_url_to_webpage_url(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
 
         # step 1, expand playlists
         try:
