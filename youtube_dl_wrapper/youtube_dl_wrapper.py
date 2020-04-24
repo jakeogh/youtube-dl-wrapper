@@ -338,7 +338,7 @@ def download_url(*, url, ydl_ops, retries, verbose, current_try=1):
 
 
 def construct_url_from_id(*, vid_id, extractor):
-    if extractor == "youtube:playlist":
+    if extractor in ["youtube:playlist", "youtube:search_url"]:
         return "https://www.youtube.com/watch?v={}".format(vid_id)
     if extractor == "BitChute":
         return "https://www.bitchute.com/video/{}".format(vid_id)
