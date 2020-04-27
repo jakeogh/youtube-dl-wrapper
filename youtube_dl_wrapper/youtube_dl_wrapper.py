@@ -425,7 +425,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
             if verbose:
                 ic(url_from_id)
             url_set.add(url_from_id)
-            continue
+            #continue
 
         # step 2, expand redirects
         url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
@@ -433,7 +433,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
             ic(url_redirect)
         url_set.add(url_redirect)
         url_set.add(url)
-        continue
+        #continue
 
         # step 1 get json_info
         #json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
@@ -443,7 +443,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
             ic(playlist_url)
         url_set.add(playlist_url)
         url_set.add(url)
-        continue
+        #continue
 
     larger_url_set = set()
     for index, url in enumerate(url_set):
