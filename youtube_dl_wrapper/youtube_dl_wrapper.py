@@ -122,10 +122,12 @@ def get_filename_for_url(*, url, ydl_ops):
     raise ValueError
 
 
-def get_playlist_for_channel(url):
+def get_playlist_for_channel(url, verbose):
     ydl = YoutubeDL()
     ie = YoutubeChannelIE(ydl)
     info = ie.extract(url)
+    if verbose:
+        ic(info)
     return info['url']
 
 
@@ -207,8 +209,10 @@ def generate_download_options(*, cache_dir=False, ignore_download_archive=True, 
 
 
 
-def convert_url_to_redirect(*, url, json_info, verbose):
-    ic()
+def convert_url_to_redirect(*, url, ydl_ops, verbose):
+    if verbose:
+        ic(url)
+    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose)
     #ydl_ops['dumpjson'] = True
     #ydl_ops['extract_flat'] = True
     ##try:
@@ -233,17 +237,14 @@ def convert_url_to_redirect(*, url, json_info, verbose):
         return url
 
 
-def convert_url_to_webpage_url(*, url, json_info, verbose):
-    ic()
-    #ydl_ops['dumpjson'] = True
-    #ydl_ops['extract_flat'] = True
-    ##try:
-    #with YoutubeDL(ydl_ops) as ydl:
-    #    json_info = ydl.extract_info(url, download=False)
-    #if verbose:
-    #    ic(json_info)
-
-    return json_info['webpage_url']
+def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose):
+    if verbose:
+        ic(vid_id)
+    json_info = get_json_info(url=vid_id, ydl_ops=ydl_ops, verbose=verbose)
+    webpage_url = json_info['webpage_url']
+    if verbose:
+        ic(webpage_url)
+    return webpage_url
 
 
 def convert_url_to_youtube_playlist(*, url, json_info, verbose):
@@ -256,9 +257,11 @@ def convert_url_to_youtube_playlist(*, url, json_info, verbose):
 
     try:
         if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
+            playlist_url = json_info['url']
             if verbose:
                 ic(json_info['extractor'])
-            return json_info['url']
+                ic(playlist_url)
+            return playlist_url
     except TypeError as e:  # 'NoneType' object is not subscriptable
         if verbose:
             ic(e)
@@ -267,11 +270,13 @@ def convert_url_to_youtube_playlist(*, url, json_info, verbose):
         return url
 
 
-def get_playlist_links(*, url, json_info, verbose):
-    ic()
-    url = convert_url_to_youtube_playlist(url=url, json_info=json_info, verbose=verbose)
+def get_playlist_links(*, url, ydl_ops, verbose):
     if verbose:
         ic(url)
+    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose)
+    #playlist_url = convert_url_to_youtube_playlist(url=url, json_info=json_info, verbose=verbose)
+    #if verbose:
+    #    ic(playlist_url)
     links = []
     #ydl_ops['dumpjson'] = True
     #ydl_ops['extract_flat'] = True
@@ -408,42 +413,61 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
                                                 archive_file=archive_file,
                                                 notitle=True)
 
-    url_set = set([])
+    url_set = set()
     for index, url in enumerate(urls):
+        if verbose:
+            ic(index, url)
         eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
-
-
-        # step -1 get json_info
-        json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
 
         # step 0, convert non-url to url
         if not url.startswith('https://'):
-            if not url.startswith('https://'):
-                url = convert_url_to_webpage_url(url=url, json_info=json_info, verbose=verbose)
-
-        # step 1, expand playlists
-        try:
-            for extractor, vid_id in get_playlist_links(url=url, json_info=json_info, verbose=verbose):
-                try:
-                    constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor)
-                    url_set.add(constructed_url)
-                except NotImplementedError as e:
-                    ic(e)
-                    url_set.add(url)
-
-        except NotPlaylistException:
-            eprint("Not a playlist, adding url to set directly")
-            url_set.add(url)
+            url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+            if verbose:
+                ic(url_from_id)
+            url_set.add(url_from_id)
+            continue
 
         # step 2, expand redirects
-        url_redirect = convert_url_to_redirect(url=url, json_info=json_info, verbose=verbose)
+        url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
         if verbose:
             ic(url_redirect)
         url_set.add(url_redirect)
+        url_set.add(url)
+        continue
+
+        # step 1 get json_info
+        json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+
+        playlist_url = convert_url_to_youtube_playlist(url=url, json_info=json_info, verbose=verbose)
+        if verbose:
+            ic(playlist_url)
+        url_set.add(playlist_url)
+        url_set.add(url)
+        continue
+
+    larger_url_set = set()
+    for index, url in enumerate(url_set):
+        # step 1, expand playlists
+        try:
+            for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops_standard, verbose=verbose):
+                try:
+                    constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor)
+                    larger_url_set.add(constructed_url)
+                except NotImplementedError as e:
+                    ic(e)
+                    larger_url_set.add(url)
+
+        except NotPlaylistException:
+            eprint("Not a playlist, adding url to set directly")
+            larger_url_set.add(url)
+
 
     retries = 5
-    url_set_len = len(url_set)
-    for index, url in enumerate(url_set):
+    url_set_len = len(larger_url_set)
+    for index, url in enumerate(larger_url_set):
+        if verbose:
+            ic(index, url)
+
         eprint("{} of {}".format(index+1, url_set_len), url)
 
         try:
