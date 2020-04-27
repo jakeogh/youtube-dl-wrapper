@@ -24,6 +24,9 @@ from kcl.printops import eprint
 from kcl.fileops import points_to_data
 from kcl.clipboardops import get_clipboard_iris
 
+ic.configureOutput(includeContext=True)
+from shutil import get_terminal_size
+ic.lineWrapWidth, _ = get_terminal_size((80, 20))
 
 global DELAY_MULTIPLIER
 DELAY_MULTIPLIER = random.random() / 2
