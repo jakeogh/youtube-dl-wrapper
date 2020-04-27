@@ -250,14 +250,11 @@ def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose):
     return webpage_url
 
 
-def convert_url_to_youtube_playlist(*, url, json_info, verbose):
-    ic()
-    #ydl_ops['dumpjson'] = True
-    #ydl_ops['extract_flat'] = True
-    ##try:
-    #with YoutubeDL(ydl_ops) as ydl:
-    #    json_info = ydl.extract_info(url, download=False)
+def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose):
+    if verbose:
+        ic(url)
 
+    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose)
     try:
         if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
             playlist_url = json_info['url']
@@ -439,9 +436,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         continue
 
         # step 1 get json_info
-        json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+        #json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
 
-        playlist_url = convert_url_to_youtube_playlist(url=url, json_info=json_info, verbose=verbose)
+        playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
         if verbose:
             ic(playlist_url)
         url_set.add(playlist_url)
