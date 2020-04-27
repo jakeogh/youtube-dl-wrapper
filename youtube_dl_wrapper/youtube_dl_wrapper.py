@@ -288,7 +288,7 @@ def get_playlist_links(*, url, ydl_ops, verbose):
         if 'entries' in json_info.keys():
             for item in json_info['entries']:
                 links.append((json_info['extractor'], item['url']))
-    except AttributeError:  #  'NoneType' object has no attribute 'keys'
+    except (AttributeError, KeyError):  #  'NoneType' object has no attribute 'keys'
         raise NotPlaylistException
     #except Exception as e:
     #    ic(e)
