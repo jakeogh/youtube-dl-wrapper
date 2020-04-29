@@ -342,7 +342,9 @@ def download_url(*, url, ydl_ops, retries, verbose, current_try=1):
             download_url(url=url, ydl_ops=ydl_ops, retries=retries, verbose=verbose, current_try=current_try+1)
 
 
-def construct_url_from_id(*, vid_id, extractor):
+def construct_url_from_id(*, vid_id, extractor, verbose):
+    if verbose:
+        ic(vid_id)
     if extractor in ["youtube:playlist", "youtube:search_url"]:
         return "https://www.youtube.com/watch?v={}".format(vid_id)
     if extractor == "BitChute":
@@ -451,7 +453,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         try:
             for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops_standard, verbose=verbose):
                 try:
-                    constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor)
+                    constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor, verbose=verbose)
                     larger_url_set.add(constructed_url)
                 except NotImplementedError as e:
                     ic(e)
