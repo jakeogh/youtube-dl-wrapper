@@ -23,6 +23,7 @@ from kcl.printops import ceprint
 from kcl.printops import eprint
 from kcl.fileops import points_to_data
 from kcl.clipboardops import get_clipboard_iris
+from kcl.clipboardops import get_clipboard
 
 ic.configureOutput(includeContext=True)
 from shutil import get_terminal_size
@@ -391,7 +392,12 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         if verbose:
             ic(urls)
 
+    if not urls:
+        urls = get_clipboard(verbose=verbose)
+
     urls = list(urls)
+    if verbose:
+        ic(urls)
     shuffle(urls)
     ic(urls)
     cache_folder = compat_expanduser(destdir)
@@ -470,7 +476,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         if verbose:
             ic(index, url)
 
-        eprint("{} of {}".format(index+1, url_set_len), url)
+        eprint("{} of {}".format(index + 1, url_set_len), url)
 
         try:
             url_id, extractor = extract_id_from_url(url)
