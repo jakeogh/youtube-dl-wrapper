@@ -212,7 +212,6 @@ def generate_download_options(*, cache_dir=False, ignore_download_archive=True, 
     return ydl_ops
 
 
-
 def convert_url_to_redirect(*, url, ydl_ops, verbose):
     if verbose:
         ic(url)
@@ -394,10 +393,11 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
     if not urls:
         urls = get_clipboard(verbose=verbose)
+        urls = [urls]
 
-    urls = list(urls)
-    if verbose:
-        ic(urls)
+    #urls = list(urls)
+    #if verbose:
+    #    ic(urls)
     shuffle(urls)
     ic(urls)
     cache_folder = compat_expanduser(destdir)
