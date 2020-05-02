@@ -427,6 +427,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
             ic(index, url)
         eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
 
+        if url.startswith("file://"):
+            continue
+
         # step 0, convert non-url to url
         if not (url.startswith('https://') or url.startswith('http://')):
             url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose)
