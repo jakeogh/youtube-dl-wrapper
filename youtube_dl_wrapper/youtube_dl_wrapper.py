@@ -428,12 +428,13 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
 
         # step 0, convert non-url to url
-        if not url.startswith('https://'):
+        if not (url.startswith('https://') or url.startswith('http://')):
             url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose)
             if verbose:
                 ic(url_from_id)
-            url_set.add(url_from_id)
-            #continue
+            if id_from_url != url:
+                url_set.add(url_from_id)
+                continue
 
         # step 2, expand redirects
         url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
