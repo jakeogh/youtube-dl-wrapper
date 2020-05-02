@@ -156,7 +156,14 @@ def check_if_video_exists_by_video_id(video_id):
     raise NoMatchException
 
 
-def generate_download_options(*, cache_dir=False, ignore_download_archive=True, play=False, verbose=False, archive_file=False, notitle=False):
+def generate_download_options(*,
+                              verbose,
+                              debug,
+                              cache_dir=False,
+                              ignore_download_archive=True,
+                              play=False,
+                              archive_file=False,
+                              notitle=False):
     play_command = ' '.join(VIDEO_CMD) + ' {}'
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
     #fsindex_command = ' '.join(FSINDEX_CMD) + ' {}'
