@@ -126,11 +126,11 @@ def get_filename_for_url(*, url, ydl_ops):
     raise ValueError
 
 
-def get_playlist_for_channel(url, verbose):
+def get_playlist_for_channel(url, verbose, debug):
     ydl = YoutubeDL()
     ie = YoutubeChannelIE(ydl)
     info = ie.extract(url)
-    if verbose:
+    if debug:
         ic(info)
     return info['url']
 
@@ -212,10 +212,10 @@ def generate_download_options(*, cache_dir=False, ignore_download_archive=True, 
     return ydl_ops
 
 
-def convert_url_to_redirect(*, url, ydl_ops, verbose):
+def convert_url_to_redirect(*, url, ydl_ops, verbose, debug):
     if verbose:
         ic(url)
-    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose)
+    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
     #ydl_ops['dumpjson'] = True
     #ydl_ops['extract_flat'] = True
     ##try:
@@ -226,7 +226,7 @@ def convert_url_to_redirect(*, url, ydl_ops, verbose):
 
     try:
         if json_info['extractor'] in ['generic']:
-            if verbose:
+            if debug:
                 ic(json_info['extractor'])
             try:
                 return json_info['url']
@@ -240,21 +240,21 @@ def convert_url_to_redirect(*, url, ydl_ops, verbose):
         return url
 
 
-def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose):
+def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose, debug):
     if verbose:
         ic(vid_id)
-    json_info = get_json_info(url=vid_id, ydl_ops=ydl_ops, verbose=verbose)
+    json_info = get_json_info(url=vid_id, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
     webpage_url = json_info['webpage_url']
     if verbose:
         ic(webpage_url)
     return webpage_url
 
 
-def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose):
+def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose, debug):
     if verbose:
         ic(url)
 
-    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose)
+    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
     try:
         if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
             playlist_url = json_info['url']
@@ -270,11 +270,11 @@ def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose):
         return url
 
 
-def get_playlist_links(*, url, ydl_ops, verbose):
+def get_playlist_links(*, url, ydl_ops, verbose, debug):
     if verbose:
         ic(url)
-    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose)
-    #playlist_url = convert_url_to_youtube_playlist(url=url, json_info=json_info, verbose=verbose)
+    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
+    #playlist_url = convert_url_to_youtube_playlist(url=url, json_info=json_info, verbose=verbose, debug=debug)
     #if verbose:
     #    ic(playlist_url)
     links = []
@@ -303,18 +303,18 @@ def get_playlist_links(*, url, ydl_ops, verbose):
     return links
 
 
-def get_json_info(*, url, ydl_ops, verbose):
+def get_json_info(*, url, ydl_ops, verbose, debug):
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
     #try:
     with YoutubeDL(ydl_ops) as ydl:
         json_info = ydl.extract_info(url, download=False)
-    if verbose:
+    if debug:
         ic(json_info)
     return json_info
 
 
-def download_url(*, url, ydl_ops, retries, verbose, current_try=1):
+def download_url(*, url, ydl_ops, retries, verbose, debug, current_try=1):
     global DELAY_MULTIPLIER
     assert url
     response = None
@@ -342,7 +342,7 @@ def download_url(*, url, ydl_ops, retries, verbose, current_try=1):
             download_url(url=url, ydl_ops=ydl_ops, retries=retries, verbose=verbose, current_try=current_try+1)
 
 
-def construct_url_from_id(*, vid_id, extractor, verbose):
+def construct_url_from_id(*, vid_id, extractor, verbose, debug):
     if verbose:
         ic(vid_id)
     if extractor in ["youtube:playlist", "youtube:search_url"]:
@@ -392,7 +392,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
             ic(urls)
 
     if not urls:
-        urls = get_clipboard(verbose=verbose)
+        urls = get_clipboard(verbose=debug)
         urls = [urls]
 
     #urls = list(urls)
@@ -412,12 +412,14 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
                                                  ignore_download_archive=ignore_download_archive,
                                                  play=play,
                                                  verbose=verbose,
+                                                 debug=debug,
                                                  archive_file=archive_file)
 
     ydl_ops_notitle = generate_download_options(cache_dir=cache_folder,
                                                 ignore_download_archive=ignore_download_archive,
                                                 play=play,
                                                 verbose=verbose,
+                                                debug=debug,
                                                 archive_file=archive_file,
                                                 notitle=True)
 
@@ -432,7 +434,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
         # step 0, convert non-url to url
         if not (url.startswith('https://') or url.startswith('http://')):
-            url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+            url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
             if verbose:
                 ic(url_from_id)
             if id_from_url != url:
@@ -440,7 +442,7 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
                 continue
 
         # step 2, expand redirects
-        url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+        url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
         if verbose:
             ic(url_redirect)
         url_set.add(url_redirect)
@@ -448,9 +450,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
         #continue
 
         # step 1 get json_info
-        #json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+        #json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
 
-        playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose)
+        playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
         if verbose:
             ic(playlist_url)
         url_set.add(playlist_url)
@@ -461,9 +463,9 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
     for index, url in enumerate(url_set):
         # step 1, expand playlists
         try:
-            for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops_standard, verbose=verbose):
+            for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug):
                 try:
-                    constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor, verbose=verbose)
+                    constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor, verbose=verbose, debug=debug)
                     larger_url_set.add(constructed_url)
                 except NotImplementedError as e:
                     ic(e)
@@ -488,10 +490,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
             extractor = None
 
         if extractor in ['twitter'] or url.startswith('https://t.co/'):
-            download_url(url=url, ydl_ops=ydl_ops_notitle, retries=retries, verbose=verbose)
+            download_url(url=url, ydl_ops=ydl_ops_notitle, retries=retries, verbose=verbose, debug=debug)
 
         else:
-            download_url(url=url, ydl_ops=ydl_ops_standard, retries=retries, verbose=verbose)
+            download_url(url=url, ydl_ops=ydl_ops_standard, retries=retries, verbose=verbose, debug=debug)
 
         print()
         continue
