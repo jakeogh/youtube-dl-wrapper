@@ -346,7 +346,7 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, current_try=1):
     if int(thing) == 1:
         ic(current_try)
         if current_try <= retries:
-            download_url(url=url, ydl_ops=ydl_ops, retries=retries, verbose=verbose, current_try=current_try+1)
+            download_url(url=url, ydl_ops=ydl_ops, retries=retries, verbose=verbose, debug=debug, current_try=current_try+1)
 
 
 def construct_url_from_id(*, vid_id, extractor, verbose, debug):
