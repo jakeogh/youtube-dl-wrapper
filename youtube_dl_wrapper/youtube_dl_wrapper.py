@@ -223,13 +223,6 @@ def convert_url_to_redirect(*, url, ydl_ops, verbose, debug):
     if verbose:
         ic(url)
     json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
-    #ydl_ops['dumpjson'] = True
-    #ydl_ops['extract_flat'] = True
-    ##try:
-    #with YoutubeDL(ydl_ops) as ydl:
-    #    json_info = ydl.extract_info(url, download=False)
-    #if verbose:
-    #    ic(json_info)
 
     try:
         if json_info['extractor'] in ['generic']:
@@ -442,7 +435,10 @@ def youtube_dl_wrapper(urls, id_from_url, ignore_download_archive, play, extract
 
         # step 0, convert non-url to url
         if not (url.startswith('https://') or url.startswith('http://')):
-            url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+            try:
+                url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+            except TypeError:
+                continue    # it's not a valid id, skip it
             if verbose:
                 ic(url_from_id)
             if id_from_url != url:
