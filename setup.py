@@ -29,7 +29,7 @@ setup(
     install_requires=dependencies,
     entry_points={
         'console_scripts': [
-            'youtube-dl-wrapper = youtube_dl_wrapper.youtube_dl_wrapper:youtube_dl_wrapper',
+            'youtube-dl-wrapper = youtube_dl_wrapper.youtube_dl_wrapper:cli',
         ],
     },
     classifiers=[
