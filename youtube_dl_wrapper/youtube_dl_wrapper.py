@@ -373,7 +373,20 @@ def look_for_output_file_variations(output_file):
     return False
 
 
-def youtube_dl_wrapper(*, urls, id_from_url, ignore_download_archive, extract_urls, destdir, archive_file, play=False, verbose=False, debug=False):
+def youtube_dl_wrapper(*,
+                       urls,
+                       id_from_url,
+                       ignore_download_archive,
+                       extract_urls,
+                       destdir,
+                       archive_file,
+                       play=False,
+                       verbose=False,
+                       debug=False):
+
+    destdir = Path(os.path.expanduser(destdir))
+    archive_file = Path(os.path.expanduser(archive_file))
+
     ic(verbose)
     if not urls:
         ceprint("no args, checking clipboard for urls")
