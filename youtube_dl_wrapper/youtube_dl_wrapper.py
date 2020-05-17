@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-import copy
+#import copy
 import os
 import time
 import re
@@ -9,11 +9,12 @@ import glob
 import string
 import io
 import sre_constants
+from pathlib import Path
 from contextlib import redirect_stdout
 from random import shuffle
+import random
 from icecream import ic
 import requests
-import random
 import click
 from youtube_dl.extractor import YoutubeChannelIE
 from youtube_dl.compat import compat_expanduser
