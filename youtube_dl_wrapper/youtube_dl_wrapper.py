@@ -109,7 +109,7 @@ def extract_id_from_url(url):
     raise NoIDException
 
 
-def is_direct_link_to_video(*, url):
+def is_direct_link_to_video(url):
     url = UrlparseResult(url)
     if url.domain == "youtu.be":
         if len(url) == 28:
