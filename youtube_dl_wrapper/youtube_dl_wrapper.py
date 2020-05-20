@@ -25,6 +25,7 @@ from kcl.printops import eprint
 from kcl.fileops import points_to_data
 from kcl.clipboardops import get_clipboard_iris
 from kcl.clipboardops import get_clipboard
+from iridb.atoms import UrlparseResult
 
 ic.configureOutput(includeContext=True)
 from shutil import get_terminal_size
@@ -106,6 +107,16 @@ def extract_id_from_url(url):
         #    pass
 
     raise NoIDException
+
+
+def is_direct_link_to_video(*, url):
+    url = UrlparseResult(url)
+    if url.domain == "youtu.be":
+        if len(url) == 28:
+            return True
+    if url.domain == "youtube.com":
+        if len(url) == 43:
+            return True
 
 
 def get_filename_for_url(*, url, ydl_ops):
@@ -440,6 +451,7 @@ def youtube_dl_wrapper(*,
         # step 0, convert non-url to url
         if not (url.startswith('https://') or url.startswith('http://')):
             try:
+                eprint("attempting to convert", url, "to url")
                 url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
             except TypeError:
                 continue    # it's not a valid id, skip it
@@ -449,23 +461,24 @@ def youtube_dl_wrapper(*,
                 url_set.add(url_from_id)
                 continue
 
-        # step 2, expand redirects
-        url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-        if verbose:
-            ic(url_redirect)
-        url_set.add(url_redirect)
-        url_set.add(url)
-        #continue
+        if not is_direct_link_to_video(url):
+            # step 2, expand redirects
+            url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+            if verbose:
+                ic(url_redirect)
+            url_set.add(url_redirect)
+            url_set.add(url)
+            #continue
 
-        # step 1 get json_info
-        #json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+            # step 1 get json_info
+            #json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
 
-        playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-        if verbose:
-            ic(playlist_url)
-        url_set.add(playlist_url)
-        url_set.add(url)
-        #continue
+            playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+            if verbose:
+                ic(playlist_url)
+            url_set.add(playlist_url)
+            url_set.add(url)
+            #continue
 
     larger_url_set = set()
     for index, url in enumerate(url_set):
