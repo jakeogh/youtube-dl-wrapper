@@ -448,6 +448,10 @@ def youtube_dl_wrapper(*,
         if url.startswith("file://"):
             continue
 
+        if is_direct_link_to_video(url):
+            url_set.add(url)
+            continue
+
         # step 0, convert non-url to url
         if not (url.startswith('https://') or url.startswith('http://')):
             try:
@@ -461,24 +465,23 @@ def youtube_dl_wrapper(*,
                 url_set.add(url_from_id)
                 continue
 
-        if not is_direct_link_to_video(url):
-            # step 2, expand redirects
-            url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-            if verbose:
-                ic(url_redirect)
-            url_set.add(url_redirect)
-            url_set.add(url)
-            #continue
+        # step 2, expand redirects
+        url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+        if verbose:
+            ic(url_redirect)
+        url_set.add(url_redirect)
+        url_set.add(url)
+        #continue
 
-            # step 1 get json_info
-            #json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+        # step 1 get json_info
+        #json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
 
-            playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-            if verbose:
-                ic(playlist_url)
-            url_set.add(playlist_url)
-            url_set.add(url)
-            #continue
+        playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+        if verbose:
+            ic(playlist_url)
+        url_set.add(playlist_url)
+        url_set.add(url)
+        #continue
 
     larger_url_set = set()
     for index, url in enumerate(url_set):
