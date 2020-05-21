@@ -68,8 +68,14 @@ class NoIDException(ValueError):
 class NoMatchException(ValueError):
     pass
 
+
 class NotPlaylistException(ValueError):
     pass
+
+
+class NoVideoException(ValueError):
+    pass
+
 
 def extract_id_from_url(url):
     #ceprint("url:", url)
@@ -329,12 +335,14 @@ def get_json_info(*, url, ydl_ops, verbose, debug):
                 json_info = ydl.extract_info(url, download=False)
     stderr_out = f_stderr.getvalue()
     stdout_out = f_stdout.getvalue()
-    ic(stderr_out)
-    ic(stdout_out)
+    #ic(stderr_out)
+    #ic(stdout_out)
     print(stderr_out)
     print(stdout_out)
     if debug:
         ic(json_info)
+    if "youtube_dl.utils.ExtractorError" in stderr_out:
+        raise NoVideoException
     return json_info
 
 
@@ -485,9 +493,6 @@ def youtube_dl_wrapper(*,
         url_set.add(url_redirect)
         url_set.add(url)
         #continue
-
-        # step 1 get json_info
-        #json_info = get_json_info(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
 
         playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
         if verbose:
