@@ -110,6 +110,7 @@ def extract_id_from_url(url):
 
 
 def is_direct_link_to_video(url):
+    #https://twitter.com/TheUnitedSpot1/status/1263190701996556288
     url = UrlparseResult(url)
     if url.domain == "youtu.be":
         if len(url) == 28:
