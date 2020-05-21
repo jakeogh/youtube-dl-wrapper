@@ -8,9 +8,10 @@ import re
 import glob
 import string
 import io
+from contextlib import redirect_stderr
+from contextlib import redirect_stdout
 import sre_constants
 from pathlib import Path
-from contextlib import redirect_stdout
 from random import shuffle
 import random
 from icecream import ic
@@ -321,7 +322,12 @@ def get_json_info(*, url, ydl_ops, verbose, debug):
     ydl_ops['extract_flat'] = True
     #try:
     with YoutubeDL(ydl_ops) as ydl:
-        json_info = ydl.extract_info(url, download=False)
+        f = io.StringIO()
+        with redirect_stderr(f):
+            json_info = ydl.extract_info(url, download=False)
+        stderr_out = f.getvalue()
+        ic(stderr_out)
+        print(stderr_out)
     if debug:
         ic(json_info)
     return json_info
@@ -391,6 +397,7 @@ def youtube_dl_wrapper(*,
                        id_from_url,
                        ignore_download_archive,
                        extract_urls,
+                       retries,
                        destdir,
                        archive_file,
                        play=False,
@@ -501,7 +508,6 @@ def youtube_dl_wrapper(*,
             larger_url_set.add(url)
 
 
-    retries = 5
     url_set_len = len(larger_url_set)
     for index, url in enumerate(larger_url_set):
         if verbose:
@@ -530,6 +536,7 @@ def youtube_dl_wrapper(*,
 @click.option('--ignore-download-archive', is_flag=True)
 @click.option('--play', is_flag=True)
 @click.option('--extract-urls', is_flag=True)
+@click.option('--tries', type=int, default=4)
 @click.option('--verbose', is_flag=True)
 @click.option('--debug', is_flag=True)
 @click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
@@ -539,6 +546,7 @@ def cli(urls, id_from_url, ignore_download_archive, play, extract_urls, verbose,
                        id_from_url=id_from_url,
                        ignore_download_archive=ignore_download_archive,
                        play=play,
+                       retries=tries,
                        extract_urls=extract_urls,
                        verbose=verbose,
                        debug=debug,
