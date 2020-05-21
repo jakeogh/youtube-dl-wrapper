@@ -230,8 +230,8 @@ def generate_download_options(*,
         else:
             ydl_ops['outtmpl'] = FILE_TEMPLATE
 
-    if verbose:
-        ydl_ops['verbose'] = True
+    #if verbose:
+    ydl_ops['verbose'] = True  # must be set to scrape tracebacks
 
     if not ignore_download_archive:
         ydl_ops['download_archive'] = archive_file
