@@ -541,7 +541,7 @@ def youtube_dl_wrapper(*,
 @click.option('--debug', is_flag=True)
 @click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
 @click.option('--archive-file', is_flag=False, required=False, default='~/.youtube_dl.cache')
-def cli(urls, id_from_url, ignore_download_archive, play, extract_urls, verbose, debug, destdir, archive_file):
+def cli(urls, id_from_url, ignore_download_archive, play, extract_urls, tries, verbose, debug, destdir, archive_file):
     youtube_dl_wrapper(urls=urls,
                        id_from_url=id_from_url,
                        ignore_download_archive=ignore_download_archive,
