@@ -321,18 +321,18 @@ def get_json_info(*, url, ydl_ops, verbose, debug):
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
     #try:
-    with YoutubeDL(ydl_ops) as ydl:
-        f_stderr = io.StringIO()
-        f_stdout = io.StringIO()
-        with redirect_stderr(f_stderr):
-            with redirect_stdout(f_stdout):
+    f_stderr = io.StringIO()
+    f_stdout = io.StringIO()
+    with redirect_stderr(f_stderr):
+        with redirect_stdout(f_stdout):
+            with YoutubeDL(ydl_ops) as ydl:
                 json_info = ydl.extract_info(url, download=False)
-        stderr_out = f_stderr.getvalue()
-        stdout_out = f_stdout.getvalue()
-        ic(stderr_out)
-        ic(stdout_out)
-        print(stderr_out)
-        print(stdout_out)
+    stderr_out = f_stderr.getvalue()
+    stdout_out = f_stdout.getvalue()
+    ic(stderr_out)
+    ic(stdout_out)
+    print(stderr_out)
+    print(stdout_out)
     if debug:
         ic(json_info)
     return json_info
