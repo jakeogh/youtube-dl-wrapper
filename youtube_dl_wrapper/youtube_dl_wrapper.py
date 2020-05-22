@@ -131,6 +131,11 @@ def is_direct_link_to_video(url):
             return True
 
 
+def is_direct_link_to_channel(url):
+    if url.startswith("https://www.youtube.com/channel"):
+        return True
+
+
 def get_filename_for_url(*, url, ydl_ops):
     ic(url)
     ydl_ops['forcefilename'] = True
@@ -467,17 +472,20 @@ def youtube_dl_wrapper(*,
 
         else:
             # step 2, expand redirects
-            url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-            if verbose:
-                ic(url_redirect)
-            url_set.add(url_redirect)
-            url_set.add(url)
+            if not is_direct_link_to_channel(url):
+                url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+                if verbose:
+                    ic(url_redirect)
+                url_set.add(url_redirect)
+                url_set.add(url)
 
-            playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-            if verbose:
-                ic(playlist_url)
-            url_set.add(playlist_url)
-            url_set.add(url)
+                playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+                if verbose:
+                    ic(playlist_url)
+                url_set.add(playlist_url)
+                url_set.add(url)
+            else:
+                url_set.add(url)
 
     larger_url_set = set()
     for index, url in enumerate(url_set):
