@@ -376,9 +376,28 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, current_try=1):
             time.sleep(delay)
             delay = delay + (delay * DELAY_MULTIPLIER)
 
-    with YoutubeDL(ydl_ops) as ydl:
-        thing = ydl.download([url])
-        ic(thing)
+
+
+    f_stderr = io.StringIO()
+    f_stdout = io.StringIO()
+    with redirect_stderr(f_stderr):
+        with redirect_stdout(f_stdout):
+            with YoutubeDL(ydl_ops) as ydl:
+                thing = ydl.download([url])
+                #ic(thing)
+    stderr_out = f_stderr.getvalue()
+    stdout_out = f_stdout.getvalue()
+    #ic(stderr_out)
+    #ic(stdout_out)
+    print(stderr_out)
+    print(stdout_out)
+    if "<HTTPError 404: 'Not Found'>" in stderr_out:
+        raise NoVideoException
+
+
+    #with YoutubeDL(ydl_ops) as ydl:
+    #    thing = ydl.download([url])
+    #    ic(thing)
     if int(thing) == 1:
         ic(current_try)
         if current_try <= retries:
