@@ -77,6 +77,10 @@ class NoVideoException(ValueError):
     pass
 
 
+class TooManyRequestsException(ValueError):
+    pass
+
+
 def extract_id_from_url(url):
     #ceprint("url:", url)
     #ceprint("extractors:", extractors)
@@ -343,6 +347,8 @@ def get_json_info(*, url, ydl_ops, verbose, debug):
         ic(json_info)
     if "youtube_dl.utils.ExtractorError" in stderr_out:
         raise NoVideoException
+    if "<HTTPError 429: 'Too Many Requests'>" in stderr_out:
+        raise TooManyRequestsException
     return json_info
 
 
@@ -406,7 +412,7 @@ def look_for_output_file_variations(output_file):
 
 
 def youtube_dl_wrapper(*,
-                       urls,
+                       url,
                        id_from_url,
                        ignore_download_archive,
                        extract_urls,
@@ -421,22 +427,6 @@ def youtube_dl_wrapper(*,
     archive_file = Path(os.path.expanduser(archive_file))
 
     ic(verbose)
-    if not urls:
-        ceprint("no args, checking clipboard for urls")
-        urls = get_clipboard_iris(verbose=debug)
-        if verbose:
-            ic(urls)
-
-    if not urls:
-        urls = get_clipboard(verbose=debug)
-        urls = [urls]
-
-    #urls = list(urls)
-    #if verbose:
-    #    ic(urls)
-    urls = list(urls)
-    shuffle(urls)
-    ic(urls)
     cache_folder = compat_expanduser(destdir)
     try:
         os.chdir(cache_folder)
@@ -461,45 +451,34 @@ def youtube_dl_wrapper(*,
                                                 notitle=True)
 
     url_set = set()
-    for index, url in enumerate(urls):
-        if verbose:
-            ic(index, url)
-        eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
 
-        if url.startswith("file://"):
-            continue
-
-        if is_direct_link_to_video(url):
-            url_set.add(url)
-            continue
-
+    if is_direct_link_to_video(url):
+        url_set.add(url)
+    else:
         # step 0, convert non-url to url
         if not (url.startswith('https://') or url.startswith('http://')):
             try:
                 eprint("attempting to convert", url, "to url")
                 url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
             except TypeError:
-                continue    # it's not a valid id, skip it
+                return False    # it's not a valid id, skip it
             if verbose:
                 ic(url_from_id)
             if id_from_url != url:
                 url_set.add(url_from_id)
-                continue
+            else:
+                # step 2, expand redirects
+                url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+                if verbose:
+                    ic(url_redirect)
+                url_set.add(url_redirect)
+                url_set.add(url)
 
-        # step 2, expand redirects
-        url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-        if verbose:
-            ic(url_redirect)
-        url_set.add(url_redirect)
-        url_set.add(url)
-        #continue
-
-        playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-        if verbose:
-            ic(playlist_url)
-        url_set.add(playlist_url)
-        url_set.add(url)
-        #continue
+                playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+                if verbose:
+                    ic(playlist_url)
+                url_set.add(playlist_url)
+                url_set.add(url)
 
     larger_url_set = set()
     for index, url in enumerate(url_set):
@@ -552,15 +531,39 @@ def youtube_dl_wrapper(*,
 @click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
 @click.option('--archive-file', is_flag=False, required=False, default='~/.youtube_dl.cache')
 def cli(urls, id_from_url, ignore_download_archive, play, extract_urls, tries, verbose, debug, destdir, archive_file):
-    youtube_dl_wrapper(urls=urls,
-                       id_from_url=id_from_url,
-                       ignore_download_archive=ignore_download_archive,
-                       play=play,
-                       retries=tries,
-                       extract_urls=extract_urls,
-                       verbose=verbose,
-                       debug=debug,
-                       destdir=destdir,
-                       archive_file=archive_file)
+    if not urls:
+        ceprint("no args, checking clipboard for urls")
+        urls = get_clipboard_iris(verbose=debug)
+        if verbose:
+            ic(urls)
+
+    if not urls:
+        urls = get_clipboard(verbose=debug)
+        urls = [urls]
+
+    urls = list(urls)
+    shuffle(urls)
+    ic(urls)
+    for index, url in enumerate(urls):
+        if verbose:
+            ic(index, url)
+        eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
+
+        if url.startswith("file://"):
+            continue
+
+        try:
+            youtube_dl_wrapper(url=url,
+                               id_from_url=id_from_url,
+                               ignore_download_archive=ignore_download_archive,
+                               play=play,
+                               retries=tries,
+                               extract_urls=extract_urls,
+                               verbose=verbose,
+                               debug=debug,
+                               destdir=destdir,
+                               archive_file=archive_file)
+        except NoVideoException:
+            eprint("No Video at URL:", url)
 
 
