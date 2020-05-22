@@ -553,16 +553,17 @@ def cli(urls, id_from_url, ignore_download_archive, play, extract_urls, tries, v
             continue
 
         try:
-            youtube_dl_wrapper(url=url,
-                               id_from_url=id_from_url,
-                               ignore_download_archive=ignore_download_archive,
-                               play=play,
-                               retries=tries,
-                               extract_urls=extract_urls,
-                               verbose=verbose,
-                               debug=debug,
-                               destdir=destdir,
-                               archive_file=archive_file)
+            result = \
+                youtube_dl_wrapper(url=url,
+                                   id_from_url=id_from_url,
+                                   ignore_download_archive=ignore_download_archive,
+                                   play=play,
+                                   retries=tries,
+                                   extract_urls=extract_urls,
+                                   verbose=verbose,
+                                   debug=debug,
+                                   destdir=destdir,
+                                   archive_file=archive_file)
         except NoVideoException:
             eprint("No Video at URL:", url)
 
