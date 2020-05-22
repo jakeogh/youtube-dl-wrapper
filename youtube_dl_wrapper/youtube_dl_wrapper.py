@@ -450,6 +450,7 @@ def youtube_dl_wrapper(*,
                                                 archive_file=archive_file,
                                                 notitle=True)
 
+
     url_set = set()
 
     if is_direct_link_to_video(url):
@@ -457,28 +458,26 @@ def youtube_dl_wrapper(*,
     else:
         # step 0, convert non-url to url
         if not (url.startswith('https://') or url.startswith('http://')):
-            try:
-                eprint("attempting to convert", url, "to url")
-                url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-            except TypeError:
-                return False    # it's not a valid id, skip it
+            eprint("attempting to convert", url, "to url")
+            url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
             if verbose:
                 ic(url_from_id)
             if id_from_url != url:
                 url_set.add(url_from_id)
-            else:
-                # step 2, expand redirects
-                url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-                if verbose:
-                    ic(url_redirect)
-                url_set.add(url_redirect)
-                url_set.add(url)
 
-                playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
-                if verbose:
-                    ic(playlist_url)
-                url_set.add(playlist_url)
-                url_set.add(url)
+        else:
+            # step 2, expand redirects
+            url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+            if verbose:
+                ic(url_redirect)
+            url_set.add(url_redirect)
+            url_set.add(url)
+
+            playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+            if verbose:
+                ic(playlist_url)
+            url_set.add(playlist_url)
+            url_set.add(url)
 
     larger_url_set = set()
     for index, url in enumerate(url_set):
