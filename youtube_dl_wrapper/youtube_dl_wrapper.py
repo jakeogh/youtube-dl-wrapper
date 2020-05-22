@@ -564,6 +564,7 @@ def cli(urls, id_from_url, ignore_download_archive, play, extract_urls, tries, v
                                    debug=debug,
                                    destdir=destdir,
                                    archive_file=archive_file)
+            ic(result)
         except NoVideoException:
             eprint("No Video at URL:", url)
 
