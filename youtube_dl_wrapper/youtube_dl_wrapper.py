@@ -69,6 +69,8 @@ class Tee:
         for target in self.targets:
             target.flush()
 
+    def isatty():
+        return True
 
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
