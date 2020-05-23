@@ -374,7 +374,7 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
 
     if is_excluded(byte_string=redis_value_to_look_for,
                    exclusions_key=redis_skip,
-                   verbose=verbose
+                   verbose=verbose,
                    debug=debug):
         raise RedsiSkipException
 
@@ -404,7 +404,11 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, json_info
             delay = delay + (delay * DELAY_MULTIPLIER)
 
     if not json_info:
-        json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
+        json_info = get_json_info(url=url,
+                                  ydl_ops=ydl_ops,
+                                  verbose=verbose,
+                                  debug=debug,
+                                  redis_skip=redis_skip)
         if debug:
             ic(json_info)
             #import IPython; IPython.embed()
