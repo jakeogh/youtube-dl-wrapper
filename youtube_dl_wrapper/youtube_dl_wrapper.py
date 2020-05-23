@@ -81,6 +81,10 @@ class TooManyRequestsException(ValueError):
     pass
 
 
+class AlreadyDownloadedException(ValueError):
+    pass
+
+
 def extract_id_from_url(url):
     #ceprint("url:", url)
     #ceprint("extractors:", extractors)
@@ -377,7 +381,6 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, current_try=1):
             delay = delay + (delay * DELAY_MULTIPLIER)
 
 
-
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
     with redirect_stderr(f_stderr):
@@ -393,6 +396,8 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, current_try=1):
     print(stdout_out)
     if "<HTTPError 404: 'Not Found'>" in stderr_out:
         raise NoVideoException
+    if "has already been recorded in archive" in stderr_out:
+        raise AlreadyDownloadedException
 
 
     #with YoutubeDL(ydl_ops) as ydl:
@@ -492,18 +497,21 @@ def youtube_dl_wrapper(*,
         else:
             # step 2, expand redirects
             if not is_direct_link_to_channel(url):
+                eprint("not a direct link to a channel, checking for a redirect")
                 url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
                 if verbose:
                     ic(url_redirect)
                 url_set.add(url_redirect)
                 url_set.add(url)
 
+                eprint("converting to playlist")
                 playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
                 if verbose:
                     ic(playlist_url)
                 url_set.add(playlist_url)
                 url_set.add(url)
             else:
+                eprint("direct link to channel, adding to download set")
                 url_set.add(url)
 
     larger_url_set = set()
@@ -521,7 +529,6 @@ def youtube_dl_wrapper(*,
         except NotPlaylistException:
             eprint("Not a playlist, adding url to set directly")
             larger_url_set.add(url)
-
 
     url_set_len = len(larger_url_set)
     for index, url in enumerate(larger_url_set):
