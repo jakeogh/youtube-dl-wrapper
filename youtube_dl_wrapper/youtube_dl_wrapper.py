@@ -559,7 +559,8 @@ def youtube_dl_wrapper(*,
                 url_set.add(url_redirect)
                 url_set.add(url)
 
-                eprint("converting to playlist")
+            elif is_direct_link_to_channel(url):
+                eprint("converting channel to playlist")
                 playlist_url = convert_url_to_youtube_playlist(url=url,
                                                                ydl_ops=ydl_ops_standard,
                                                                verbose=verbose,
@@ -568,9 +569,12 @@ def youtube_dl_wrapper(*,
                 if verbose:
                     ic(playlist_url)
                 url_set.add(playlist_url)
+                #url_set.add(url)
+            elif is_direct_link_to_playlist(url):
+                eprint("direct link to playlist, adding to download set")
                 url_set.add(url)
             else:
-                eprint("direct link to channel or playlist, adding to download set")
+                eprint("not a direct link to channel or playlist, no idea, adding to download set anyway")
                 url_set.add(url)
 
     larger_url_set = set()
