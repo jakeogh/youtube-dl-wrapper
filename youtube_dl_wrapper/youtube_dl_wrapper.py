@@ -143,6 +143,11 @@ def is_direct_link_to_video(url):
     #    import IPython; IPython.embed()
 
 
+def is_direct_link_to_playlist(url):
+    if url.startswith("https://www.youtube.com/playlist?list="):
+        return True
+
+
 def is_direct_link_to_channel(url):
     if url.startswith("https://www.youtube.com/channel"):
         return True
@@ -540,8 +545,8 @@ def youtube_dl_wrapper(*,
 
         else:
             # step 2, expand redirects
-            if not is_direct_link_to_channel(url):
-                eprint("not a direct link to a channel, checking for a redirect")
+            if not (is_direct_link_to_channel(url) or is_direct_link_to_playlist(url)):
+                eprint("not a direct link to a channel or playlist, checking for a redirect")
                 url_redirect = convert_url_to_redirect(url=url,
                                                        ydl_ops=ydl_ops_standard,
                                                        verbose=verbose,
@@ -563,7 +568,7 @@ def youtube_dl_wrapper(*,
                 url_set.add(playlist_url)
                 url_set.add(url)
             else:
-                eprint("direct link to channel, adding to download set")
+                eprint("direct link to channel or playlist, adding to download set")
                 url_set.add(url)
 
     larger_url_set = set()
@@ -683,8 +688,8 @@ def cli(urls,
         except NoVideoException:
             eprint("No Video at URL:", url)
         except AlreadyDownloadedException:
-            eprint("Video already downloaded")
+            eprint("Video already downloaded", url)
         except RedsiSkipException:
-            eprint("RedsiSkipException")
+            eprint("RedsiSkipException", url)
 
 
