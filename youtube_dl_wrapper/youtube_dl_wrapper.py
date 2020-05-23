@@ -65,6 +65,10 @@ class Tee:
         for target in self.targets:
             target.write(b)
 
+    def flush(self, b):
+        for target in self.targets:
+            target.flush(b)
+
 
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
