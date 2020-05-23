@@ -397,9 +397,8 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, current_try=1):
     print(stdout_out)
     if "<HTTPError 404: 'Not Found'>" in stderr_out:
         raise NoVideoException
-    if "has already been recorded in archive" in stderr_out:
+    if "has already been recorded in archive" in stdout_out:
         raise AlreadyDownloadedException
-
 
     #with YoutubeDL(ydl_ops) as ydl:
     #    thing = ydl.download([url])
@@ -520,18 +519,19 @@ def youtube_dl_wrapper(*,
     larger_url_set = set()
     for index, url in enumerate(url_set):
         # step 1, expand playlists
-        try:
-            for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug):
-                try:
-                    constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor, verbose=verbose, debug=debug)
-                    larger_url_set.add(constructed_url)
-                except NotImplementedError as e:
-                    ic(e)
-                    larger_url_set.add(url)
+        if not is_direct_link_to_video(url):
+            try:
+                for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug):
+                    try:
+                        constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor, verbose=verbose, debug=debug)
+                        larger_url_set.add(constructed_url)
+                    except NotImplementedError as e:
+                        ic(e)
+                        larger_url_set.add(url)
 
-        except NotPlaylistException:
-            eprint("Not a playlist, adding url to set directly")
-            larger_url_set.add(url)
+            except NotPlaylistException:
+                eprint("Not a playlist, adding url to set directly")
+                larger_url_set.add(url)
 
     url_set_len = len(larger_url_set)
     for index, url in enumerate(larger_url_set):
