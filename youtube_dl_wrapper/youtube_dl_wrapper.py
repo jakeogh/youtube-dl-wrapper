@@ -605,5 +605,7 @@ def cli(urls, id_from_url, ignore_download_archive, play, extract_urls, tries, v
             ic(result)
         except NoVideoException:
             eprint("No Video at URL:", url)
+        except AlreadyDownloadedException:
+            eprint("Video already downloaded")
 
 
