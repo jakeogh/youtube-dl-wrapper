@@ -8,6 +8,7 @@ import re
 import glob
 import string
 import io
+from shutil import get_terminal_size
 from contextlib import redirect_stderr
 from contextlib import redirect_stdout
 import sre_constants
@@ -27,9 +28,9 @@ from kcl.fileops import points_to_data
 from kcl.clipboardops import get_clipboard_iris
 from kcl.clipboardops import get_clipboard
 from iridb.atoms import UrlparseResult
+from redisfilter.redisfilter import is_excluded
 
 ic.configureOutput(includeContext=True)
-from shutil import get_terminal_size
 ic.lineWrapWidth, _ = get_terminal_size((80, 20))
 
 global DELAY_MULTIPLIER
@@ -82,6 +83,10 @@ class TooManyRequestsException(ValueError):
 
 
 class AlreadyDownloadedException(ValueError):
+    pass
+
+
+class RedsiSkipException(ValueError):
     pass
 
 
@@ -255,10 +260,10 @@ def generate_download_options(*,
     return ydl_ops
 
 
-def convert_url_to_redirect(*, url, ydl_ops, verbose, debug):
+def convert_url_to_redirect(*, url, ydl_ops, verbose, debug, redis_skip):
     if verbose:
         ic(url)
-    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
+    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
 
     try:
         if json_info['extractor'] in ['generic']:
@@ -276,21 +281,21 @@ def convert_url_to_redirect(*, url, ydl_ops, verbose, debug):
         return url
 
 
-def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose, debug):
+def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose, debug, redis_skip):
     if verbose:
         ic(vid_id)
-    json_info = get_json_info(url=vid_id, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
+    json_info = get_json_info(url=vid_id, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
     webpage_url = json_info['webpage_url']
     if verbose:
         ic(webpage_url)
     return webpage_url
 
 
-def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose, debug):
+def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose, debug, redis_skip):
     if verbose:
         ic(url)
 
-    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
+    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
     try:
         if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
             playlist_url = json_info['url']
@@ -306,10 +311,10 @@ def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose, debug):
         return url
 
 
-def get_playlist_links(*, url, ydl_ops, verbose, debug):
+def get_playlist_links(*, url, ydl_ops, verbose, debug, redis_skip):
     if verbose:
         ic(url)
-    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
+    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
     #playlist_url = convert_url_to_youtube_playlist(url=url, json_info=json_info, verbose=verbose, debug=debug)
     #if verbose:
     #    ic(playlist_url)
@@ -339,7 +344,7 @@ def get_playlist_links(*, url, ydl_ops, verbose, debug):
     return links
 
 
-def get_json_info(*, url, ydl_ops, verbose, debug):
+def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
     #try:
@@ -361,16 +366,26 @@ def get_json_info(*, url, ydl_ops, verbose, debug):
         raise NoVideoException
     if "<HTTPError 429: 'Too Many Requests'>" in stderr_out:
         raise TooManyRequestsException
+
+    redis_value_to_look_for = json_info['extractor'] + "/" + json_info['uploader']
+    redis_value_to_look_for = redis_value_to_look_for.encode('utf8')
+    if verbose:
+        ic(redis_value_to_look_for)
+
+    if is_excluded(byte_string=redis_value_to_look_for, exclusions_key=redis_skip):
+        raise RedsiSkipException
+
     return json_info
 
 
-def download_url(*, url, ydl_ops, retries, verbose, debug, json_info=None, current_try=1):
+def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, json_info=None, current_try=1):
 
     # wrong spot to do this...
     global DELAY_MULTIPLIER
     assert url
     response = None
     delay = 10
+
     while response == None:
         try:
             response = requests.head(url)
@@ -386,11 +401,10 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, json_info=None, curre
             delay = delay + (delay * DELAY_MULTIPLIER)
 
     if not json_info:
-        json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
+        json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
         if debug:
             ic(json_info)
-            import IPython; IPython.embed()
-
+            #import IPython; IPython.embed()
 
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
@@ -417,7 +431,13 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, json_info=None, curre
     if int(thing) == 1:
         ic(current_try)
         if current_try <= retries:
-            download_url(url=url, ydl_ops=ydl_ops, retries=retries, verbose=verbose, debug=debug, current_try=current_try+1)
+            download_url(url=url,
+                         ydl_ops=ydl_ops,
+                         retries=retries,
+                         verbose=verbose,
+                         debug=debug,
+                         redis_skip=redis_skip,
+                         current_try=current_try + 1)
 
 
 def construct_url_from_id(*, vid_id, extractor, verbose, debug):
@@ -458,6 +478,7 @@ def youtube_dl_wrapper(*,
                        extract_urls,
                        destdir,
                        archive_file,
+                       redis_skip=b"mpv:queue:exclude#",
                        retries=4,
                        play=False,
                        verbose=False,
@@ -490,7 +511,6 @@ def youtube_dl_wrapper(*,
                                                 archive_file=archive_file,
                                                 notitle=True)
 
-
     url_set = set()
 
     if is_direct_link_to_video(url):
@@ -501,7 +521,11 @@ def youtube_dl_wrapper(*,
         # step 0, convert non-url to url
         if not (url.startswith('https://') or url.startswith('http://')):
             eprint("attempting to convert", url, "to url")
-            url_from_id = convert_id_to_webpage_url(vid_id=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+            url_from_id = convert_id_to_webpage_url(vid_id=url,
+                                                    ydl_ops=ydl_ops_standard,
+                                                    verbose=verbose,
+                                                    redis_skip=redis_skip,
+                                                    debug=debug)
             if verbose:
                 ic(url_from_id)
             if id_from_url != url:
@@ -511,14 +535,22 @@ def youtube_dl_wrapper(*,
             # step 2, expand redirects
             if not is_direct_link_to_channel(url):
                 eprint("not a direct link to a channel, checking for a redirect")
-                url_redirect = convert_url_to_redirect(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+                url_redirect = convert_url_to_redirect(url=url,
+                                                       ydl_ops=ydl_ops_standard,
+                                                       verbose=verbose,
+                                                       redis_skip=redis_skip,
+                                                       debug=debug)
                 if verbose:
                     ic(url_redirect)
                 url_set.add(url_redirect)
                 url_set.add(url)
 
                 eprint("converting to playlist")
-                playlist_url = convert_url_to_youtube_playlist(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug)
+                playlist_url = convert_url_to_youtube_playlist(url=url,
+                                                               ydl_ops=ydl_ops_standard,
+                                                               verbose=verbose,
+                                                               redis_skip=redis_skip,
+                                                               debug=debug)
                 if verbose:
                     ic(playlist_url)
                 url_set.add(playlist_url)
@@ -532,7 +564,11 @@ def youtube_dl_wrapper(*,
         # step 1, expand playlists
         if not is_direct_link_to_video(url):
             try:
-                for extractor, vid_id in get_playlist_links(url=url, ydl_ops=ydl_ops_standard, verbose=verbose, debug=debug):
+                for extractor, vid_id in get_playlist_links(url=url,
+                                                            ydl_ops=ydl_ops_standard,
+                                                            verbose=verbose,
+                                                            redis_skip=redis_skip,
+                                                            debug=debug):
                     try:
                         constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor, verbose=verbose, debug=debug)
                         larger_url_set.add(constructed_url)
@@ -559,10 +595,20 @@ def youtube_dl_wrapper(*,
             extractor = None
 
         if extractor in ['twitter'] or url.startswith('https://t.co/'):
-            download_url(url=url, ydl_ops=ydl_ops_notitle, retries=retries, verbose=verbose, debug=debug)
+            download_url(url=url,
+                         ydl_ops=ydl_ops_notitle,
+                         retries=retries,
+                         verbose=verbose,
+                         redis_skip=redis_skip,
+                         debug=debug)
 
         else:
-            download_url(url=url, ydl_ops=ydl_ops_standard, retries=retries, verbose=verbose, debug=debug)
+            download_url(url=url,
+                         ydl_ops=ydl_ops_standard,
+                         retries=retries,
+                         verbose=verbose,
+                         redis_skip=redis_skip,
+                         debug=debug)
 
         print()
         continue
@@ -577,9 +623,21 @@ def youtube_dl_wrapper(*,
 @click.option('--tries', type=int, default=4)
 @click.option('--verbose', is_flag=True)
 @click.option('--debug', is_flag=True)
+@click.option('--redis-skip-uploader-set', is_flag=False, required=False, type=bytes, default=b'mpv:queue:exclude#')
 @click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
 @click.option('--archive-file', is_flag=False, required=False, default='~/.youtube_dl.cache')
-def cli(urls, id_from_url, ignore_download_archive, play, extract_urls, tries, verbose, debug, destdir, archive_file):
+def cli(urls,
+        id_from_url,
+        ignore_download_archive,
+        play,
+        extract_urls,
+        tries,
+        verbose,
+        debug,
+        destdir,
+        redis_skip_uploader_set,
+        archive_file):
+
     if not urls:
         ceprint("no args, checking clipboard for urls")
         urls = get_clipboard_iris(verbose=debug)
@@ -609,6 +667,7 @@ def cli(urls, id_from_url, ignore_download_archive, play, extract_urls, tries, v
                                    play=play,
                                    retries=tries,
                                    extract_urls=extract_urls,
+                                   redis_skip=redis_skip_uploader_set,
                                    verbose=verbose,
                                    debug=debug,
                                    destdir=destdir,
