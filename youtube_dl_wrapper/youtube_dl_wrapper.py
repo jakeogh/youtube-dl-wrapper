@@ -133,6 +133,10 @@ def is_direct_link_to_video(url):
     if url.domain_psl() == "youtube.com":
         if len(url) == 43:
             return True
+    if url.domain_psl() == "twitter.com":
+        ic(dir(url))
+        import IPython; IPython.embed()
+
 
 
 def is_direct_link_to_channel(url):
