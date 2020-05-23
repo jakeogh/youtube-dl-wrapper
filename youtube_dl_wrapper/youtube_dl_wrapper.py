@@ -372,7 +372,10 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
     if verbose:
         ic(redis_value_to_look_for)
 
-    if is_excluded(byte_string=redis_value_to_look_for, exclusions_key=redis_skip, verbose=verbose):
+    if is_excluded(byte_string=redis_value_to_look_for,
+                   exclusions_key=redis_skip,
+                   verbose=verbose
+                   debug=debug):
         raise RedsiSkipException
 
     return json_info
