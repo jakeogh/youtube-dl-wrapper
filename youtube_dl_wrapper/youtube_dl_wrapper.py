@@ -372,6 +372,8 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
     if "<HTTPError 429: 'Too Many Requests'>" in stderr_out:
         raise TooManyRequestsException
 
+    import IPython; IPython.embed()
+
     redis_value_to_look_for = json_info['extractor'] + "/" + json_info['uploader']
     redis_value_to_look_for = redis_value_to_look_for.encode('utf8')
     if verbose:
