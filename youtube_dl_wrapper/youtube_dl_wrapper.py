@@ -532,6 +532,8 @@ def youtube_dl_wrapper(*,
             except NotPlaylistException:
                 eprint("Not a playlist, adding url to set directly")
                 larger_url_set.add(url)
+        else:
+            larger_url_set.add(url)
 
     url_set_len = len(larger_url_set)
     for index, url in enumerate(larger_url_set):
