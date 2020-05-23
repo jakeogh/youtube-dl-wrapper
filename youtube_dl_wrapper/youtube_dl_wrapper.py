@@ -390,8 +390,9 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, current_try=1):
                 #ic(thing)
     stderr_out = f_stderr.getvalue()
     stdout_out = f_stdout.getvalue()
-    #ic(stderr_out)
-    #ic(stdout_out)
+    if verbose:
+        ic(stderr_out)
+        ic(stdout_out)
     print(stderr_out)
     print(stdout_out)
     if "<HTTPError 404: 'Not Found'>" in stderr_out:
@@ -483,8 +484,10 @@ def youtube_dl_wrapper(*,
     url_set = set()
 
     if is_direct_link_to_video(url):
+        eprint("its a direct link to a video, adding to set")
         url_set.add(url)
     else:
+        eprint("not a direct link to a video")
         # step 0, convert non-url to url
         if not (url.startswith('https://') or url.startswith('http://')):
             eprint("attempting to convert", url, "to url")
