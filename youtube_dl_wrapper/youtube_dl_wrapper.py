@@ -684,5 +684,7 @@ def cli(urls,
             eprint("No Video at URL:", url)
         except AlreadyDownloadedException:
             eprint("Video already downloaded")
+        except RedsiSkipException:
+            eprint("RedsiSkipException")
 
 
