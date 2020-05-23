@@ -69,7 +69,7 @@ class Tee:
         for target in self.targets:
             target.flush()
 
-    def isatty():
+    def isatty(self):
         return True
 
 def is_non_zero_file(fpath):
