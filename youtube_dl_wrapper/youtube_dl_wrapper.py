@@ -374,7 +374,7 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
 
     #import IPython; IPython.embed()
 
-    if json_info['extractor'] == "YoutubeChannel":  # cant know the uploader yet unfortunatly
+    if json_info['extractor'] == "youtube:channel":  # cant know the uploader yet unfortunatly
         return json_info
 
     redis_value_to_look_for = json_info['extractor'] + "/" + json_info['uploader']
