@@ -372,7 +372,7 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
     if verbose:
         ic(redis_value_to_look_for)
 
-    if is_excluded(byte_string=redis_value_to_look_for, exclusions_key=redis_skip):
+    if is_excluded(byte_string=redis_value_to_look_for, exclusions_key=redis_skip, verbose=verbose):
         raise RedsiSkipException
 
     return json_info
@@ -389,7 +389,7 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, json_info
     while response == None:
         try:
             response = requests.head(url)
-            if verbose:
+            if debug:
                 ic(response.headers)
         except Exception as e:
             if current_try == 1:
