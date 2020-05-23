@@ -133,9 +133,9 @@ def is_direct_link_to_video(url):
     if url.domain_psl() == "youtube.com":
         if len(url) == 43:
             return True
-    if url.domain_psl() == "twitter.com":
-        ic(dir(url))
-        import IPython; IPython.embed()
+    #if url.domain_psl() == "twitter.com":
+    #    ic(dir(url))
+    #    import IPython; IPython.embed()
 
 
 def is_direct_link_to_channel(url):
@@ -389,6 +389,8 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, json_info=None, curre
         json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
         if debug:
             ic(json_info)
+            import IPython; IPython.embed()
+
 
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
