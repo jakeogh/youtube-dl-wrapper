@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-#import copy
+import sys
 import os
 import time
 import re
@@ -54,6 +54,16 @@ FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s_
 FILE_TEMPLATE_TW = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(id)s.%(ext)s"
 
 MAX_TRIES = 3
+
+
+# from @altendky
+class Tee:
+    def __init__(self, *targets):
+        self.targets = targets
+
+    def write(self, b):
+        for target in self.targets:
+            target.write(b)
 
 
 def is_non_zero_file(fpath):
@@ -425,8 +435,8 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, json_info
 
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
-    with redirect_stderr(f_stderr):
-        with redirect_stdout(f_stdout):
+    with redirect_stderr(Tee(f_stderr, sys.__stderr__)):
+        with redirect_stdout(Tee(f_stdout, sys.__stdout__)):
             with YoutubeDL(ydl_ops) as ydl:
                 thing = ydl.download([url])
                 #ic(thing)
