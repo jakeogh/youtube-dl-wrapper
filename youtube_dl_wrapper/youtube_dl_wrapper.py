@@ -69,6 +69,10 @@ class Tee:
         for target in self.targets:
             target.flush()
 
+    def close(self):
+        for target in self.targets:
+            target.close()
+
     def isatty(self):
         return True
 
