@@ -138,7 +138,6 @@ def is_direct_link_to_video(url):
         import IPython; IPython.embed()
 
 
-
 def is_direct_link_to_channel(url):
     if url.startswith("https://www.youtube.com/channel"):
         return True
@@ -365,7 +364,9 @@ def get_json_info(*, url, ydl_ops, verbose, debug):
     return json_info
 
 
-def download_url(*, url, ydl_ops, retries, verbose, debug, current_try=1):
+def download_url(*, url, ydl_ops, retries, verbose, debug, json_info=None, current_try=1):
+
+    # wrong spot to do this...
     global DELAY_MULTIPLIER
     assert url
     response = None
@@ -384,6 +385,10 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, current_try=1):
             time.sleep(delay)
             delay = delay + (delay * DELAY_MULTIPLIER)
 
+    if not json_info:
+        json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug)
+        if debug:
+            ic(json_info)
 
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
