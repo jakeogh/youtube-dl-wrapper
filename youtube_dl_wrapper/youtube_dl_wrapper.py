@@ -440,7 +440,7 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, json_info
     #with YoutubeDL(ydl_ops) as ydl:
     #    thing = ydl.download([url])
     #    ic(thing)
-    if int(thing) == 1:
+    if (int(thing) == 1) or ("<urlopen error timed out>" in stderr_out):
         ic(current_try)
         if current_try <= retries:
             download_url(url=url,
