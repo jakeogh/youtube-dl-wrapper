@@ -173,6 +173,11 @@ def is_direct_link_to_channel(url):
         return True
 
 
+def is_direct_link_to_user(url):
+    if url.startswith("https://www.youtube.com/user"):
+        return True
+
+
 def get_filename_for_url(*, url, ydl_ops):
     ic(url)
     ydl_ops['forcefilename'] = True
@@ -394,7 +399,7 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
 
     #import IPython; IPython.embed()
 
-    if json_info['extractor'] == "youtube:channel":  # cant know the uploader yet unfortunatly
+    if json_info['extractor'] in ["youtube:channel", "youtube:user"]:  # (wrong for user) cant know the uploader yet unfortunatly
         return json_info
 
     redis_value_to_look_for = json_info['extractor'] + "/" + json_info['uploader']
@@ -570,7 +575,7 @@ def youtube_dl_wrapper(*,
 
         else:
             # step 2, expand redirects
-            if not (is_direct_link_to_channel(url) or is_direct_link_to_playlist(url)):
+            if not (is_direct_link_to_channel(url) or is_direct_link_to_playlist(url) or is_direct_link_to_user(url)):
                 eprint("not a direct link to a channel or playlist, checking for a redirect")
                 url_redirect = convert_url_to_redirect(url=url,
                                                        ydl_ops=ydl_ops_standard,
@@ -582,8 +587,8 @@ def youtube_dl_wrapper(*,
                 url_set.add(url_redirect)
                 url_set.add(url)
 
-            elif is_direct_link_to_channel(url):
-                eprint("converting channel to playlist")
+            elif (is_direct_link_to_channel(url) or is_direct_link_to_user(url)):
+                eprint("converting channel or user to playlist")
                 playlist_url = convert_url_to_youtube_playlist(url=url,
                                                                ydl_ops=ydl_ops_standard,
                                                                verbose=verbose,
