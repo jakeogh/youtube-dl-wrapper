@@ -402,7 +402,11 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
     if json_info['extractor'] in ["youtube:channel", "youtube:user"]:  # (wrong for user) cant know the uploader yet unfortunatly
         return json_info
 
-    redis_value_to_look_for = json_info['extractor'] + "/" + json_info['uploader']
+    try:
+        redis_value_to_look_for = json_info['extractor'] + "/" + json_info['uploader']
+    except KeyError:
+        return json_info
+
     redis_value_to_look_for = redis_value_to_look_for.encode('utf8')
     if verbose:
         ic(redis_value_to_look_for)
