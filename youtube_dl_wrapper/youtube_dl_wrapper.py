@@ -237,7 +237,6 @@ def generate_download_options(*,
                               notitle=False):
     play_command = ' '.join(VIDEO_CMD) + ' {}'
     queue_command = ' '.join(QUEUE_CMD) + ' {}'
-    #fsindex_command = ' '.join(FSINDEX_CMD) + ' {}'
 
     if play:
         #exec_cmd = fsindex_command + ' ; ' + queue_command + ' ; ' + play_command + ' & '
@@ -345,15 +344,7 @@ def get_playlist_links(*, url, ydl_ops, verbose, debug, redis_skip):
     if verbose:
         ic(url)
     json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
-    #playlist_url = convert_url_to_youtube_playlist(url=url, json_info=json_info, verbose=verbose, debug=debug)
-    #if verbose:
-    #    ic(playlist_url)
     links = []
-    #ydl_ops['dumpjson'] = True
-    #ydl_ops['extract_flat'] = True
-    ##try:
-    #with YoutubeDL(ydl_ops) as ydl:
-    #    json_info = ydl.extract_info(url, download=False)
 
     try:
         if 'entries' in json_info.keys():
@@ -361,10 +352,6 @@ def get_playlist_links(*, url, ydl_ops, verbose, debug, redis_skip):
                 links.append((json_info['extractor'], item['url']))
     except (AttributeError, KeyError):  #  'NoneType' object has no attribute 'keys'
         raise NotPlaylistException
-    #except Exception as e:
-    #    ic(e)
-    #if not links:
-    #    links.append((json_info['extractor'], json_info['id']))
 
     if verbose:
         ic(links)
@@ -700,6 +687,12 @@ def cli(urls,
 
     urls = list(urls)
     shuffle(urls)
+    for url in urls:
+        if url.startswith("http://www.youtube.com/"):
+            url.replace("http://www.youtube.com/", "https://www.youtube.com/")
+        if url.startswith("http://youtube.com/"):
+            url.replace("http://youtube.com/", "https://youtube.com/")
+
     ic(urls)
     for index, url in enumerate(urls):
         if verbose:
