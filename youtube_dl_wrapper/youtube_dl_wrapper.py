@@ -383,6 +383,8 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
         raise NoVideoException
     if "<HTTPError 429: 'Too Many Requests'>" in stderr_out:
         raise TooManyRequestsException
+    if "<HTTPError 404: 'Not Found'>" in stderr_out:
+        raise NoVideoException
 
     #import IPython; IPython.embed()
 
@@ -692,6 +694,8 @@ def cli(urls,
             url.replace("http://www.youtube.com/", "https://www.youtube.com/")
         if url.startswith("http://youtube.com/"):
             url.replace("http://youtube.com/", "https://youtube.com/")
+
+    # https://m.youtube.com/watch?v=durcHyxpFT4
 
     ic(urls)
     for index, url in enumerate(urls):
