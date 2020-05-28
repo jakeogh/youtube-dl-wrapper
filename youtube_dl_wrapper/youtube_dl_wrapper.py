@@ -633,24 +633,32 @@ def youtube_dl_wrapper(*,
         except NoIDException:
             extractor = None
 
-        if extractor in ['twitter'] or url.startswith('https://t.co/'):
-            download_url(url=url,
-                         ydl_ops=ydl_ops_notitle,
-                         retries=retries,
-                         verbose=verbose,
-                         redis_skip=redis_skip,
-                         debug=debug)
+        try:
+            if extractor in ['twitter'] or url.startswith('https://t.co/'):
+                download_url(url=url,
+                             ydl_ops=ydl_ops_notitle,
+                             retries=retries,
+                             verbose=verbose,
+                             redis_skip=redis_skip,
+                             debug=debug)
 
-        else:
-            download_url(url=url,
-                         ydl_ops=ydl_ops_standard,
-                         retries=retries,
-                         verbose=verbose,
-                         redis_skip=redis_skip,
-                         debug=debug)
+            else:
+                download_url(url=url,
+                             ydl_ops=ydl_ops_standard,
+                             retries=retries,
+                             verbose=verbose,
+                             redis_skip=redis_skip,
+                             debug=debug)
+
+        except NoVideoException:
+            eprint("No Video at URL:", url)
+        except AlreadyDownloadedException:
+            eprint("Video already downloaded", url)
+        except RedsiSkipException:
+            eprint("RedsiSkipException", url)
 
         print()
-        continue
+
 
 
 @click.command()
@@ -706,25 +714,18 @@ def cli(urls,
         if url.startswith("file://"):
             continue
 
-        try:
-            result = \
-                youtube_dl_wrapper(url=url,
-                                   id_from_url=id_from_url,
-                                   ignore_download_archive=ignore_download_archive,
-                                   play=play,
-                                   retries=tries,
-                                   extract_urls=extract_urls,
-                                   redis_skip=redis_skip_uploader_set,
-                                   verbose=verbose,
-                                   debug=debug,
-                                   destdir=destdir,
-                                   archive_file=archive_file)
-            ic(result)
-        except NoVideoException:
-            eprint("No Video at URL:", url)
-        except AlreadyDownloadedException:
-            eprint("Video already downloaded", url)
-        except RedsiSkipException:
-            eprint("RedsiSkipException", url)
+        result = \
+            youtube_dl_wrapper(url=url,
+                               id_from_url=id_from_url,
+                               ignore_download_archive=ignore_download_archive,
+                               play=play,
+                               retries=tries,
+                               extract_urls=extract_urls,
+                               redis_skip=redis_skip_uploader_set,
+                               verbose=verbose,
+                               debug=debug,
+                               destdir=destdir,
+                               archive_file=archive_file)
+        ic(result)
 
 
