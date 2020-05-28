@@ -381,6 +381,8 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
         ic(json_info)
     if "youtube_dl.utils.ExtractorError" in stderr_out:
         raise NoVideoException
+    if "youtube_dl.utils.UnsupportedError" in stderr_out:
+        raise NoVideoException
     if "<HTTPError 429: 'Too Many Requests'>" in stderr_out:
         raise TooManyRequestsException
     if "<HTTPError 404: 'Not Found'>" in stderr_out:
