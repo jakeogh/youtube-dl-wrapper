@@ -626,6 +626,9 @@ def youtube_dl_wrapper(*,
         if verbose:
             ic(index, url)
 
+        if len(larger_url_set) == 1:
+            redis_skip = b""
+
         eprint("{} of {}".format(index + 1, url_set_len), url)
 
         try:
