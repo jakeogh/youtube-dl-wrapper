@@ -385,6 +385,8 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
         raise NoVideoException
     if "<HTTPError 429: 'Too Many Requests'>" in stderr_out:
         raise TooManyRequestsException
+    if "<urlopen error [Errno 101] Network is unreachable>" in stderr_out:
+        raise TooManyRequestsException
     if "<HTTPError 404: 'Not Found'>" in stderr_out:
         raise NoVideoException
 
@@ -459,6 +461,8 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, json_info
     print(stdout_out)
     if "<HTTPError 404: 'Not Found'>" in stderr_out:
         raise NoVideoException
+    if "<urlopen error [Errno 101] Network is unreachable>" in stderr_out:
+        raise TooManyRequestsException
     if "has already been recorded in archive" in stdout_out:
         raise AlreadyDownloadedException
 
