@@ -392,7 +392,10 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
 
     #import IPython; IPython.embed()
 
-    if json_info['extractor'] in ["youtube:channel", "youtube:user"]:  # (wrong for user) cant know the uploader yet unfortunatly
+    try:
+        if json_info['extractor'] in ["youtube:channel", "youtube:user"]:  # (wrong for user) cant know the uploader yet unfortunatly
+            return json_info
+    except TypeError:
         return json_info
 
     try:
