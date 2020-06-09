@@ -617,9 +617,9 @@ def youtube_dl_wrapper(*,
                                                             verbose=verbose,
                                                             redis_skip=redis_skip,
                                                             debug=debug):
-                    if extractor in ['generic']:
-                        if (vid_id.startswith('https://') or vid_id.startswith('http://')):
-                            larger_url_set.add(vid_id)
+                    #if extractor in ['generic']:
+                    if (vid_id.startswith('https://') or vid_id.startswith('http://')):
+                        larger_url_set.add(vid_id)
                     else:
                         try:
                             constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor, verbose=verbose, debug=debug)
