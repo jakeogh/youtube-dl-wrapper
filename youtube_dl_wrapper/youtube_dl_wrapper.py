@@ -162,7 +162,7 @@ def is_direct_link_to_video(url):
         regex_src = "https://.*\.*twitter.com/.*/status/\d{19}"
         regex = re.compile(regex_src)
         ic(regex_src, regex, url)
-        import IPython; IPython.embed()
+        #import IPython; IPython.embed()
 
         if regex.match(str(url)):
             return True
