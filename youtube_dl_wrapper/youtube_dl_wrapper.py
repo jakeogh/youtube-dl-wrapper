@@ -608,6 +608,7 @@ def youtube_dl_wrapper(*,
                 url_set.add(url)
 
     larger_url_set = set()
+    ic(url_set)
     for index, url in enumerate(url_set):
         # step 1, expand playlists
         if len(url_set) == 1:
