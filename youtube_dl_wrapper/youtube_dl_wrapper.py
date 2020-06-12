@@ -161,11 +161,13 @@ def is_direct_link_to_video(url):
     if url.domain_psl() == "twitter.com":
         regex = r"https://.*\.twitter.com/.*/status/\d{19}"
         regex = re.compile(regex)
+        ic(regex, url)
         if regex.match(str(url)):
             return True
     #    ic(dir(url))
     #    import IPython; IPython.embed()
 
+    return False
 
 def is_direct_link_to_playlist(url):
     if url.startswith("https://www.youtube.com/playlist?list="):
