@@ -610,6 +610,8 @@ def youtube_dl_wrapper(*,
     larger_url_set = set()
     for index, url in enumerate(url_set):
         # step 1, expand playlists
+        if len(url_set) == 1:
+            redis_skip = b""
         if not is_direct_link_to_video(url):
             try:
                 for extractor, vid_id in get_playlist_links(url=url,
