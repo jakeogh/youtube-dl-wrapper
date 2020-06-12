@@ -321,8 +321,12 @@ def convert_url_to_redirect(*, url, ydl_ops, verbose, debug, redis_skip):
 def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose, debug, redis_skip):
     if verbose:
         ic(vid_id)
+    #try:
     json_info = get_json_info(url=vid_id, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
     webpage_url = json_info['webpage_url']
+    #except ExtractorError as e:
+    #    if re.match(r"\d{19}", vid_id):
+    #        webpage_url = "https://mobile.twitter.com/idk/" + vid_id
     if verbose:
         ic(webpage_url)
     return webpage_url
