@@ -159,7 +159,7 @@ def is_direct_link_to_video(url):
         if len(url) == 43:
             return True
     if url.domain_psl() == "twitter.com":
-        regex_src = "https://.*\.twitter.com/.*/status/\d{19}"
+        regex_src = "https://.*\.*twitter.com/.*/status/\d{19}"
         regex = re.compile(regex_src)
         ic(regex_src, regex, url)
         import IPython; IPython.embed()
