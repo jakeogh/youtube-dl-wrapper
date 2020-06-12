@@ -159,7 +159,7 @@ def is_direct_link_to_video(url):
         if len(url) == 43:
             return True
     if url.domain_psl() == "twitter.com":
-        regex = r"https://.*\.twitter.com/.*/status/\d{19}"
+        regex = "https://.*\.twitter.com/.*/status/\d{19}"
         regex = re.compile(regex)
         ic(regex, url)
         if regex.match(str(url)):
