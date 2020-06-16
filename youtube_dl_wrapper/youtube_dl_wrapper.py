@@ -412,7 +412,7 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
 
     try:
         redis_value_to_look_for = json_info['extractor'] + "/" + json_info['uploader']
-    except KeyError:
+    except (KeyError, TypeError):
         return json_info
 
     redis_value_to_look_for = redis_value_to_look_for.encode('utf8')
