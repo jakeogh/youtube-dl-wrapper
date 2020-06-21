@@ -431,7 +431,7 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
     return json_info
 
 
-def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, json_info=None, current_try=1):
+def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, ban_terms, json_info=None, current_try=1):
 
     # wrong spot to do this...
     global DELAY_MULTIPLIER
@@ -461,7 +461,7 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, json_info
                                   redis_skip=redis_skip)
         if debug:
             ic(json_info)
-            #import IPython; IPython.embed()
+            import IPython; IPython.embed()
 
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
@@ -537,6 +537,7 @@ def youtube_dl_wrapper(*,
                        extract_urls,
                        dest_dir,
                        archive_file,
+                       ban_terms,
                        redis_skip=b"mpv:queue:exclude#",
                        retries=4,
                        dont_queue=False,
@@ -676,6 +677,7 @@ def youtube_dl_wrapper(*,
                              ydl_ops=ydl_ops_notitle,
                              retries=retries,
                              verbose=verbose,
+                             ban_terms=ban_terms,
                              redis_skip=redis_skip,
                              debug=debug)
 
@@ -684,6 +686,7 @@ def youtube_dl_wrapper(*,
                              ydl_ops=ydl_ops_standard,
                              retries=retries,
                              verbose=verbose,
+                             ban_terms=ban_terms,
                              redis_skip=redis_skip,
                              debug=debug)
 
@@ -700,6 +703,7 @@ def youtube_dl_wrapper(*,
 
 @click.command()
 @click.argument('urls', nargs=-1)
+@click.option('--ban-term', type=str, nargs=-1)
 @click.option('--id-from-url', is_flag=True)
 @click.option('--ignore-download-archive', is_flag=True)
 @click.option('--play', is_flag=True)
@@ -721,6 +725,7 @@ def cli(urls,
         dont_queue,
         debug,
         dest_dir,
+        ban_term,
         redis_skip_uploader_set,
         archive_file):
 
@@ -764,6 +769,7 @@ def cli(urls,
                                verbose=verbose,
                                debug=debug,
                                dest_dir=dest_dir,
+                               ban_terms=ban_term,
                                dont_queue=dont_queue,
                                archive_file=archive_file)
         ic(result)
