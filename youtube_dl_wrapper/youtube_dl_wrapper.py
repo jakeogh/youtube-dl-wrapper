@@ -703,7 +703,7 @@ def youtube_dl_wrapper(*,
 
 @click.command()
 @click.argument('urls', nargs=-1)
-@click.option('--ban-term', type=str, nargs=-1)
+@click.option('--ban-term', type=str, multiple=True)
 @click.option('--id-from-url', is_flag=True)
 @click.option('--ignore-download-archive', is_flag=True)
 @click.option('--play', is_flag=True)
