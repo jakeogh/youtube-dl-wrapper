@@ -255,7 +255,7 @@ def generate_download_options(*,
         if queue:
             exec_cmd = QUEUE_COMMAND
         else:
-            exec_cmd = ''
+            exec_cmd = 'ls -alh '
 
     #ceprint("exec_cmd:", exec_cmd)
     ydl_ops = {
