@@ -535,7 +535,7 @@ def youtube_dl_wrapper(*,
                        id_from_url,
                        ignore_download_archive,
                        extract_urls,
-                       destdir,
+                       dest_dir,
                        archive_file,
                        redis_skip=b"mpv:queue:exclude#",
                        retries=4,
@@ -544,11 +544,11 @@ def youtube_dl_wrapper(*,
                        verbose=False,
                        debug=False):
 
-    destdir = Path(os.path.expanduser(destdir))
+    dest_dir = Path(os.path.expanduser(dest_dir))
     archive_file = Path(os.path.expanduser(archive_file))
 
     ic(verbose)
-    cache_folder = compat_expanduser(destdir)
+    cache_folder = compat_expanduser(dest_dir)
     try:
         os.chdir(cache_folder)
     except FileNotFoundError:
@@ -720,7 +720,7 @@ def cli(urls,
         verbose,
         dont_queue,
         debug,
-        destdir,
+        dest_dir,
         redis_skip_uploader_set,
         archive_file):
 
@@ -763,7 +763,7 @@ def cli(urls,
                                redis_skip=redis_skip_uploader_set,
                                verbose=verbose,
                                debug=debug,
-                               destdir=destdir,
+                               dest_dir=dest_dir,
                                dont_queue=dont_queue,
                                archive_file=archive_file)
         ic(result)
