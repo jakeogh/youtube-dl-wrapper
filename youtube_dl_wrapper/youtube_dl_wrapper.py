@@ -110,6 +110,9 @@ class RedsiSkipException(ValueError):
     pass
 
 
+class BannedTermException(ValueError):
+    pass
+
 def extract_id_from_url(url):
     #ceprint("url:", url)
     #ceprint("extractors:", extractors)
@@ -461,7 +464,13 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, ban_terms
                                   redis_skip=redis_skip)
         if debug:
             ic(json_info)
-            import IPython; IPython.embed()
+
+            #import IPython; IPython.embed()
+        for term in banned_terms:
+            if term in json_info['title'].lower():
+                raise BannedTermException(term)
+            #if term in json_info['title'].lower():
+            #    raise BannedTermException(term)
 
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
@@ -495,6 +504,7 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, ban_terms
                          retries=retries,
                          verbose=verbose,
                          debug=debug,
+                         ban_terms=ban_terms,
                          redis_skip=redis_skip,
                          current_try=current_try + 1)
 
@@ -750,6 +760,8 @@ def cli(urls,
     # https://m.youtube.com/watch?v=durcHyxpFT4
 
     ic(urls)
+    if verbose:
+        ic(ban_term)
     for index, url in enumerate(urls):
         if verbose:
             ic(index, url)
