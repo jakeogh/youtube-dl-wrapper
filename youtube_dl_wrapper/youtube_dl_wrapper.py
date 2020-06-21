@@ -588,6 +588,9 @@ def youtube_dl_wrapper(*,
 
     url_set = set()
 
+    if url.startswith("http://www.youtube.com/"):
+        url = url.replace("http://www.youtube.com/", "https://www.youtube.com/")
+
     if is_direct_link_to_video(url):
         eprint("its a direct link to a video, adding to set")
         url_set.add(url)
