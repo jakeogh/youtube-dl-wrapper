@@ -549,7 +549,7 @@ def youtube_dl_wrapper(*,
                        archive_file,
                        banned_terms,
                        redis_skip=b"mpv:queue:exclude#",
-                       retries=4,
+                       retries=1,
                        dont_queue=False,
                        play=False,
                        verbose=False,
@@ -721,7 +721,7 @@ def youtube_dl_wrapper(*,
 @click.option('--ignore-download-archive', is_flag=True)
 @click.option('--play', is_flag=True)
 @click.option('--extract-urls', is_flag=True)
-@click.option('--tries', type=int, default=4)
+@click.option('--tries', type=int, default=1)
 @click.option('--verbose', is_flag=True)
 @click.option('--dont-queue', is_flag=True)
 @click.option('--debug', is_flag=True)
