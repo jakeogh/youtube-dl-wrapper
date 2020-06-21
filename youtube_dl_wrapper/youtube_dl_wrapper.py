@@ -470,7 +470,7 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, banned_te
         if json_info:
             for term in banned_terms:
                 if term in json_info['title'].lower():
-                    raise BannedTermException(term)
+                    raise BannedTermException((json_info['title'], term))
                 #if term in json_info['title'].lower():
                 #    raise BannedTermException(term)
 
