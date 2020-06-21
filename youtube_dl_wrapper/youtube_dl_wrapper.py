@@ -37,7 +37,7 @@ global DELAY_MULTIPLIER
 DELAY_MULTIPLIER = random.random() / 2
 
 extractors = gen_extractors()
-QUEUE_CMD = ['/home/cfg/redis/types/list/rpush', 'mpv:queue#']
+QUEUE_COMMAND = ['/home/cfg/redis/types/list/rpush', 'mpv:queue#']
 #FSINDEX_CMD = ['/usr/bin/fsindex', 'create', 'record']
 downloaded_video_list = []
 
@@ -250,11 +250,10 @@ def generate_download_options(*,
     play_command = ' '.join(VIDEO_CMD) + ' {}'
 
     if play:
-        #exec_cmd = fsindex_command + ' ; ' + queue_command + ' ; ' + play_command + ' & '
-        exec_cmd = queue_command + ' ; ' + play_command + ' & '
+        exec_cmd = QUEUE_COMMAND + ' ; ' + play_command + ' & '
     else:
         if queue:
-            exec_cmd = queue_command
+            exec_cmd = QUEUE_COMMAND
         else:
             exec_cmd = ''
 
