@@ -242,15 +242,18 @@ def generate_download_options(*,
                               ignore_download_archive=True,
                               play=False,
                               archive_file=False,
+                              queue=True,
                               notitle=False):
     play_command = ' '.join(VIDEO_CMD) + ' {}'
-    queue_command = ' '.join(QUEUE_CMD) + ' {}'
 
     if play:
         #exec_cmd = fsindex_command + ' ; ' + queue_command + ' ; ' + play_command + ' & '
         exec_cmd = queue_command + ' ; ' + play_command + ' & '
     else:
-        exec_cmd = queue_command
+        if queue:
+            exec_cmd = queue_command
+        else:
+            exec_cmd = ''
 
     #ceprint("exec_cmd:", exec_cmd)
     ydl_ops = {
@@ -536,6 +539,7 @@ def youtube_dl_wrapper(*,
                        archive_file,
                        redis_skip=b"mpv:queue:exclude#",
                        retries=4,
+                       dont_queue=False,
                        play=False,
                        verbose=False,
                        debug=False):
@@ -557,6 +561,7 @@ def youtube_dl_wrapper(*,
                                                  play=play,
                                                  verbose=verbose,
                                                  debug=debug,
+                                                 queue=not dont_queue,
                                                  archive_file=archive_file)
 
     ydl_ops_notitle = generate_download_options(cache_dir=cache_folder,
@@ -564,6 +569,7 @@ def youtube_dl_wrapper(*,
                                                 play=play,
                                                 verbose=verbose,
                                                 debug=debug,
+                                                queue=not dont_queue,
                                                 archive_file=archive_file,
                                                 notitle=True)
 
@@ -700,9 +706,10 @@ def youtube_dl_wrapper(*,
 @click.option('--extract-urls', is_flag=True)
 @click.option('--tries', type=int, default=4)
 @click.option('--verbose', is_flag=True)
+@click.option('--dont-queue', is_flag=True)
 @click.option('--debug', is_flag=True)
 @click.option('--redis-skip-uploader-set', is_flag=False, required=False, type=bytes, default=b'mpv:queue:exclude#')
-@click.option('--destdir', is_flag=False, required=False, default='~/_youtube')
+@click.option('--dest-dir', is_flag=False, required=False, default='~/_youtube')
 @click.option('--archive-file', is_flag=False, required=False, default='~/.youtube_dl.cache')
 def cli(urls,
         id_from_url,
@@ -711,6 +718,7 @@ def cli(urls,
         extract_urls,
         tries,
         verbose,
+        dont_queue,
         debug,
         destdir,
         redis_skip_uploader_set,
@@ -756,6 +764,7 @@ def cli(urls,
                                verbose=verbose,
                                debug=debug,
                                destdir=destdir,
+                               dont_queue=dont_queue,
                                archive_file=archive_file)
         ic(result)
 
