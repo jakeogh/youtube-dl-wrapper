@@ -465,11 +465,12 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, banned_te
             ic(json_info)
 
             #import IPython; IPython.embed()
-        for term in banned_terms:
-            if term in json_info['title'].lower():
-                raise BannedTermException(term)
-            #if term in json_info['title'].lower():
-            #    raise BannedTermException(term)
+        if json_info:
+            for term in banned_terms:
+                if term in json_info['title'].lower():
+                    raise BannedTermException(term)
+                #if term in json_info['title'].lower():
+                #    raise BannedTermException(term)
 
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
