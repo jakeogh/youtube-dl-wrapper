@@ -113,6 +113,10 @@ class RedisSkipException(ValueError):
 class BannedTermException(ValueError):
     pass
 
+
+class NetworkUnreachableException(ValueError):
+    pass
+
 def extract_id_from_url(url):
     #ceprint("url:", url)
     #ceprint("extractors:", extractors)
@@ -397,17 +401,23 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
     if debug:
         ic(json_info)
     if "youtube_dl.utils.ExtractorError" in stderr_out:
+        eprint("raising NoVideoException")
         raise NoVideoException
     if "youtube_dl.utils.RegexNotFoundError:" in stderr_out:
+        eprint("raising NoVideoException")
         raise NoVideoException
     if "youtube_dl.utils.UnsupportedError" in stderr_out:
+        eprint("raising NoVideoException")
+        raise NoVideoException
+    if "<HTTPError 404: 'Not Found'>" in stderr_out:
+        eprint("raising NoVideoException")
         raise NoVideoException
     if "<HTTPError 429: 'Too Many Requests'>" in stderr_out:
+        eprint("raising TooManyRequestsException")
         raise TooManyRequestsException
-    if "<urlopen error [Errno 101] Network is unreachable>" in stderr_out:
-        raise TooManyRequestsException
-    if "<HTTPError 404: 'Not Found'>" in stderr_out:
-        raise NoVideoException
+    if "Network is unreachable" in stderr_out:
+        eprint("raising NetworkUnreachableException")
+        raise NetworkUnreachableException
 
     #import IPython; IPython.embed()
 
