@@ -37,18 +37,18 @@ global DELAY_MULTIPLIER
 DELAY_MULTIPLIER = random.random() / 2
 
 extractors = gen_extractors()
-QUEUE_COMMAND = ['/home/cfg/redis/types/list/rpush', 'mpv:queue#']
+QUEUE_COMMAND = ' '.join(['/home/cfg/redis/types/list/rpush', 'mpv:queue#'])
 #FSINDEX_CMD = ['/usr/bin/fsindex', 'create', 'record']
 downloaded_video_list = []
 
-VIDEO_CMD = ['/usr/bin/xterm',
+VIDEO_CMD = ' '.join(['/usr/bin/xterm',
              '-e',
              '/usr/bin/mpv',
              '--cache-pause',
              '--hwdec=vdpau',
              '--cache-initial=75000',
              '--cache-default=275000',
-             '--pause']
+             '--pause'])
 
 FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(title)s__%(id)s.%(ext)s"
 FILE_TEMPLATE_TW = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(id)s.%(ext)s"
