@@ -264,7 +264,8 @@ def generate_download_options(*,
         else:
             exec_cmd = 'ls -alh '
 
-    #ceprint("exec_cmd:", exec_cmd)
+    ic(exec_cmd)
+    assert isinstance(exec_cmd, str)
     ydl_ops = {
         'socket_timeout': 60,
         'ignoreerrors': True,
