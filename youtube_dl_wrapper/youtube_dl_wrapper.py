@@ -178,8 +178,10 @@ def is_direct_link_to_video(url):
 
     return False
 
-def is_direct_link_to_playlist(url):
+def is_direct_link_to_playlist(url):  # bug, check the json instead
     if url.startswith("https://www.youtube.com/playlist?list="):
+        return True
+    if url.startswith("https://www.youtube.com/results?search_query="):
         return True
 
 
