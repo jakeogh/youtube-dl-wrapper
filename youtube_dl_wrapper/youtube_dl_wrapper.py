@@ -441,7 +441,7 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
         ic(redis_value_to_look_for)
 
     if is_excluded(byte_string=redis_value_to_look_for,
-                   exclusions_key=redis_skip,
+                   exclusions_keys=[redis_skip],
                    verbose=verbose,
                    debug=debug):
         raise RedisSkipException
