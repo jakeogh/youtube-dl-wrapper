@@ -1,5 +1,20 @@
 #!/usr/bin/env python3
 
+# pylint: disable=C0111     # docstrings are always outdated and wrong
+# pylint: disable=W0511     # todo is encouraged
+# pylint: disable=R0902     # too many instance attributes
+# pylint: disable=C0302     # too many lines in module
+# pylint: disable=C0103     # single letter var names
+# pylint: disable=R0911     # too many return statements
+# pylint: disable=R0912     # too many branches
+# pylint: disable=R0915     # too many statements
+# pylint: disable=R0913     # too many arguments
+# pylint: disable=R1702     # too many nested blocks
+# pylint: disable=R0914     # too many local variables
+# pylint: disable=R0903     # too few public methods
+# pylint: disable=E1101     # no member for base
+# pylint: disable=W0201     # attribute defined outside __init__
+
 
 import sys
 import os
@@ -27,8 +42,8 @@ from kcl.printops import eprint
 from kcl.fileops import points_to_data
 from kcl.clipboardops import get_clipboard_iris
 from kcl.clipboardops import get_clipboard
-from iridb.atoms import UrlparseResult
 from redisfilter.redisfilter import is_excluded
+from iridb.atoms import UrlparseResult
 
 ic.configureOutput(includeContext=True)
 ic.lineWrapWidth, _ = get_terminal_size((80, 20))
@@ -38,17 +53,16 @@ DELAY_MULTIPLIER = random.random() / 2
 
 extractors = gen_extractors()
 QUEUE_COMMAND = ' '.join(['/home/cfg/redis/types/list/rpush', 'mpv:queue#'])
-#FSINDEX_CMD = ['/usr/bin/fsindex', 'create', 'record']
 downloaded_video_list = []
 
 VIDEO_CMD = ' '.join(['/usr/bin/xterm',
-             '-e',
-             '/usr/bin/mpv',
-             '--cache-pause',
-             '--hwdec=vdpau',
-             '--cache-initial=75000',
-             '--cache-default=275000',
-             '--pause'])
+                      '-e',
+                      '/usr/bin/mpv',
+                      '--cache-pause',
+                      '--hwdec=vdpau',
+                      '--cache-initial=75000',
+                      '--cache-default=275000',
+                      '--pause'])
 
 FILE_TEMPLATE = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(title)s__%(id)s.%(ext)s"
 FILE_TEMPLATE_TW = '%(extractor)s' + '/' + '%(uploader)s' + '/' + "%(uploader_id)s__%(upload_date)s__%(id)s.%(ext)s"
@@ -61,9 +75,9 @@ class Tee:
     def __init__(self, *targets):
         self.targets = targets
 
-    def write(self, b):
+    def write(self, data):
         for target in self.targets:
-            target.write(b)
+            target.write(data)
 
     def flush(self):
         for target in self.targets:
@@ -75,6 +89,7 @@ class Tee:
 
     def isatty(self):
         return True
+
 
 def is_non_zero_file(fpath):
     if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
@@ -116,6 +131,7 @@ class BannedTermException(ValueError):
 
 class NetworkUnreachableException(ValueError):
     pass
+
 
 def extract_id_from_url(url):
     #ceprint("url:", url)
@@ -166,7 +182,7 @@ def is_direct_link_to_video(url):
         if len(url) == 43:
             return True
     if url.domain_psl() == "twitter.com":
-        regex_src = "https://.*\.*twitter.com/.*/status/\d{19}"
+        regex_src = r"https://.*\.*twitter.com/.*/status/\d{19}"
         regex = re.compile(regex_src)
         ic(regex_src, regex, url)
         #import IPython; IPython.embed()
@@ -178,21 +194,25 @@ def is_direct_link_to_video(url):
 
     return False
 
+
 def is_direct_link_to_playlist(url):  # bug, check the json instead
     if url.startswith("https://www.youtube.com/playlist?list="):
         return True
     if url.startswith("https://www.youtube.com/results?search_query="):
         return True
+    return False
 
 
 def is_direct_link_to_channel(url):
     if url.startswith("https://www.youtube.com/channel"):
         return True
+    return False
 
 
 def is_direct_link_to_user(url):
     if url.startswith("https://www.youtube.com/user"):
         return True
+    return False
 
 
 def get_filename_for_url(*, url, ydl_ops):
@@ -215,6 +235,8 @@ def get_filename_for_url(*, url, ydl_ops):
 
 
 def get_playlist_for_channel(url, verbose, debug):
+    if verbose:
+        ic(url)
     ydl = YoutubeDL()
     ie = YoutubeChannelIE(ydl)
     info = ie.extract(url)
@@ -254,6 +276,9 @@ def generate_download_options(*,
                               archive_file=False,
                               queue=True,
                               notitle=False):
+    if verbose:
+        ic()
+
     play_command = ' '.join(VIDEO_CMD) + ' {}'
 
     if play:
@@ -307,13 +332,21 @@ def generate_download_options(*,
     if not ignore_download_archive:
         ydl_ops['download_archive'] = archive_file
 
+    if debug:
+        ic(ydl_ops)
+
     return ydl_ops
 
 
-def convert_url_to_redirect(*, url, ydl_ops, verbose, debug, redis_skip):
+def convert_url_to_redirect(*, url, ydl_ops, verbose, debug, redis_skip, json_ipython):
     if verbose:
         ic(url)
-    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
+    json_info = get_json_info(url=url,
+                              ydl_ops=ydl_ops,
+                              verbose=verbose,
+                              debug=debug,
+                              redis_skip=redis_skip,
+                              json_ipython=json_ipython)
 
     try:
         if json_info['extractor'] in ['generic']:
@@ -331,11 +364,16 @@ def convert_url_to_redirect(*, url, ydl_ops, verbose, debug, redis_skip):
         return url
 
 
-def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose, debug, redis_skip):
+def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose, debug, redis_skip, json_ipython):
     if verbose:
         ic(vid_id)
     #try:
-    json_info = get_json_info(url=vid_id, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
+    json_info = get_json_info(url=vid_id,
+                              ydl_ops=ydl_ops,
+                              verbose=verbose,
+                              debug=debug,
+                              redis_skip=redis_skip,
+                              json_ipython=json_ipython)
     webpage_url = json_info['webpage_url']
     #except ExtractorError as e:
     #    if re.match(r"\d{19}", vid_id):
@@ -345,11 +383,16 @@ def convert_id_to_webpage_url(*, vid_id, ydl_ops, verbose, debug, redis_skip):
     return webpage_url
 
 
-def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose, debug, redis_skip):
+def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose, debug, redis_skip, json_ipython):
     if verbose:
         ic(url)
 
-    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
+    json_info = get_json_info(url=url,
+                              ydl_ops=ydl_ops,
+                              verbose=verbose,
+                              debug=debug,
+                              redis_skip=redis_skip,
+                              json_ipython=json_ipython)
     try:
         if json_info['extractor'] in ['youtube:user', 'youtube:channel']:
             playlist_url = json_info['url']
@@ -365,10 +408,15 @@ def convert_url_to_youtube_playlist(*, url, ydl_ops, verbose, debug, redis_skip)
         return url
 
 
-def get_playlist_links(*, url, ydl_ops, verbose, debug, redis_skip):
+def get_playlist_links(*, url, ydl_ops, verbose, debug, redis_skip, json_ipython):
     if verbose:
         ic(url)
-    json_info = get_json_info(url=url, ydl_ops=ydl_ops, verbose=verbose, debug=debug, redis_skip=redis_skip)
+    json_info = get_json_info(url=url,
+                              ydl_ops=ydl_ops,
+                              verbose=verbose,
+                              debug=debug,
+                              redis_skip=redis_skip,
+                              json_ipython=json_ipython)
     links = []
 
     try:
@@ -386,7 +434,7 @@ def get_playlist_links(*, url, ydl_ops, verbose, debug, redis_skip):
     return links
 
 
-def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
+def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip, json_ipython):
     ydl_ops['dumpjson'] = True
     ydl_ops['extract_flat'] = True
     #try:
@@ -402,6 +450,11 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
     #ic(stdout_out)
     print(stderr_out)
     print(stdout_out)
+
+    if json_ipython:
+        import IPython
+        IPython.embed()
+
     if debug:
         ic(json_info)
     if "youtube_dl.utils.ExtractorError" in stderr_out:
@@ -449,7 +502,17 @@ def get_json_info(*, url, ydl_ops, verbose, debug, redis_skip):
     return json_info
 
 
-def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, banned_terms, json_info=None, current_try=1):
+def download_url(*,
+                 url,
+                 ydl_ops,
+                 retries,
+                 verbose,
+                 debug,
+                 redis_skip,
+                 banned_terms,
+                 json_ipython,
+                 json_info=None,
+                 current_try=1):
 
     # wrong spot to do this...
     global DELAY_MULTIPLIER
@@ -457,12 +520,14 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, banned_te
     response = None
     delay = 10
 
-    while response == None:
+    while response is None:
         try:
             response = requests.head(url)
             if debug:
                 ic(response.headers)
         except Exception as e:
+            if debug:
+                ic(e)
             if current_try == 1:
                 ic(delay, url, e)
             else:
@@ -476,7 +541,8 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, banned_te
                                   ydl_ops=ydl_ops,
                                   verbose=verbose,
                                   debug=debug,
-                                  redis_skip=redis_skip)
+                                  redis_skip=redis_skip,
+                                  json_ipython=json_ipython)
         if debug:
             ic(json_info)
 
@@ -520,13 +586,14 @@ def download_url(*, url, ydl_ops, retries, verbose, debug, redis_skip, banned_te
                          retries=retries,
                          verbose=verbose,
                          debug=debug,
+                         json_ipython=json_ipython,
                          banned_terms=banned_terms,
                          redis_skip=redis_skip,
                          current_try=current_try + 1)
 
 
 def construct_url_from_id(*, vid_id, extractor, verbose, debug):
-    if verbose:
+    if verbose or debug:
         ic(vid_id)
     if extractor in ["youtube:playlist", "youtube:search_url"]:
         return "https://www.youtube.com/watch?v={}".format(vid_id)
@@ -565,12 +632,19 @@ def youtube_dl_wrapper(*,
                        archive_file,
                        banned_terms,
                        no_json_file,
+                       json_ipython,
                        redis_skip=b"mpv:queue:skipdownload#",
                        retries=1,
                        dont_queue=False,
                        play=False,
                        verbose=False,
                        debug=False):
+
+    orig_url = url
+    del url
+
+    if id_from_url:
+        raise NotImplementedError
 
     dest_dir = Path(os.path.expanduser(dest_dir))
     archive_file = Path(os.path.expanduser(archive_file))
@@ -605,58 +679,61 @@ def youtube_dl_wrapper(*,
 
     url_set = set()
 
-    if url.startswith("http://www.youtube.com/"):
-        url = url.replace("http://www.youtube.com/", "https://www.youtube.com/")
+    if orig_url.startswith("http://www.youtube.com/"):
+        orig_url = orig_url.replace("http://www.youtube.com/", "https://www.youtube.com/")
 
-    if is_direct_link_to_video(url):
+    if is_direct_link_to_video(orig_url):
         eprint("its a direct link to a video, adding to set")
-        url_set.add(url)
+        url_set.add(orig_url)
     else:
         eprint("not a direct link to a video")
         # step 0, convert non-url to url
-        if not (url.startswith('https://') or url.startswith('http://')):
-            eprint("attempting to convert", url, "to url")
-            url_from_id = convert_id_to_webpage_url(vid_id=url,
+        if not (orig_url.startswith('https://') or orig_url.startswith('http://')):
+            eprint("attempting to convert", orig_url, "to url")
+            url_from_id = convert_id_to_webpage_url(vid_id=orig_url,
                                                     ydl_ops=ydl_ops_standard,
                                                     verbose=verbose,
+                                                    json_ipython=json_ipython,
                                                     redis_skip=redis_skip,
                                                     debug=debug)
             if verbose:
                 ic(url_from_id)
-            if id_from_url != url:
+            if url_from_id != orig_url:
                 url_set.add(url_from_id)
 
         else:
             # step 2, expand redirects
-            if not (is_direct_link_to_channel(url) or is_direct_link_to_playlist(url) or is_direct_link_to_user(url)):
+            if not (is_direct_link_to_channel(orig_url) or is_direct_link_to_playlist(orig_url) or is_direct_link_to_user(orig_url)):
                 eprint("not a direct link to a channel or playlist, checking for a redirect")
-                url_redirect = convert_url_to_redirect(url=url,
+                url_redirect = convert_url_to_redirect(url=orig_url,
                                                        ydl_ops=ydl_ops_standard,
                                                        verbose=verbose,
+                                                       json_ipython=json_ipython,
                                                        redis_skip=redis_skip,
                                                        debug=debug)
                 if verbose:
                     ic(url_redirect)
                 url_set.add(url_redirect)
-                url_set.add(url)
+                url_set.add(orig_url)
 
-            elif (is_direct_link_to_channel(url) or is_direct_link_to_user(url)):
+            elif (is_direct_link_to_channel(orig_url) or is_direct_link_to_user(orig_url)):
                 eprint("converting channel or user to playlist")
-                playlist_url = convert_url_to_youtube_playlist(url=url,
+                playlist_url = convert_url_to_youtube_playlist(url=orig_url,
                                                                ydl_ops=ydl_ops_standard,
                                                                verbose=verbose,
+                                                               json_ipython=json_ipython,
                                                                redis_skip=redis_skip,
                                                                debug=debug)
                 if verbose:
                     ic(playlist_url)
                 url_set.add(playlist_url)
                 #url_set.add(url)
-            elif is_direct_link_to_playlist(url):
+            elif is_direct_link_to_playlist(orig_url):
                 eprint("direct link to playlist, adding to download set")
-                url_set.add(url)
+                url_set.add(orig_url)
             else:
                 eprint("not a direct link to channel or playlist, no idea, adding to download set anyway")
-                url_set.add(url)
+                url_set.add(orig_url)
 
     larger_url_set = set()
     ic(url_set)
@@ -669,6 +746,7 @@ def youtube_dl_wrapper(*,
                 for extractor, vid_id in get_playlist_links(url=url,
                                                             ydl_ops=ydl_ops_standard,
                                                             verbose=verbose,
+                                                            json_ipython=json_ipython,
                                                             redis_skip=redis_skip,
                                                             debug=debug):
                     #if extractor in ['generic']:
@@ -676,7 +754,10 @@ def youtube_dl_wrapper(*,
                         larger_url_set.add(vid_id)
                     else:
                         try:
-                            constructed_url = construct_url_from_id(vid_id=vid_id, extractor=extractor, verbose=verbose, debug=debug)
+                            constructed_url = construct_url_from_id(vid_id=vid_id,
+                                                                    extractor=extractor,
+                                                                    verbose=verbose,
+                                                                    debug=debug)
                             larger_url_set.add(constructed_url)
                         except NotImplementedError as e:
                             ic(e)
@@ -709,6 +790,7 @@ def youtube_dl_wrapper(*,
                              ydl_ops=ydl_ops_notitle,
                              retries=retries,
                              verbose=verbose,
+                             json_ipython=json_ipython,
                              banned_terms=banned_terms,
                              redis_skip=redis_skip,
                              debug=debug)
@@ -718,6 +800,7 @@ def youtube_dl_wrapper(*,
                              ydl_ops=ydl_ops_standard,
                              retries=retries,
                              verbose=verbose,
+                             json_ipython=json_ipython,
                              banned_terms=banned_terms,
                              redis_skip=redis_skip,
                              debug=debug)
@@ -735,7 +818,6 @@ def youtube_dl_wrapper(*,
         print()
 
 
-
 @click.command()
 @click.argument('urls', nargs=-1)
 @click.option('--ban-term', type=str, multiple=True)
@@ -746,6 +828,7 @@ def youtube_dl_wrapper(*,
 @click.option('--no-json-file', is_flag=True)
 @click.option('--tries', type=int, default=1)
 @click.option('--verbose', is_flag=True)
+@click.option('--ipython-json', "json_ipython", is_flag=True)
 @click.option('--dont-queue', is_flag=True)
 @click.option('--debug', is_flag=True)
 @click.option('--redis-skip-uploader-set', is_flag=False, required=False, type=bytes, default=b'mpv:queue:exclude#')
@@ -759,6 +842,7 @@ def cli(urls,
         no_json_file,
         tries,
         verbose,
+        json_ipython,
         dont_queue,
         debug,
         dest_dir,
@@ -805,6 +889,7 @@ def cli(urls,
                                retries=tries,
                                extract_urls=extract_urls,
                                no_json_file=no_json_file,
+                               json_ipython=json_ipython,
                                redis_skip=redis_skip_uploader_set,
                                verbose=verbose,
                                debug=debug,
@@ -813,5 +898,3 @@ def cli(urls,
                                dont_queue=dont_queue,
                                archive_file=archive_file)
         ic(result)
-
-
