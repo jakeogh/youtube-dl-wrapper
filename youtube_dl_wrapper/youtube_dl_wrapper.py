@@ -175,13 +175,13 @@ def extract_id_from_url(url):
 def is_direct_link_to_video(url):
     #https://twitter.com/TheUnitedSpot1/status/1263190701996556288
     url = UrlparseResult(url)
-    if url.domain_psl() == "youtu.be":
+    if url.domain_psl == "youtu.be":
         if len(url) == 28:
             return True
-    if url.domain_psl() == "youtube.com":
+    if url.domain_psl == "youtube.com":
         if len(url) == 43:
             return True
-    if url.domain_psl() == "twitter.com":
+    if url.domain_psl == "twitter.com":
         regex_src = r"https://.*\.*twitter.com/.*/status/\d{19}"
         regex = re.compile(regex_src)
         ic(regex_src, regex, url)
