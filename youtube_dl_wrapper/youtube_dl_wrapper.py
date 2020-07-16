@@ -514,6 +514,9 @@ def download_url(*,
                  json_info=None,
                  current_try=1):
 
+    if not banned_terms:
+        banned_terms = []
+
     # wrong spot to do this...
     global DELAY_MULTIPLIER
     assert url
