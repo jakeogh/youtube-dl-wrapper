@@ -582,8 +582,9 @@ def download_url(*,
             raise TooManyRequestsException
         if "has already been recorded in archive" in stdout_out:
             raise AlreadyDownloadedException
-        if "PermissionError: [Errno 13] Permission denied: '/home/user/_youtube/sources'" in stderr_out:
-            eprint("PermissionError: [Errno 13] Permission denied: '/home/user/_youtube/sources'")
+        if "PermissionError: [Errno 13] Permission denied:" in stderr_out:
+            ic(stderr_out)
+            #eprint("PermissionError: [Errno 13] Permission denied: '/home/user/_youtube/sources'")
             delay = delay + (delay * 0.5)
             ic(delay)
             time.sleep(delay)
