@@ -558,28 +558,36 @@ def download_url(*,
                 #if term in json_info['title'].lower():
                 #    raise BannedTermException(term)
 
+    delay = 1
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
-    with redirect_stderr(Tee(f_stderr, sys.__stderr__)):
-        with redirect_stdout(Tee(f_stdout, sys.__stdout__)):
-            with YoutubeDL(ydl_ops) as ydl:
-                eprint("calling ydl.download()")
-                thing = retry_on_exception(function=ydl.download, kwargs={"url_list": [url]}, exception=PermissionError)
-                #thing = ydl.download([url])
-                #ic(thing)
-    stderr_out = f_stderr.getvalue()
-    stdout_out = f_stdout.getvalue()
-    if verbose:
-        ic(stderr_out)
-        ic(stdout_out)
-    print(stderr_out)
-    print(stdout_out)
-    if "<HTTPError 404: 'Not Found'>" in stderr_out:
-        raise NoVideoException
-    if "<urlopen error [Errno 101] Network is unreachable>" in stderr_out:
-        raise TooManyRequestsException
-    if "has already been recorded in archive" in stdout_out:
-        raise AlreadyDownloadedException
+    while True:
+        with redirect_stderr(Tee(f_stderr, sys.__stderr__)):
+            with redirect_stdout(Tee(f_stdout, sys.__stdout__)):
+                with YoutubeDL(ydl_ops) as ydl:
+                    eprint("calling ydl.download()")
+                    #thing = retry_on_exception(function=ydl.download, kwargs={"url_list": [url]}, exception=PermissionError)
+                    thing = ydl.download([url])
+                    #ic(thing)
+        stderr_out = f_stderr.getvalue()
+        stdout_out = f_stdout.getvalue()
+        if verbose:
+            ic(stderr_out)
+            ic(stdout_out)
+        print(stderr_out)
+        print(stdout_out)
+        if "<HTTPError 404: 'Not Found'>" in stderr_out:
+            raise NoVideoException
+        if "<urlopen error [Errno 101] Network is unreachable>" in stderr_out:
+            raise TooManyRequestsException
+        if "has already been recorded in archive" in stdout_out:
+            raise AlreadyDownloadedException
+        if "PermissionError: [Errno 13] Permission denied: '/home/user/_youtube/sources'" in stderr_out:
+            eprint("PermissionError: [Errno 13] Permission denied: '/home/user/_youtube/sources'")
+            delay = delay + (delay * 0.5)
+            ic(delay)
+            time.sleep(delay)
+
 
     #with YoutubeDL(ydl_ops) as ydl:
     #    thing = ydl.download([url])
