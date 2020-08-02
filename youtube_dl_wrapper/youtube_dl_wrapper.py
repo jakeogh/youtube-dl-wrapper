@@ -563,6 +563,7 @@ def download_url(*,
     with redirect_stderr(Tee(f_stderr, sys.__stderr__)):
         with redirect_stdout(Tee(f_stdout, sys.__stdout__)):
             with YoutubeDL(ydl_ops) as ydl:
+                eprint("calling ydl.download()")
                 thing = retry_on_exception(function=ydl.download, kwargs={"url_list": [url]}, exception=PermissionError)
                 #thing = ydl.download([url])
                 #ic(thing)
