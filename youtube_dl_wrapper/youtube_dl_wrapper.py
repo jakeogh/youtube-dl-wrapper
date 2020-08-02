@@ -42,6 +42,7 @@ from kcl.printops import eprint
 from kcl.fileops import points_to_data
 from kcl.clipboardops import get_clipboard_iris
 from kcl.clipboardops import get_clipboard
+from kcl.exceptionops import retry_on_exception
 from redisfilter.redisfilter import is_excluded
 from iridb.atoms import UrlparseResult
 
@@ -562,7 +563,8 @@ def download_url(*,
     with redirect_stderr(Tee(f_stderr, sys.__stderr__)):
         with redirect_stdout(Tee(f_stdout, sys.__stdout__)):
             with YoutubeDL(ydl_ops) as ydl:
-                thing = ydl.download([url])
+                thing = retry_on_exception(function=ydl.download, kwargs={"url_list": [url]}, exception=PermissionError)
+                #thing = ydl.download([url])
                 #ic(thing)
     stderr_out = f_stderr.getvalue()
     stdout_out = f_stdout.getvalue()
