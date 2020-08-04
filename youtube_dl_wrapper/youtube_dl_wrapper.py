@@ -625,7 +625,7 @@ def construct_youtube_url_from_id(ytid):
             ceprint("found bare youtube id:", ytid)
             url = 'https://www.youtube.com/watch?v=' + ytid
             return url
-    return False
+    raise NoIDException(ytid)
 
 
 def look_for_output_file_variations(output_file):
@@ -698,6 +698,8 @@ def youtube_dl_wrapper(*,
     if orig_url.startswith("http://www.youtube.com/"):
         orig_url = orig_url.replace("http://www.youtube.com/", "https://www.youtube.com/")
 
+
+
     if is_direct_link_to_video(orig_url):
         eprint("its a direct link to a video, adding to set")
         url_set.add(orig_url)
@@ -706,16 +708,20 @@ def youtube_dl_wrapper(*,
         # step 0, convert non-url to url
         if not (orig_url.startswith('https://') or orig_url.startswith('http://')):
             eprint("attempting to convert", orig_url, "to url")
-            url_from_id = convert_id_to_webpage_url(vid_id=orig_url,
-                                                    ydl_ops=ydl_ops_standard,
-                                                    verbose=verbose,
-                                                    json_ipython=json_ipython,
-                                                    redis_skip=redis_skip,
-                                                    debug=debug)
-            if verbose:
-                ic(url_from_id)
-            if url_from_id != orig_url:
-                url_set.add(url_from_id)
+            try:
+                url_from_id = convert_id_to_webpage_url(vid_id=orig_url,
+                                                        ydl_ops=ydl_ops_standard,
+                                                        verbose=verbose,
+                                                        json_ipython=json_ipython,
+                                                        redis_skip=redis_skip,
+                                                        debug=debug)
+                if verbose:
+                    ic(url_from_id)
+                if url_from_id != orig_url:
+                    url_set.add(url_from_id)
+            except (NoIDException, NoVideoException) as e:
+                ic(e)
+                pass
 
         else:
             # step 2, expand redirects
@@ -778,6 +784,8 @@ def youtube_dl_wrapper(*,
                         except NotImplementedError as e:
                             ic(e)
                             larger_url_set.add(url)
+                        except NoIDException as e:
+                            ic(e)
 
             except NotPlaylistException:
                 eprint("Not a playlist, adding url to set directly")
