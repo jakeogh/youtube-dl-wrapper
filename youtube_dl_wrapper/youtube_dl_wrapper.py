@@ -578,23 +578,25 @@ def download_url(*,
         print(stdout_out)
         if "<HTTPError 404: 'Not Found'>" in stderr_out:
             raise NoVideoException
-        elif "<urlopen error [Errno 101] Network is unreachable>" in stderr_out:
-            raise TooManyRequestsException
+        #elif "<urlopen error [Errno 101] Network is unreachable>" in stderr_out:
+        #    raise TooManyRequestsException
         elif "has already been recorded in archive" in stdout_out:
             raise AlreadyDownloadedException
-        elif "PermissionError: [Errno 13] Permission denied:" in stderr_out:
+        elif ("PermissionError: [Errno 13] Permission denied:" in stderr_out) or \
+             ("<urlopen error [Errno 101] Network is unreachable>" in stderr_out):
             ic(stderr_out)
-            #eprint("PermissionError: [Errno 13] Permission denied: '/home/user/_youtube/sources'")
             delay = delay + (delay * 0.5)
             ic(delay)
             time.sleep(delay)
         else:
             break
 
-    #with YoutubeDL(ydl_ops) as ydl:
-    #    thing = ydl.download([url])
-    #    ic(thing)
-    if (int(thing) == 1) or ("<urlopen error timed out>" in stderr_out):
+    if (int(thing) == 1) or \
+            ("<urlopen error timed out>" in stderr_out) or \
+            ("<urlopen error [Errno 101] Network is unreachable>" in stderr_out):
+
+        if "<urlopen error [Errno 101] Network is unreachable>" in stderr_out:
+            current_try = max(current_try-1, 1)
         ic(current_try)
         if current_try <= retries:
             download_url(url=url,
