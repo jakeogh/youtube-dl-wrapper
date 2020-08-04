@@ -550,7 +550,7 @@ def download_url(*,
         if debug:
             ic(json_info)
 
-            #import IPython; IPython.embed()
+        #import IPython; IPython.embed()
         if json_info:
             for term in banned_terms:
                 if term in json_info['title'].lower():
@@ -590,7 +590,6 @@ def download_url(*,
             time.sleep(delay)
         else:
             break
-
 
     #with YoutubeDL(ydl_ops) as ydl:
     #    thing = ydl.download([url])
@@ -879,11 +878,6 @@ def cli(urls,
 
     urls = list(urls)
     shuffle(urls)
-    for url in urls:
-        if url.startswith("http://www.youtube.com/"):
-            url.replace("http://www.youtube.com/", "https://www.youtube.com/")
-        if url.startswith("http://youtube.com/"):
-            url.replace("http://youtube.com/", "https://youtube.com/")
 
     # https://m.youtube.com/watch?v=durcHyxpFT4
 
@@ -893,10 +887,18 @@ def cli(urls,
     for index, url in enumerate(urls):
         if verbose:
             ic(index, url)
+        if url.startswith("http://www.youtube.com/"):
+            url.replace("http://www.youtube.com/", "https://www.youtube.com/")
+        if url.startswith("http://youtube.com/"):
+            url.replace("http://youtube.com/", "https://youtube.com/")
         eprint('(outer) (' + str(index + 1), "of", str(len(urls)) + '):', url)
 
         if url.startswith("file://"):
             continue
+        if not (url.startswith('http://') or url.startswith('https://')):
+            if not url[0].isdigit():
+                eprint("skipping:", url)
+                continue
 
         result = \
             youtube_dl_wrapper(url=url,
