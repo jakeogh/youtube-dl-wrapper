@@ -586,7 +586,7 @@ def download_url(*,
             ("<urlopen error [Errno 101] Network is unreachable>" in stderr_out):
 
         if "<urlopen error [Errno 101] Network is unreachable>" in stderr_out:
-            current_try = max(current_try-1, 1)
+            current_try = max(current_try - 1, 1)
         ic(current_try)
         if current_try <= retries:
             download_url(url=url,
@@ -799,6 +799,7 @@ def youtube_dl_wrapper(*,
             url_id, extractor = extract_id_from_url(url)
         except NoIDException:
             extractor = None
+        ic(extractor)
 
         try:
             if extractor in ['twitter'] or url.startswith('https://t.co/'):
