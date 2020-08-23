@@ -513,6 +513,7 @@ def download_url(*,
                  json_info=None,
                  current_try=1):
 
+    ic(url)
     if not banned_terms:
         banned_terms = []
 
