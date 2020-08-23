@@ -519,12 +519,13 @@ def download_url(*,
         banned_terms = []
 
     # wrong spot to do this...
-    headers_delaygen = Delay(start=10, multiplier=random.random() / 3, end=3600)
+    headers_delaygen = Delay(start=10, multiplier=random.random() / 3, end=360)
     assert url
     response = None
 
     while response is None:
         try:
+            eprint("getting headers for url:", url)
             response = requests.head(url)
             if debug:
                 ic(response.headers)
@@ -535,6 +536,7 @@ def download_url(*,
             if debug:
                 ic(e)
             response = None
+            ic(headers_delaygen)
             headers_delaygen.sleep()
 
     if not json_info:
@@ -555,7 +557,7 @@ def download_url(*,
             #if term in json_info['title'].lower():
             #    raise BannedTermException(term)
 
-    download_delaygen = Delay(start=1, multiplier=random.random() / 3, end=3600)
+    download_delaygen = Delay(start=1, multiplier=random.random() / 3, end=360)
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
     while True:
@@ -583,6 +585,7 @@ def download_url(*,
         elif ("PermissionError: [Errno 13] Permission denied:" in stderr_out) or \
              ("<urlopen error [Errno 101] Network is unreachable>" in stderr_out):
             ic(stderr_out)
+            ic(download_delaygen)
             download_delaygen.sleep()
         else:
             break
