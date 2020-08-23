@@ -40,7 +40,7 @@ from youtube_dl import YoutubeDL
 from kcl.printops import ceprint
 from kcl.printops import eprint
 from kcl.fileops import points_to_data
-from kcl.timeops import DelayGen
+from kcl.timeops import Delay
 from kcl.clipboardops import get_clipboard_iris
 from kcl.clipboardops import get_clipboard
 from kcl.exceptionops import retry_on_exception
@@ -517,7 +517,7 @@ def download_url(*,
         banned_terms = []
 
     # wrong spot to do this...
-    headers_delaygen = DelayGen(start=10, multiplier=random.random() / 3, end=3600)
+    headers_delaygen = Delay(start=10, multiplier=random.random() / 3, end=3600)
     assert url
     response = None
 
@@ -550,7 +550,7 @@ def download_url(*,
                 #if term in json_info['title'].lower():
                 #    raise BannedTermException(term)
 
-    download_delaygen = DelayGen(start=1, multiplier=random.random() / 3, end=3600)
+    download_delaygen = Delay(start=1, multiplier=random.random() / 3, end=3600)
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
     while True:
