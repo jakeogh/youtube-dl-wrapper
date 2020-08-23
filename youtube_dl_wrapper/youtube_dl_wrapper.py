@@ -512,8 +512,8 @@ def download_url(*,
                  json_ipython,
                  json_info=None,
                  current_try=1):
-
-    ic(url)
+    if verbose:
+        ic(url)
     if not banned_terms:
         banned_terms = []
 
@@ -544,12 +544,12 @@ def download_url(*,
             ic(json_info)
 
         #import IPython; IPython.embed()
-        if json_info:
-            for term in banned_terms:
-                if term in json_info['title'].lower():
-                    raise BannedTermException((json_info['title'], term))
-                #if term in json_info['title'].lower():
-                #    raise BannedTermException(term)
+    if json_info:
+        for term in banned_terms:
+            if term in json_info['title'].lower():
+                raise BannedTermException((json_info['title'], term))
+            #if term in json_info['title'].lower():
+            #    raise BannedTermException(term)
 
     download_delaygen = Delay(start=1, multiplier=random.random() / 3, end=3600)
     f_stderr = io.StringIO()
@@ -560,6 +560,7 @@ def download_url(*,
                 with YoutubeDL(ydl_ops) as ydl:
                     eprint("calling ydl.download()")
                     #thing = retry_on_exception(function=ydl.download, kwargs={"url_list": [url]}, exception=PermissionError)
+                    ic(url)
                     thing = ydl.download([url])
                     #ic(thing)
         stderr_out = f_stderr.getvalue()
