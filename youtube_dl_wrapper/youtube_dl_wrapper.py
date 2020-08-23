@@ -40,6 +40,7 @@ from youtube_dl import YoutubeDL
 from kcl.printops import ceprint
 from kcl.printops import eprint
 from kcl.fileops import points_to_data
+from kcl.timeops import DelayGen
 from kcl.clipboardops import get_clipboard_iris
 from kcl.clipboardops import get_clipboard
 from kcl.exceptionops import retry_on_exception
@@ -48,9 +49,6 @@ from iridb.atoms import UrlparseResult
 
 ic.configureOutput(includeContext=True)
 ic.lineWrapWidth, _ = get_terminal_size((80, 20))
-
-global DELAY_MULTIPLIER
-DELAY_MULTIPLIER = random.random() / 2
 
 extractors = gen_extractors()
 QUEUE_COMMAND = ' '.join(['/home/cfg/redis/types/list/rpush', 'mpv:queue#'])
@@ -519,10 +517,9 @@ def download_url(*,
         banned_terms = []
 
     # wrong spot to do this...
-    global DELAY_MULTIPLIER
+    headers_delaygen = DelayGen(start=10, multiplier=random.random() / 3, end=3600)
     assert url
     response = None
-    delay = 10
 
     while response is None:
         try:
@@ -532,13 +529,8 @@ def download_url(*,
         except Exception as e:
             if debug:
                 ic(e)
-            if current_try == 1:
-                ic(delay, url, e)
-            else:
-                ic(delay)
             response = None
-            time.sleep(delay)
-            delay = delay + (delay * DELAY_MULTIPLIER)
+            headers_delaygen.sleep()
 
     if not json_info:
         json_info = get_json_info(url=url,
@@ -558,7 +550,7 @@ def download_url(*,
                 #if term in json_info['title'].lower():
                 #    raise BannedTermException(term)
 
-    delay = 1
+    download_delaygen = DelayGen(start=1, multiplier=random.random() / 3, end=3600)
     f_stderr = io.StringIO()
     f_stdout = io.StringIO()
     while True:
@@ -585,9 +577,7 @@ def download_url(*,
         elif ("PermissionError: [Errno 13] Permission denied:" in stderr_out) or \
              ("<urlopen error [Errno 101] Network is unreachable>" in stderr_out):
             ic(stderr_out)
-            delay = delay + (delay * 0.5)
-            ic(delay)
-            time.sleep(delay)
+            download_delaygen.sleep()
         else:
             break
 
