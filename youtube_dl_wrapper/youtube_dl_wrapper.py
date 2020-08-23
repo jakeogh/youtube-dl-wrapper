@@ -32,6 +32,7 @@ from random import shuffle
 import random
 from icecream import ic
 import requests
+from requests.exceptions import InvalidSchema
 import click
 from youtube_dl.extractor import YoutubeChannelIE
 from youtube_dl.compat import compat_expanduser
@@ -527,6 +528,9 @@ def download_url(*,
             response = requests.head(url)
             if debug:
                 ic(response.headers)
+        except InvalidSchema as e:
+            ic(e)   # fine, could be a youtube-dl constructed url like peertube:video.maga.host:f0ccb692-dd11-4ca3-bb96-9256870188b4
+            break
         except Exception as e:
             if debug:
                 ic(e)
