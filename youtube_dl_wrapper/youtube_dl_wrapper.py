@@ -778,6 +778,8 @@ def youtube_dl_wrapper(*,
                         except NotImplementedError as e:
                             ic(e)
                             larger_url_set.add(url)
+                            larger_url_set.add(vid_id)  # to get constructed urls from a playlist, like:
+                                                        # peertube:video.maga.host:f0ccb692-dd11-4ca3-bb96-9256870188b4
                         except NoIDException as e:
                             ic(e)
 
