@@ -533,8 +533,8 @@ def download_url(*,
             ic(e)   # fine, could be a youtube-dl constructed url like peertube:video.maga.host:f0ccb692-dd11-4ca3-bb96-9256870188b4
             break
         except Exception as e:
-            if debug:
-                ic(e)
+            #if debug:
+            ic(e)
             response = None
             ic(headers_delaygen)
             headers_delaygen.sleep()
@@ -583,7 +583,7 @@ def download_url(*,
         elif "has already been recorded in archive" in stdout_out:
             raise AlreadyDownloadedException
         elif ("PermissionError: [Errno 13] Permission denied:" in stderr_out) or \
-             ("<urlopen error [Errno 101] Network is unreachable>" in stderr_out):
+                ("<urlopen error [Errno 101] Network is unreachable>" in stderr_out):
             ic(stderr_out)
             ic(download_delaygen)
             download_delaygen.sleep()
