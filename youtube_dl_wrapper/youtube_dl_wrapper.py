@@ -519,7 +519,7 @@ def download_url(*,
         banned_terms = []
 
     # wrong spot to do this...
-    headers_delaygen = Delay(start=10, multiplier=random.random() / 3, end=360)
+    headers_delaygen = Delay(start=10, multiplier=random.random() / 3, end=359)
     assert url
     response = None
 
@@ -548,8 +548,8 @@ def download_url(*,
                                   json_ipython=json_ipython)
         if debug:
             ic(json_info)
-
         #import IPython; IPython.embed()
+
     if json_info:
         for term in banned_terms:
             if term in json_info['title'].lower():
