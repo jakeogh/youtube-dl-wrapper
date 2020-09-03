@@ -553,16 +553,16 @@ def download_url(*,
         #import IPython; IPython.embed()
 
     assert json_info
-    if json_info:
-        #if debug:
-        #    ic(json_info)
-        for term in banned_terms:
-            if debug:
-                ic(term)
-            if term in json_info['title'].lower():
-                raise BannedTermException((json_info['title'], term))
-            #if term in json_info['title'].lower():
-            #    raise BannedTermException(term)
+    #if json_info:
+    #if debug:
+    #    ic(json_info)
+    for term in banned_terms:
+        if verbose:
+            ic(term)
+        if term.lower() in json_info['title'].lower():
+            raise BannedTermException((json_info['title'], term))
+        #if term in json_info['title'].lower():
+        #    raise BannedTermException(term)
 
     download_delaygen = Delay(start=1, multiplier=random.random() / 3, end=360)
     f_stderr = io.StringIO()
