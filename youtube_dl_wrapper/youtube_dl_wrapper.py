@@ -517,6 +517,8 @@ def download_url(*,
         ic(url)
     if not banned_terms:
         banned_terms = []
+    if verbose:
+        ic(banned_terms)
 
     # wrong spot to do this...
     headers_delaygen = Delay(start=10, multiplier=random.random() / 3, end=359)
@@ -552,6 +554,8 @@ def download_url(*,
 
     if json_info:
         for term in banned_terms:
+            if debug:
+                ic(term)
             if term in json_info['title'].lower():
                 raise BannedTermException((json_info['title'], term))
             #if term in json_info['title'].lower():
