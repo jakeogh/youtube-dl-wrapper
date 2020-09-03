@@ -554,6 +554,8 @@ def download_url(*,
 
     assert json_info
     if json_info:
+        if debug:
+            ic(json_info)
         for term in banned_terms:
             if debug:
                 ic(term)
@@ -875,8 +877,6 @@ def cli(urls,
         banned_terms,
         redis_skip_uploader_set,
         archive_file):
-
-    #banned_terms = ban_term
 
     if not urls:
         ceprint("no args, checking clipboard for urls")
