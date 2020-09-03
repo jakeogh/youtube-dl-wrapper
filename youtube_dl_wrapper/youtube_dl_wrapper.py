@@ -552,6 +552,7 @@ def download_url(*,
             ic(json_info)
         #import IPython; IPython.embed()
 
+    assert json_info
     if json_info:
         for term in banned_terms:
             if debug:
@@ -817,24 +818,18 @@ def youtube_dl_wrapper(*,
 
         try:
             if extractor in ['twitter'] or url.startswith('https://t.co/'):
-                download_url(url=url,
-                             ydl_ops=ydl_ops_notitle,
-                             retries=retries,
-                             verbose=verbose,
-                             json_ipython=json_ipython,
-                             banned_terms=banned_terms,
-                             redis_skip=redis_skip,
-                             debug=debug)
-
+                ydl_ops = ydl_ops_notitle
             else:
-                download_url(url=url,
-                             ydl_ops=ydl_ops_standard,
-                             retries=retries,
-                             verbose=verbose,
-                             json_ipython=json_ipython,
-                             banned_terms=banned_terms,
-                             redis_skip=redis_skip,
-                             debug=debug)
+                ydl_ops = ydl_ops_standard
+
+            download_url(url=url,
+                         ydl_ops=ydl_ops,
+                         retries=retries,
+                         verbose=verbose,
+                         json_ipython=json_ipython,
+                         banned_terms=banned_terms,
+                         redis_skip=redis_skip,
+                         debug=debug)
 
         except NoVideoException:
             eprint("No Video at URL:", url)
@@ -851,7 +846,7 @@ def youtube_dl_wrapper(*,
 
 @click.command()
 @click.argument('urls', nargs=-1)
-@click.option('--ban-term', type=str, multiple=True)
+@click.option('--ban-term', "banned_terms", type=str, multiple=True)
 @click.option('--id-from-url', is_flag=True)
 @click.option('--ignore-download-archive', is_flag=True)
 @click.option('--play', is_flag=True)
@@ -877,9 +872,11 @@ def cli(urls,
         dont_queue,
         debug,
         dest_dir,
-        ban_term,
+        banned_terms,
         redis_skip_uploader_set,
         archive_file):
+
+    #banned_terms = ban_term
 
     if not urls:
         ceprint("no args, checking clipboard for urls")
@@ -898,7 +895,7 @@ def cli(urls,
 
     ic(urls)
     if verbose:
-        ic(ban_term)
+        ic(banned_terms)
     for index, url in enumerate(urls):
         if verbose:
             ic(index, url)
@@ -928,7 +925,7 @@ def cli(urls,
                                verbose=verbose,
                                debug=debug,
                                dest_dir=dest_dir,
-                               banned_terms=ban_term,
+                               banned_terms=banned_terms,
                                dont_queue=dont_queue,
                                archive_file=archive_file)
         ic(result)
