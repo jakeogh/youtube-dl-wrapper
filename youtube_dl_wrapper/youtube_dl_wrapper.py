@@ -18,7 +18,7 @@
 
 import sys
 import os
-import time
+#import time
 import re
 import glob
 import string
@@ -44,7 +44,7 @@ from kcl.fileops import points_to_data
 from kcl.timeops import Delay
 from kcl.clipboardops import get_clipboard_iris
 from kcl.clipboardops import get_clipboard
-from kcl.exceptionops import retry_on_exception
+#from kcl.exceptionops import retry_on_exception
 from redisfilter.redisfilter import is_excluded
 from iridb.atoms import UrlparseResult
 
@@ -704,7 +704,6 @@ def youtube_dl_wrapper(*,
         orig_url = orig_url.replace("http://www.youtube.com/", "https://www.youtube.com/")
 
 
-
     if is_direct_link_to_video(orig_url):
         eprint("its a direct link to a video, adding to set")
         url_set.add(orig_url)
@@ -790,7 +789,7 @@ def youtube_dl_wrapper(*,
                             ic(e)
                             larger_url_set.add(url)
                             larger_url_set.add(vid_id)  # to get constructed urls from a playlist, like:
-                                                        # peertube:video.maga.host:f0ccb692-dd11-4ca3-bb96-9256870188b4
+                            #                           # peertube:video.maga.host:f0ccb692-dd11-4ca3-bb96-9256870188b4
                         except NoIDException as e:
                             ic(e)
 
