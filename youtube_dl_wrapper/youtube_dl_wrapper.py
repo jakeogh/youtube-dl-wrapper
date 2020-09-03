@@ -554,8 +554,8 @@ def download_url(*,
 
     assert json_info
     if json_info:
-        if debug:
-            ic(json_info)
+        #if debug:
+        #    ic(json_info)
         for term in banned_terms:
             if debug:
                 ic(term)
